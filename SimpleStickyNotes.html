@@ -164,7 +164,7 @@
             area.style.display = "none";
         });
         document.getElementById("importButton").addEventListener("click", () => {
-            clearAllStickyNote();
+            document.getElementById("clearButton").click();
             var text = document.getElementById("importText").value;
             var array = JSON.parse(text);
             array.forEach(obj => {
