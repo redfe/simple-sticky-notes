@@ -58,12 +58,11 @@
         .card-menu-button {
             display: none;
             position: absolute;
-            width: 15px;
-            height: 15px;
-            right: 0px;
-            top: 0px;
+            width: 20px;
+            height: 20px;
+            right: 2px;
+            top: 2px;
             margin: 0;
-            padding: 2px;
             border: none;
             cursor: pointer;
         }
@@ -149,6 +148,7 @@
             left: 0;
             height: 60px;
             background-color: white;
+            border-bottom: solid 1px rgb(200, 200, 200);
         }
 
         #menu input[type='number'] {
@@ -257,7 +257,7 @@
         };
 
         $(() => {
-            
+
             $(window).bind('beforeunload', function (e) {
                 return "<任意の文字列>";
             });
