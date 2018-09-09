@@ -4,9 +4,10 @@ very simple stikcy notes.
 
 ## Features
 
-- 3 colors sticky notes.
-- export to json file.
-- import from json text.
+- 6 colors sticky notes.
+- change color.
+- zoom in/out.
+- delete/return.
 
 ## Usage
 
