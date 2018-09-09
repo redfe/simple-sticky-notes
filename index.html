@@ -16,6 +16,30 @@
             margin: 0;
         }
 
+        #menu {
+            padding-top: 10px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            min-height: 50px;
+            padding-bottom: 10px;
+            background-color: white;
+            border-bottom: solid 1px rgb(200, 200, 200);
+        }
+
+        #menu input[type='number'] {
+            width: 70px;
+        }
+
+        #main {
+            padding: 0;
+            margin: 0 auto;
+        }
+
+        #card-menu-dialog .modal-body {
+            padding: 0;
+        }
+
         .card {
             font-size: 0.7em;
             width: 150px;
@@ -50,7 +74,7 @@
             position: relative;
             background-color: antiquewhite;
             width: 5000px;
-            height: 5000px;
+            height: 3000px;
             overflow: hidden;
             z-index: 0;
         }
@@ -141,29 +165,6 @@
 
         /* colors end */
 
-        #menu {
-            padding-top: 10px;
-            position: fixed;
-            top: 0;
-            left: 0;
-            height: 60px;
-            background-color: white;
-            border-bottom: solid 1px rgb(200, 200, 200);
-        }
-
-        #menu input[type='number'] {
-            width: 100px;
-        }
-
-        #main {
-            padding: 10px 0 0 0;
-            margin-top: 50px;
-        }
-
-        #card-menu-dialog .modal-body {
-            padding: 0;
-        }
-
     </style>
 </head>
 
@@ -175,8 +176,9 @@
 
     <div id="menu" class="container-fluid">
         <div class="row">
-            <div class="col-sm-3">
-                <select id="color-selection">
+            <div class="col-sm-4">
+                <div>Card</div>
+                <select id="color-selection" class="">
                     <option value="" selected>Choose...</option>
                     <option value="red">Red</option>
                     <option value="blue">Blue</option>
@@ -188,15 +190,19 @@
                 <button id="add-button" class="btn btn-primary btn-sml">add</button>
                 <button id="return-button" class="btn btn-primary btn-sml">return</button>
             </div>
-            <div class="col-sm-4 btn-group">
-                <button id="zoom-in-button" class="btn btn-secondary btn-sml">zoom in</button>
-                <button id="zoom-out-button" class="btn btn-secondary btn-sml">zoom out</button>
-                <button id="zoom-reset-button" class="btn btn-secondary btn-sml">zoom reset</button>
+            <div class="col-sm-3">
+                <div class="">Zoom</div>
+                <div class="btn-group">
+                    <button id="zoom-in-button" class="btn btn-secondary btn-sml">in</button>
+                    <button id="zoom-out-button" class="btn btn-secondary btn-sml">out</button>
+                    <button id="zoom-reset-button" class="btn btn-secondary btn-sml">reset</button>
+                </div>
             </div>
-            <div class="col-sm-5 form-row">
+            <div class="col-sm-5">
+                <div>Canvas size</div>
                 <input type="number" name="canvas-width" />
                 <input type="number" name="canvas-height" />
-                <button id="set-canvas-size-button" class="btn btn-success btn-sml">set canvas size</button>
+                <button id="set-canvas-size-button" class="btn btn-secondary btn-sml">set</button>
             </div>
         </div>
     </div>
@@ -285,13 +291,17 @@
             $("#set-canvas-size-button").parent().find("input[name='canvas-width']").val($("#canvas").width());
             $("#set-canvas-size-button").parent().find("input[name='canvas-height']").val($("#canvas").height());
 
-            // conrifm
+            // initialize margin of main.
+            adjustMainMarginTop();
+            $(window).on("resize", adjustMainMarginTop)
+
+            // setup conrifm
             $(window).on('beforeunload', function (event) {
                 console.log('beforeunload');
                 return 'jquery beforeunload';
             });
         });
-
+        
         function add() {
 
             let color = $("#color-selection").val();
@@ -359,12 +369,12 @@
         }
 
         function zoomIn() {
-            currentScale = currentScale + (currentScale *  scaleStep);
+            currentScale = currentScale + (currentScale * scaleStep);
             applyScale();
         }
 
         function zoomOut() {
-            currentScale = currentScale - (currentScale *  scaleStep);
+            currentScale = currentScale - (currentScale * scaleStep);
             applyScale();
         }
 
@@ -403,7 +413,10 @@
             let cardId = deletedCardIds.pop();
             $("#" + cardId).show("middle");
         }
-
+        
+        function adjustMainMarginTop() {
+            $("#main").css("margin-top", $("#menu").innerHeight());
+        }
     </script>
 </body>
 
