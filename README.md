@@ -12,3 +12,4 @@ very simple stikcy notes.
 ## Usage
 
 open `index.html` in your web browser.
+or access to https://redfe.github.io/simple-sticky-notes/.
