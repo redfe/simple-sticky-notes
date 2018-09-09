@@ -11,4 +11,4 @@ very simple stikcy notes.
 
 ## Usage
 
-open `SimpleStickyNotes.html` in your web browser.
+open `index.html` in your web browser.
