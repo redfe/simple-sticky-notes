@@ -308,7 +308,7 @@
             $("#zoom-reset-button").on("click", zoomReset);
             $("#set-canvas-size-button").on("click", setCanvasSize);
             $("#delete-card-link").on("click", deleteCard);
-            $("#canvas").selectable({filter: ".sticky-note"});
+            toSelectable($("#canvas"));
 
             $("#card-menu-dialog").on("hide.bs.modal", () => {
                 selectedCardId = null;
@@ -424,6 +424,13 @@
                 }
             });
         }
+
+        function toSelectable(canvas) {
+            $(canvas).selectable({
+                filter: ".sticky-note"
+            });
+        }
+
         function zoomIn() {
             currentScale = currentScale + (currentScale * scaleStep);
             applyScale();
@@ -453,16 +460,17 @@
         }
 
         function changeColor(color) {
-            let card = $("#" + selectedCardId);
+            let targets = $("#" + selectedCardId + ", .ui-selected");
             let colors = $("#card-menu-color-selection").find("option").each((i, v) => {
-                card.removeClass("color-" + $(v).val());
+                targets.removeClass("color-" + $(v).val());
             });
-            card.addClass("color-" + color);
+            targets.addClass("color-" + color);
         }
 
         function deleteCard() {
-            $("#" + selectedCardId).hide("middle");
-            deletedCardIds.push(selectedCardId);
+            $("#" + selectedCardId + ", .ui-selected").hide().each((i, deleted) => {
+                deletedCardIds.push($(deleted).attr("id"));
+            });
         }
 
         function returnCard() {
