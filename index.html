@@ -41,29 +41,38 @@
         }
 
         .card {
-            font-size: 0.7em;
-            width: 150px;
-            height: 100px;
+            font-size: 0.75em;
             position: absolute;
-            padding: 0;
+            width: 22em;
+            padding: 2em 1em 0em 1em;
             cursor: grab;
             box-shadow: 0px 5px 10px 0px rgba(0, 0, 0, 0.4);
             border: solid 1px;
         }
 
         .card-body {
-            padding: 20px 7px 7px 7px;
-            width: 100%;
-            height: 100%;
+            padding: 0;
         }
 
         .card-body textarea {
-            width: 100%;
-            height: 100%;
+            width: 20em;
+            height: 8em;
             margin: 0;
             padding: 0;
             border: none;
             resize: none;
+        }
+
+        .card-footer {
+            background-color: rgba(0,0,0,0);
+            border-top: none;
+            padding: 0;
+            overflow: hidden;
+            height: 1.5em;
+        }
+
+        .card-footer span {
+            padding: 0.4em;
         }
 
         .ui-draggable-dragging {
@@ -82,19 +91,22 @@
         .card-menu-button {
             display: none;
             position: absolute;
-            width: 20px;
-            height: 20px;
-            right: 2px;
-            top: 2px;
+            width: 1.5em;
+            height: 1.5em;
+            right: 0.25em;
+            top: 0.25em;
             margin: 0;
             border: none;
             cursor: pointer;
         }
 
+        .card-menu-button {
+            background-color: rgba(0,0,0,0);
+            background-repeat: no-repeat;
+        }
         /* colors */
 
         .color-red,
-        .color-red .card-menu-button,
         .color-red .card-body textarea {
             background-color: rgba(255, 200, 255, 1);
             border-color: rgba(200, 150, 200, 1);
@@ -105,7 +117,6 @@
         }
 
         .color-blue,
-        .color-blue .card-menu-button,
         .color-blue .card-body textarea {
             background-color: rgba(200, 200, 255, 1);
             border-color: rgba(150, 150, 200, 1);
@@ -116,7 +127,6 @@
         }
 
         .color-green,
-        .color-green .card-menu-button,
         .color-green .card-body textarea {
             background-color: rgba(200, 255, 200, 1);
             border-color: rgba(150, 200, 150, 1);
@@ -127,7 +137,6 @@
         }
 
         .color-yellow,
-        .color-yellow .card-menu-button,
         .color-yellow .card-body textarea {
             background-color: rgba(255, 255, 200, 1);
             border-color: rgba(200, 200, 150, 1);
@@ -138,7 +147,6 @@
         }
 
         .color-white,
-        .color-white .card-menu-button,
         .color-white .card-body textarea {
             background-color: rgba(255, 255, 255, 1);
             border-color: rgba(150, 150, 150, 1);
@@ -149,7 +157,6 @@
         }
 
         .color-transparent,
-        .color-transparent .card-menu-button,
         .color-transparent .card-body textarea {
             background-color: unset;
             border-color: rgba(0, 0, 0, 0.3);
@@ -296,7 +303,6 @@
 
             // setup conrifm
             $(window).on('beforeunload', function (event) {
-                console.log('beforeunload');
                 return 'jquery beforeunload';
             });
         });
@@ -312,6 +318,7 @@
             let cardBody = $("<div>")
             let textArea = $("<textarea>");
             let cardMenuButton = $("<button>");
+            let cardFooter = $("<div>");
 
             cardMenuButton.addClass("card-menu-button");
             cardMenuButton.on("click", () => {
@@ -322,22 +329,34 @@
             cardBody.addClass("card-body");
             cardBody.append(textArea);
 
+            cardFooter.addClass("card-footer");
+            cardFooter.append("<span>&nbsp</span>");
+
             card.append(cardMenuButton);
             card.append(cardBody);
+            card.append(cardFooter);
             card.attr("id", cardId);
             card.addClass("card");
             card.addClass("color-" + color);
 
             let scrollX = window.scrollX / currentScale;
             let scrollY = window.scrollY / currentScale;
-            card.css("top", scrollY + "px");
-            card.css("left", scrollX + "px");
-            card.css("z-index", $(".card").length + 1)
+            let zIndex = 0;
+            $(".card").each((i,e) => {
+                let index = $(e).css("z-index");
+                zIndex = zIndex < index ? index : zIndex;
+            });
+            card.css("top", scrollY + 30 + "px");
+            card.css("left", scrollX + 30 + "px");
+            card.css("z-index", zIndex + 1);
 
             card.on("mouseover", (e) => {
+                $(e.target).find(".card-menu-button").show();
                 $(e.target).parents(".card").find(".card-menu-button").show();
             });
+
             card.on("mouseout", (e) => {
+                $(e.target).find(".card-menu-button").hide();
                 $(e.target).parents(".card").find(".card-menu-button").hide();
             });
 
