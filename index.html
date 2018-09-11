@@ -63,16 +63,21 @@
             resize: none;
         }
 
-        .card-footer {
+        .sticky-note-footer {
             background-color: rgba(0,0,0,0);
             border-top: none;
             padding: 0;
             overflow: hidden;
             height: 1.5em;
+            color: rgba(0,0,0,0.3);
         }
 
-        .card-footer span {
-            padding: 0.4em;
+        .sticky-note-footer .row {
+            margin: 0;
+        }
+
+        .sticky-note-footer div div {
+            text-align: center;
         }
 
         .ui-draggable-dragging {
@@ -252,7 +257,13 @@
         <div class="card-body">
             <textarea></textarea>
         </div>
-        <div class="card-footer"></div>
+        <div class="sticky-note-footer container-fluid">
+            <div class="row">
+                <div class="col-sm-4">option1</div>
+                <div class="col-sm-4">option2</div>
+                <div class="col-sm-4">option3</div>
+            </div>
+        </div>
     </div>
 
     <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
