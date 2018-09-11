@@ -118,8 +118,8 @@
 
         .color-blue,
         .color-blue .card-body textarea {
-            background-color: rgba(200, 200, 255, 1);
-            border-color: rgba(150, 150, 200, 1);
+            background-color: rgba(150, 200, 255, 1);
+            border-color: rgba(100, 150, 200, 1);
         }
 
         .color-blue .card-menu-button {
@@ -187,11 +187,11 @@
                 <div>Card</div>
                 <select id="color-selection" class="">
                     <option value="" selected>Choose...</option>
-                    <option value="red">Red</option>
-                    <option value="blue">Blue</option>
-                    <option value="green">Green</option>
-                    <option value="yellow">Yellow</option>
-                    <option value="white">White</option>
+                    <option value="red" class="color-red">Red</option>
+                    <option value="blue" class="color-blud">Blue</option>
+                    <option value="green" class="color-green">Green</option>
+                    <option value="yellow" class="color-yellow">Yellow</option>
+                    <option value="white" class="color-white">White</option>
                     <option value="transparent">Transparent</option>
                 </select>
                 <button id="add-button" class="btn btn-primary btn-sml">add</button>
@@ -229,11 +229,11 @@
                             <label for="card-menu-color-selection">Color</label>
                             <select id="card-menu-color-selection">
                                 <option value="" selected>Choose...</option>
-                                <option value="red">Red</option>
-                                <option value="blue">Blue</option>
-                                <option value="green">Green</option>
-                                <option value="yellow">Yellow</option>
-                                <option value="white">White</option>
+                                <option value="red" class="color-red">Red</option>
+                                <option value="blue" class="color-blue">Blue</option>
+                                <option value="green" class="color-green">Green</option>
+                                <option value="yellow" class="color-yellow">Yellow</option>
+                                <option value="white" class="color-white">White</option>
                                 <option value="transparent">Transparent</option>
                             </select>
                         </div>
@@ -337,9 +337,9 @@
 
             let scrollX = window.scrollX / currentScale;
             let scrollY = window.scrollY / currentScale;
-            let zIndex = 0;
+            var zIndex = 0;
             $(".card").each((i,e) => {
-                let index = $(e).css("z-index");
+                let index = parseInt($(e).css("z-index"));
                 zIndex = zIndex < index ? index : zIndex;
             });
             card.css("top", scrollY + 30 + "px");
