@@ -247,6 +247,14 @@
         </div>
     </div>
 
+    <div id="card-template" class="d-none card sticky-note">
+        <button class="card-menu-button"></button>
+        <div class="card-body">
+            <textarea></textarea>
+        </div>
+        <div class="card-footer"></div>
+    </div>
+
     <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
         crossorigin="anonymous"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js" integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU="
@@ -314,28 +322,16 @@
                 color = "yellow";
             }
             let cardId = cuid();
-            let card = $("<div>");
-            let cardBody = $("<div>")
-            let textArea = $("<textarea>");
-            let cardMenuButton = $("<button>");
-            let cardFooter = $("<div>");
+            let card = $("#card-template").clone();
+            let cardMenuButton = card.find("button");
 
-            cardMenuButton.addClass("card-menu-button");
             cardMenuButton.on("click", () => {
                 selectedCardId = cardId;
                 $("#card-menu-dialog").modal();
             });
 
-            cardBody.addClass("card-body");
-            cardBody.append(textArea);
-
-            cardFooter.addClass("card-footer");
-            cardFooter.append("<span>&nbsp</span>");
-
-            card.append(cardMenuButton);
-            card.append(cardBody);
-            card.append(cardFooter);
             card.attr("id", cardId);
+            card.removeClass("d-none");
             card.addClass("card");
             card.addClass("color-" + color);
 
