@@ -11,6 +11,14 @@
         crossorigin="anonymous">
 
     <style>
+        #canvas .ui-selecting {
+            box-shadow: 0px 0px 10px 10px white;
+        }
+
+        #canvas .ui-selected {
+            box-shadow: 0px 0px 10px 10px white;
+        }
+
         body {
             padding: 0;
             margin: 0;
@@ -300,6 +308,7 @@
             $("#zoom-reset-button").on("click", zoomReset);
             $("#set-canvas-size-button").on("click", setCanvasSize);
             $("#delete-card-link").on("click", deleteCard);
+            $("#canvas").selectable({filter: ".sticky-note"});
 
             $("#card-menu-dialog").on("hide.bs.modal", () => {
                 selectedCardId = null;
@@ -322,10 +331,11 @@
 
             // setup conrifm
             $(window).on('beforeunload', function (event) {
+                console.log(".");
                 return 'jquery beforeunload';
             });
         });
-        
+
         function add() {
 
             let color = $("#color-selection").val();
@@ -349,7 +359,7 @@
             let scrollX = window.scrollX / currentScale;
             let scrollY = window.scrollY / currentScale;
             var zIndex = 0;
-            $(".card").each((i,e) => {
+            $(".card").each((i, e) => {
                 let index = parseInt($(e).css("z-index"));
                 zIndex = zIndex < index ? index : zIndex;
             });
@@ -369,13 +379,21 @@
 
             $("#canvas").append(card);
 
+            toDraggable(card);
+        }
+
+        function toDraggable(card) {
             // In the case of zoom-in / zoom-out, since the position of the drag shifts, it is necessary to adjust it.
             // see https://stackoverflow.com/questions/13882070/jquery-draggable-and-webkit-transform-scale
-            card.draggable({
-                stack: ".card",
+            $(card).draggable({
+                stack: ".sticky-note",
                 start: function (event) {
                     click.x = event.clientX;
                     click.y = event.clientY;
+                    $(".ui-selected").each((i, selected) => {
+                        selected.startX = parseInt($(selected).css("left"));
+                        selected.startY = parseInt($(selected).css("top"));
+                    });
                 },
                 drag: function (event, ui) {
                     // This is the parameter for scale()
@@ -389,10 +407,23 @@
                         top: (event.clientY - click.y + original.top) / zoom
                     };
 
+                    let moveX = original.left - ui.position.left;
+                    let moveY = original.top - ui.position.top;
+
+                    if (!$(event.target).hasClass("ui-selected")) {
+                        return;
+                    }
+
+                    $(".ui-selected").each((i, selected) => {
+                        if (!$(event.target) == selected) {
+                            return;
+                        }
+                        $(selected).css("left", (selected.startX - moveX) + "px");
+                        $(selected).css("top", (selected.startY - moveY) + "px");
+                    });
                 }
             });
         }
-
         function zoomIn() {
             currentScale = currentScale + (currentScale * scaleStep);
             applyScale();
@@ -438,7 +469,7 @@
             let cardId = deletedCardIds.pop();
             $("#" + cardId).show("middle");
         }
-        
+
         function adjustMainMarginTop() {
             $("#main").css("margin-top", $("#menu").innerHeight());
         }
