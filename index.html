@@ -460,7 +460,7 @@
         }
 
         function changeColor(color) {
-            let targets = $("#" + selectedCardId + ", .ui-selected");
+            let targets = getEditTargets();
             let colors = $("#card-menu-color-selection").find("option").each((i, v) => {
                 targets.removeClass("color-" + $(v).val());
             });
@@ -468,9 +468,18 @@
         }
 
         function deleteCard() {
-            $("#" + selectedCardId + ", .ui-selected").hide().each((i, deleted) => {
+            let targets = getEditTargets();
+            $(targets).hide().each((i, deleted) => {
                 deletedCardIds.push($(deleted).attr("id"));
             });
+        }
+
+        function getEditTargets() {
+            if ($("#" + selectedCardId +".ui-selected").length == 1) {
+                return $(".ui-selected");
+            } else {
+                return $("#" + selectedCardId);
+            }
         }
 
         function returnCard() {
