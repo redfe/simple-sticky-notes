@@ -267,9 +267,9 @@
         </div>
         <div class="sticky-note-footer container-fluid">
             <div class="row">
-                <div class="col-sm-4">option1</div>
-                <div class="col-sm-4">option2</div>
-                <div class="col-sm-4">option3</div>
+                <div class="col-sm-4"></div>
+                <div class="col-sm-4"></div>
+                <div class="col-sm-4"></div>
             </div>
         </div>
     </div>
@@ -391,8 +391,8 @@
                     click.x = event.clientX;
                     click.y = event.clientY;
                     $(".ui-selected").each((i, selected) => {
-                        selected.startX = parseInt($(selected).css("left"));
-                        selected.startY = parseInt($(selected).css("top"));
+                        $(selected).attr("startX", parseInt($(selected).css("left")));
+                        $(selected).attr("startY", parseInt($(selected).css("top")));
                     });
                 },
                 drag: function (event, ui) {
@@ -407,19 +407,19 @@
                         top: (event.clientY - click.y + original.top) / zoom
                     };
 
-                    let moveX = original.left - ui.position.left;
-                    let moveY = original.top - ui.position.top;
-
                     if (!$(event.target).hasClass("ui-selected")) {
                         return;
                     }
+
+                    let moveX = original.left/zoom - ui.position.left;
+                    let moveY = original.top /zoom- ui.position.top;
 
                     $(".ui-selected").each((i, selected) => {
                         if (!$(event.target) == selected) {
                             return;
                         }
-                        $(selected).css("left", (selected.startX - moveX) + "px");
-                        $(selected).css("top", (selected.startY - moveY) + "px");
+                        $(selected).css("left", ($(selected).attr("startX") - moveX) + "px");
+                        $(selected).css("top", ($(selected).attr("startY") - moveY) + "px");
                     });
                 }
             });
@@ -460,7 +460,7 @@
         }
 
         function changeColor(color) {
-            let targets = $("#" + selectedCardId + ", .ui-selected");
+            let targets = getEditTargets();
             let colors = $("#card-menu-color-selection").find("option").each((i, v) => {
                 targets.removeClass("color-" + $(v).val());
             });
@@ -468,9 +468,19 @@
         }
 
         function deleteCard() {
-            $("#" + selectedCardId + ", .ui-selected").hide().each((i, deleted) => {
+            let targets = getEditTargets();
+            $(targets).hide().each((i, deleted) => {
+                $(deleted).removeClass("ui-selected");
                 deletedCardIds.push($(deleted).attr("id"));
             });
+        }
+
+        function getEditTargets() {
+            if ($("#" + selectedCardId +".ui-selected").length == 1) {
+                return $(".ui-selected");
+            } else {
+                return $("#" + selectedCardId);
+            }
         }
 
         function returnCard() {
