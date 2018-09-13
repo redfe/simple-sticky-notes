@@ -391,8 +391,8 @@
                     click.x = event.clientX;
                     click.y = event.clientY;
                     $(".ui-selected").each((i, selected) => {
-                        selected.startX = parseInt($(selected).css("left"));
-                        selected.startY = parseInt($(selected).css("top"));
+                        $(selected).attr("startX", parseInt($(selected).css("left")));
+                        $(selected).attr("startY", parseInt($(selected).css("top")));
                     });
                 },
                 drag: function (event, ui) {
@@ -407,19 +407,19 @@
                         top: (event.clientY - click.y + original.top) / zoom
                     };
 
-                    let moveX = original.left - ui.position.left;
-                    let moveY = original.top - ui.position.top;
-
                     if (!$(event.target).hasClass("ui-selected")) {
                         return;
                     }
+
+                    let moveX = original.left/zoom - ui.position.left;
+                    let moveY = original.top /zoom- ui.position.top;
 
                     $(".ui-selected").each((i, selected) => {
                         if (!$(event.target) == selected) {
                             return;
                         }
-                        $(selected).css("left", (selected.startX - moveX) + "px");
-                        $(selected).css("top", (selected.startY - moveY) + "px");
+                        $(selected).css("left", ($(selected).attr("startX") - moveX) + "px");
+                        $(selected).css("top", ($(selected).attr("startY") - moveY) + "px");
                     });
                 }
             });
