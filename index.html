@@ -11,6 +11,14 @@
         crossorigin="anonymous">
 
     <style>
+        #canvas .ui-selecting {
+            box-shadow: 0px 0px 10px 10px white;
+        }
+
+        #canvas .ui-selected {
+            box-shadow: 0px 0px 10px 10px white;
+        }
+
         body {
             padding: 0;
             margin: 0;
@@ -41,29 +49,43 @@
         }
 
         .card {
-            font-size: 0.7em;
-            width: 150px;
-            height: 100px;
+            font-size: 0.75em;
             position: absolute;
-            padding: 0;
+            width: 22em;
+            padding: 2em 1em 0em 1em;
             cursor: grab;
             box-shadow: 0px 5px 10px 0px rgba(0, 0, 0, 0.4);
             border: solid 1px;
         }
 
         .card-body {
-            padding: 20px 7px 7px 7px;
-            width: 100%;
-            height: 100%;
+            padding: 0;
         }
 
         .card-body textarea {
-            width: 100%;
-            height: 100%;
+            width: 20em;
+            height: 8em;
             margin: 0;
             padding: 0;
             border: none;
             resize: none;
+        }
+
+        .sticky-note-footer {
+            background-color: rgba(0,0,0,0);
+            border-top: none;
+            padding: 0;
+            overflow: hidden;
+            height: 1.5em;
+            color: rgba(0,0,0,0.3);
+        }
+
+        .sticky-note-footer .row {
+            margin: 0;
+        }
+
+        .sticky-note-footer div div {
+            text-align: center;
         }
 
         .ui-draggable-dragging {
@@ -82,19 +104,22 @@
         .card-menu-button {
             display: none;
             position: absolute;
-            width: 20px;
-            height: 20px;
-            right: 2px;
-            top: 2px;
+            width: 1.5em;
+            height: 1.5em;
+            right: 0.25em;
+            top: 0.25em;
             margin: 0;
             border: none;
             cursor: pointer;
         }
 
+        .card-menu-button {
+            background-color: rgba(0,0,0,0);
+            background-repeat: no-repeat;
+        }
         /* colors */
 
         .color-red,
-        .color-red .card-menu-button,
         .color-red .card-body textarea {
             background-color: rgba(255, 200, 255, 1);
             border-color: rgba(200, 150, 200, 1);
@@ -105,10 +130,9 @@
         }
 
         .color-blue,
-        .color-blue .card-menu-button,
         .color-blue .card-body textarea {
-            background-color: rgba(200, 200, 255, 1);
-            border-color: rgba(150, 150, 200, 1);
+            background-color: rgba(150, 200, 255, 1);
+            border-color: rgba(100, 150, 200, 1);
         }
 
         .color-blue .card-menu-button {
@@ -116,7 +140,6 @@
         }
 
         .color-green,
-        .color-green .card-menu-button,
         .color-green .card-body textarea {
             background-color: rgba(200, 255, 200, 1);
             border-color: rgba(150, 200, 150, 1);
@@ -127,7 +150,6 @@
         }
 
         .color-yellow,
-        .color-yellow .card-menu-button,
         .color-yellow .card-body textarea {
             background-color: rgba(255, 255, 200, 1);
             border-color: rgba(200, 200, 150, 1);
@@ -138,7 +160,6 @@
         }
 
         .color-white,
-        .color-white .card-menu-button,
         .color-white .card-body textarea {
             background-color: rgba(255, 255, 255, 1);
             border-color: rgba(150, 150, 150, 1);
@@ -149,7 +170,6 @@
         }
 
         .color-transparent,
-        .color-transparent .card-menu-button,
         .color-transparent .card-body textarea {
             background-color: unset;
             border-color: rgba(0, 0, 0, 0.3);
@@ -180,11 +200,11 @@
                 <div>Card</div>
                 <select id="color-selection" class="">
                     <option value="" selected>Choose...</option>
-                    <option value="red">Red</option>
-                    <option value="blue">Blue</option>
-                    <option value="green">Green</option>
-                    <option value="yellow">Yellow</option>
-                    <option value="white">White</option>
+                    <option value="red" class="color-red">Red</option>
+                    <option value="blue" class="color-blud">Blue</option>
+                    <option value="green" class="color-green">Green</option>
+                    <option value="yellow" class="color-yellow">Yellow</option>
+                    <option value="white" class="color-white">White</option>
                     <option value="transparent">Transparent</option>
                 </select>
                 <button id="add-button" class="btn btn-primary btn-sml">add</button>
@@ -222,11 +242,11 @@
                             <label for="card-menu-color-selection">Color</label>
                             <select id="card-menu-color-selection">
                                 <option value="" selected>Choose...</option>
-                                <option value="red">Red</option>
-                                <option value="blue">Blue</option>
-                                <option value="green">Green</option>
-                                <option value="yellow">Yellow</option>
-                                <option value="white">White</option>
+                                <option value="red" class="color-red">Red</option>
+                                <option value="blue" class="color-blue">Blue</option>
+                                <option value="green" class="color-green">Green</option>
+                                <option value="yellow" class="color-yellow">Yellow</option>
+                                <option value="white" class="color-white">White</option>
                                 <option value="transparent">Transparent</option>
                             </select>
                         </div>
@@ -236,6 +256,20 @@
                 </div>
                 <div class="modal-footer">
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="card-template" class="d-none card sticky-note">
+        <button class="card-menu-button"></button>
+        <div class="card-body">
+            <textarea></textarea>
+        </div>
+        <div class="sticky-note-footer container-fluid">
+            <div class="row">
+                <div class="col-sm-4">option1</div>
+                <div class="col-sm-4">option2</div>
+                <div class="col-sm-4">option3</div>
             </div>
         </div>
     </div>
@@ -274,6 +308,7 @@
             $("#zoom-reset-button").on("click", zoomReset);
             $("#set-canvas-size-button").on("click", setCanvasSize);
             $("#delete-card-link").on("click", deleteCard);
+            toSelectable($("#canvas"));
 
             $("#card-menu-dialog").on("hide.bs.modal", () => {
                 selectedCardId = null;
@@ -296,11 +331,11 @@
 
             // setup conrifm
             $(window).on('beforeunload', function (event) {
-                console.log('beforeunload');
+                console.log(".");
                 return 'jquery beforeunload';
             });
         });
-        
+
         function add() {
 
             let color = $("#color-selection").val();
@@ -308,48 +343,57 @@
                 color = "yellow";
             }
             let cardId = cuid();
-            let card = $("<div>");
-            let cardBody = $("<div>")
-            let textArea = $("<textarea>");
-            let cardMenuButton = $("<button>");
+            let card = $("#card-template").clone();
+            let cardMenuButton = card.find("button");
 
-            cardMenuButton.addClass("card-menu-button");
             cardMenuButton.on("click", () => {
                 selectedCardId = cardId;
                 $("#card-menu-dialog").modal();
             });
 
-            cardBody.addClass("card-body");
-            cardBody.append(textArea);
-
-            card.append(cardMenuButton);
-            card.append(cardBody);
             card.attr("id", cardId);
+            card.removeClass("d-none");
             card.addClass("card");
             card.addClass("color-" + color);
 
             let scrollX = window.scrollX / currentScale;
             let scrollY = window.scrollY / currentScale;
-            card.css("top", scrollY + "px");
-            card.css("left", scrollX + "px");
-            card.css("z-index", $(".card").length + 1)
+            var zIndex = 0;
+            $(".card").each((i, e) => {
+                let index = parseInt($(e).css("z-index"));
+                zIndex = zIndex < index ? index : zIndex;
+            });
+            card.css("top", scrollY + 30 + "px");
+            card.css("left", scrollX + 30 + "px");
+            card.css("z-index", zIndex + 1);
 
             card.on("mouseover", (e) => {
+                $(e.target).find(".card-menu-button").show();
                 $(e.target).parents(".card").find(".card-menu-button").show();
             });
+
             card.on("mouseout", (e) => {
+                $(e.target).find(".card-menu-button").hide();
                 $(e.target).parents(".card").find(".card-menu-button").hide();
             });
 
             $("#canvas").append(card);
 
+            toDraggable(card);
+        }
+
+        function toDraggable(card) {
             // In the case of zoom-in / zoom-out, since the position of the drag shifts, it is necessary to adjust it.
             // see https://stackoverflow.com/questions/13882070/jquery-draggable-and-webkit-transform-scale
-            card.draggable({
-                stack: ".card",
+            $(card).draggable({
+                stack: ".sticky-note",
                 start: function (event) {
                     click.x = event.clientX;
                     click.y = event.clientY;
+                    $(".ui-selected").each((i, selected) => {
+                        selected.startX = parseInt($(selected).css("left"));
+                        selected.startY = parseInt($(selected).css("top"));
+                    });
                 },
                 drag: function (event, ui) {
                     // This is the parameter for scale()
@@ -363,7 +407,27 @@
                         top: (event.clientY - click.y + original.top) / zoom
                     };
 
+                    let moveX = original.left - ui.position.left;
+                    let moveY = original.top - ui.position.top;
+
+                    if (!$(event.target).hasClass("ui-selected")) {
+                        return;
+                    }
+
+                    $(".ui-selected").each((i, selected) => {
+                        if (!$(event.target) == selected) {
+                            return;
+                        }
+                        $(selected).css("left", (selected.startX - moveX) + "px");
+                        $(selected).css("top", (selected.startY - moveY) + "px");
+                    });
                 }
+            });
+        }
+
+        function toSelectable(canvas) {
+            $(canvas).selectable({
+                filter: ".sticky-note"
             });
         }
 
@@ -396,23 +460,24 @@
         }
 
         function changeColor(color) {
-            let card = $("#" + selectedCardId);
+            let targets = $("#" + selectedCardId + ", .ui-selected");
             let colors = $("#card-menu-color-selection").find("option").each((i, v) => {
-                card.removeClass("color-" + $(v).val());
+                targets.removeClass("color-" + $(v).val());
             });
-            card.addClass("color-" + color);
+            targets.addClass("color-" + color);
         }
 
         function deleteCard() {
-            $("#" + selectedCardId).hide("middle");
-            deletedCardIds.push(selectedCardId);
+            $("#" + selectedCardId + ", .ui-selected").hide().each((i, deleted) => {
+                deletedCardIds.push($(deleted).attr("id"));
+            });
         }
 
         function returnCard() {
             let cardId = deletedCardIds.pop();
             $("#" + cardId).show("middle");
         }
-        
+
         function adjustMainMarginTop() {
             $("#main").css("margin-top", $("#menu").innerHeight());
         }
