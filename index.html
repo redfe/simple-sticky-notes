@@ -117,6 +117,12 @@
             background-color: rgba(0,0,0,0);
             background-repeat: no-repeat;
         }
+
+        .tooltip div {
+            font-size: 1em;
+            opacity: 0.8;
+        }
+
         /* colors */
 
         .color-red,
@@ -261,7 +267,7 @@
         </div>
     </div>
 
-    <div id="card-template" class="d-none card sticky-note">
+    <div id="card-template" class="d-none card sticky-note" data-toggle="tooltip" data-placement="top">
         <button class="card-menu-button"></button>
         <div class="card-body">
             <textarea></textarea>
@@ -297,6 +303,7 @@
         };
 
         $(() => {
+            $('[data-toggle="tooltip"]').tooltip();
             $("#add-button").on("click", add);
             $("#return-button").on("click", returnCard);
             $("#zoom-in-button").on("click", zoomIn);
@@ -373,6 +380,11 @@
             card.on("mouseout", (e) => {
                 $(e.target).find(".card-menu-button").hide();
                 $(e.target).parents(".card").find(".card-menu-button").hide();
+            });
+
+            $(card).find("textarea").on("change", (e) => {
+                $(e.target).parents(".card").tooltip("dispose");
+                $(e.target).parents(".card").tooltip({title:$(e.target).val()});
             });
 
             $("#canvas").append(card);
