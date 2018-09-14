@@ -411,8 +411,8 @@
                         return;
                     }
 
-                    let moveX = original.left/zoom - ui.position.left;
-                    let moveY = original.top /zoom- ui.position.top;
+                    let moveX = original.left / zoom - ui.position.left;
+                    let moveY = original.top / zoom - ui.position.top;
 
                     $(".ui-selected").each((i, selected) => {
                         if (!$(event.target) == selected) {
@@ -469,14 +469,16 @@
 
         function deleteCard() {
             let targets = getEditTargets();
-            $(targets).hide().each((i, deleted) => {
-                $(deleted).removeClass("ui-selected");
-                deletedCardIds.push($(deleted).attr("id"));
+            $(targets).hide({
+                done: (target) => {
+                    $(target.elem).removeClass("ui-selected");
+                    deletedCardIds.push($(target.elem).attr("id"));
+                }
             });
         }
 
         function getEditTargets() {
-            if ($("#" + selectedCardId +".ui-selected").length == 1) {
+            if ($("#" + selectedCardId + ".ui-selected").length == 1) {
                 return $(".ui-selected");
             } else {
                 return $("#" + selectedCardId);
