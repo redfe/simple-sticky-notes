@@ -117,6 +117,12 @@
             background-color: rgba(0,0,0,0);
             background-repeat: no-repeat;
         }
+
+        .tooltip div {
+            font-size: 1em;
+            opacity: 0.8;
+        }
+
         /* colors */
 
         .color-red,
@@ -201,7 +207,7 @@
                 <select id="color-selection" class="">
                     <option value="" selected>Choose...</option>
                     <option value="red" class="color-red">Red</option>
-                    <option value="blue" class="color-blud">Blue</option>
+                    <option value="blue" class="color-blue">Blue</option>
                     <option value="green" class="color-green">Green</option>
                     <option value="yellow" class="color-yellow">Yellow</option>
                     <option value="white" class="color-white">White</option>
@@ -215,6 +221,7 @@
                 <div class="btn-group">
                     <button id="zoom-in-button" class="btn btn-secondary btn-sml">in</button>
                     <button id="zoom-out-button" class="btn btn-secondary btn-sml">out</button>
+                    <button id="zoom-fit-button" class="btn btn-secondary btn-sml">fit</button>
                     <button id="zoom-reset-button" class="btn btn-secondary btn-sml">reset</button>
                 </div>
             </div>
@@ -260,7 +267,7 @@
         </div>
     </div>
 
-    <div id="card-template" class="d-none card sticky-note">
+    <div id="card-template" class="d-none card sticky-note" data-toggle="tooltip" data-placement="top">
         <button class="card-menu-button"></button>
         <div class="card-body">
             <textarea></textarea>
@@ -296,15 +303,12 @@
         };
 
         $(() => {
-
-            $(window).bind('beforeunload', function (e) {
-                return "<任意の文字列>";
-            });
-
+            $('[data-toggle="tooltip"]').tooltip();
             $("#add-button").on("click", add);
             $("#return-button").on("click", returnCard);
             $("#zoom-in-button").on("click", zoomIn);
             $("#zoom-out-button").on("click", zoomOut);
+            $("#zoom-fit-button").on("click", zoomFitWidth);
             $("#zoom-reset-button").on("click", zoomReset);
             $("#set-canvas-size-button").on("click", setCanvasSize);
             $("#delete-card-link").on("click", deleteCard);
@@ -327,7 +331,8 @@
 
             // initialize margin of main.
             adjustMainMarginTop();
-            $(window).on("resize", adjustMainMarginTop)
+            $(window).on("resize", adjustMainMarginTop);
+            $(window).on("resize", zoomFitWidth);
 
             // setup conrifm
             $(window).on('beforeunload', function (event) {
@@ -377,6 +382,11 @@
                 $(e.target).parents(".card").find(".card-menu-button").hide();
             });
 
+            $(card).find("textarea").on("change", (e) => {
+                $(e.target).parents(".card").tooltip("dispose");
+                $(e.target).parents(".card").tooltip({title:$(e.target).val()});
+            });
+
             $("#canvas").append(card);
 
             toDraggable(card);
@@ -411,8 +421,8 @@
                         return;
                     }
 
-                    let moveX = original.left/zoom - ui.position.left;
-                    let moveY = original.top /zoom- ui.position.top;
+                    let moveX = original.left / zoom - ui.position.left;
+                    let moveY = original.top / zoom - ui.position.top;
 
                     $(".ui-selected").each((i, selected) => {
                         if (!$(event.target) == selected) {
@@ -441,6 +451,11 @@
             applyScale();
         }
 
+        function zoomFitWidth() {
+            currentScale = window.innerWidth / $("#canvas").width();
+            scrollTo(0, 0);
+            applyScale();
+        }
         function zoomReset() {
             currentScale = 1;
             applyScale();
@@ -469,14 +484,16 @@
 
         function deleteCard() {
             let targets = getEditTargets();
-            $(targets).hide().each((i, deleted) => {
-                $(deleted).removeClass("ui-selected");
-                deletedCardIds.push($(deleted).attr("id"));
+            $(targets).hide({
+                done: (target) => {
+                    $(target.elem).removeClass("ui-selected");
+                    deletedCardIds.push($(target.elem).attr("id"));
+                }
             });
         }
 
         function getEditTargets() {
-            if ($("#" + selectedCardId +".ui-selected").length == 1) {
+            if ($("#" + selectedCardId + ".ui-selected").length == 1) {
                 return $(".ui-selected");
             } else {
                 return $("#" + selectedCardId);
