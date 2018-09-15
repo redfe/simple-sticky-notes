@@ -42,6 +42,7 @@
         #main {
             padding: 0;
             margin: 0 auto;
+            height: 0;
         }
 
         #card-menu-dialog .modal-body {
@@ -94,7 +95,7 @@
 
         #canvas {
             position: relative;
-            background-color: antiquewhite;
+            background: linear-gradient(135deg, antiquewhite, darksalmon);
             width: 5000px;
             height: 3000px;
             overflow: hidden;
@@ -462,10 +463,25 @@
         }
 
         function applyScale() {
-            let translatePercent = - ((scaleStep * 100 / 2) * ((1 - currentScale) / scaleStep));
-            let translateX = translatePercent + "%";
-            let translateY = translatePercent + "%";
-            $("#canvas").css("transform", "translateX(" + translateX + ") translateY(" + translateY + ") scale(" + currentScale + ")");
+            let translatePercent = (1 - currentScale) * 100 / 2;
+            let translateX = - translatePercent + "%";
+            let translateY = - translatePercent + "%";
+            if ($(".ui-selected").length == 0) {
+                let scrollLeft = $(window).scrollLeft();
+                let scrollTop = $(window).scrollTop();
+                let beforeDocumentWidth = $(document).width();
+                let beforeDocumentHeight = $(document).height();
+                $("#canvas").css("transform", "translateX(" + translateX + ") translateY(" + translateY + ") scale(" + currentScale + ")");
+                $(window).scrollLeft($(document).width() * (scrollLeft / beforeDocumentWidth));
+                $(window).scrollTop(($(document).height()) * (scrollTop / beforeDocumentHeight));
+            } else {
+                let selecteds = $(".sticky-note.ui-selected");
+                var mostLeft = Math.min.apply(null, $.map(selecteds, x => parseInt($(x).css("left"))));
+                var mostTop = Math.min.apply(null, $.map(selecteds, x => parseInt($(x).css("top"))));
+                $("#canvas").css("transform", "translateX(" + translateX + ") translateY(" + translateY + ") scale(" + currentScale + ")");
+                $(window).scrollLeft(mostLeft * currentScale - 30);
+                $(window).scrollTop(mostTop * currentScale - 30);
+            }
         }
 
         function setCanvasSize() {
@@ -506,7 +522,7 @@
         }
 
         function adjustMainMarginTop() {
-            $("#main").css("margin-top", $("#menu").innerHeight());
+            $("#canvas").css("margin-top", $("#menu").innerHeight());
         }
     </script>
 </body>
