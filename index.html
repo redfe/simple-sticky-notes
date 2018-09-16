@@ -412,6 +412,8 @@
                         $(selected).attr("startX", parseInt($(selected).css("left")));
                         $(selected).attr("startY", parseInt($(selected).css("top")));
                     });
+                    // dispose tooltip.
+                    $(event.target).tooltip("dispose");
                 },
                 drag: function (event, ui) {
                     // This is the parameter for scale()
@@ -440,6 +442,10 @@
                         $(selected).css("left", ($(selected).attr("startX") - moveX) + "px");
                         $(selected).css("top", ($(selected).attr("startY") - moveY) + "px");
                     });
+                },
+                stop : function(event) {
+                    // enable tooltip.
+                    $(event.target).tooltip({title:$(event.target).find("textarea").val()});
                 }
             });
         }
