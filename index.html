@@ -388,7 +388,7 @@
                 $(e.target).parents(".sticky-note").tooltip("dispose");
                 $(e.target).parents(".sticky-note").tooltip({title:$(e.target).val()});
             })
-            $(card).on("keyup", (e) => {
+            .on("keyup", (e) => {
                 // escape key.
                 if (e.keyCode == 27) {
                     e.target.blur();
