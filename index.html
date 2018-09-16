@@ -425,6 +425,7 @@
                     let moveX = original.left / zoom - ui.position.left;
                     let moveY = original.top / zoom - ui.position.top;
 
+                    // move selected cards.
                     $(".ui-selected").each((i, selected) => {
                         if (!$(event.target) == selected) {
                             return;
@@ -463,24 +464,25 @@
         }
 
         function applyScale() {
-            let translatePercent = (1 - currentScale) * 100 / 2;
-            let translateX = - translatePercent + "%";
-            let translateY = - translatePercent + "%";
             if ($(".ui-selected").length == 0) {
                 let scrollLeft = $(window).scrollLeft();
                 let scrollTop = $(window).scrollTop();
                 let beforeDocumentWidth = $(document).width();
                 let beforeDocumentHeight = $(document).height();
-                $("#canvas").css("transform", "translateX(" + translateX + ") translateY(" + translateY + ") scale(" + currentScale + ")");
+                $("#canvas")
+                    .css("transform", "scale(" + currentScale + ")")
+                    .css("transform-origin", "left top");
                 $(window).scrollLeft($(document).width() * (scrollLeft / beforeDocumentWidth));
                 $(window).scrollTop(($(document).height()) * (scrollTop / beforeDocumentHeight));
             } else {
                 let selecteds = $(".sticky-note.ui-selected");
                 var mostLeft = Math.min.apply(null, $.map(selecteds, x => parseInt($(x).css("left"))));
                 var mostTop = Math.min.apply(null, $.map(selecteds, x => parseInt($(x).css("top"))));
-                $("#canvas").css("transform", "translateX(" + translateX + ") translateY(" + translateY + ") scale(" + currentScale + ")");
-                $(window).scrollLeft(mostLeft * currentScale - 30);
-                $(window).scrollTop(mostTop * currentScale - 30);
+                $("#canvas")
+                    .css("transform", "scale(" + currentScale + ")")
+                     .css("transform-origin", "left top");;
+                $(window).scrollLeft(mostLeft * currentScale - (30 * currentScale));
+                $(window).scrollTop(mostTop * currentScale - (30 * currentScale));
             }
         }
 
