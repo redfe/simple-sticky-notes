@@ -334,7 +334,7 @@
             // initialize margin of main.
             adjustMainMarginTop();
             $(window).on("resize", adjustMainMarginTop);
-            $(window).on("resize", zoomFitWidth);
+            $(window).on("resize", applyScale);
 
             // setup conrifm
             $(window).on('beforeunload', function (event) {
