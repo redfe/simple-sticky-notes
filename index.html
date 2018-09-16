@@ -53,7 +53,6 @@
         .card {
             font-size: 0.75em;
             position: absolute;
-            width: 22em;
             padding: 2em 1em 0em 1em;
             cursor: grab;
             box-shadow: 0px 5px 10px 0px rgba(0, 0, 0, 0.4);
@@ -65,8 +64,8 @@
         }
 
         .card-body textarea {
-            width: 20em;
-            height: 8em;
+            width: 14em;
+            height: 5.3em;
             margin: 0;
             padding: 0;
             border: none;
@@ -74,6 +73,7 @@
         }
 
         .sticky-note-footer {
+            font-size: 0.75em;
             background-color: rgba(0,0,0,0);
             border-top: none;
             padding: 0;
@@ -305,6 +305,7 @@
         };
 
         $(() => {
+            $('[data-toggle="tooltip"]').tooltip();
             $("#add-button").on("click", add);
             $("#return-button").on("click", returnCard);
             $("#zoom-in-button").on("click", zoomIn);
@@ -384,8 +385,8 @@
             });
 
             $(card).find("textarea").on("change", (e) => {
-                $(e.target).parents(".card").tooltip("dispose");
-                $(e.target).parents(".card").tooltip({title:$(e.target).val()});
+                $(e.target).parents(".sticky-note").tooltip("dispose");
+                $(e.target).parents(".sticky-note").tooltip({title:$(e.target).val()});
             });
 
             $("#canvas").append(card);
