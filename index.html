@@ -53,7 +53,7 @@
         .card {
             font-size: 0.75em;
             position: absolute;
-            padding: 2em 1em 0em 1em;
+            padding: 1em 1em 0em 1em;
             cursor: grab;
             box-shadow: 0px 5px 10px 0px rgba(0, 0, 0, 0.4);
             border: solid 1px;
@@ -65,7 +65,7 @@
 
         .card-body textarea {
             width: 14em;
-            height: 5.3em;
+            height: 6em;
             margin: 0;
             padding: 0;
             border: none;
@@ -415,8 +415,8 @@
             let sourceTop = parseFloat($(target).css("top"));
             let colorClass = findFirstClass(target, (className) => className.startsWith("color-"));
             changeColor(added, colorClass ? colorClass.substring(6) : "color-yellow");
-            added.css("left", sourceLeft + 30 + "px");
-            added.css("top", sourceTop + 30 + "px");
+            added.css("left", sourceLeft + 5 + "px");
+            added.css("top", sourceTop + 5 + "px");
         }
 
         function findFirstClass(target, filterFunction) {
