@@ -513,7 +513,10 @@
 
         function toSelectable(canvas) {
             $(canvas).selectable({
-                filter: ".sticky-note"
+                filter: ".sticky-note",
+                start: (e, ui) => {
+                    $(".sticky-note textarea").blur();
+                }
             });
         }
 
