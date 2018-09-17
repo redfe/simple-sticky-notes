@@ -351,11 +351,43 @@
             }
             let cardId = cuid();
             let card = $("#card-template").clone();
-            let cardMenuButton = card.find("button");
+            let cardMenuButton = $(card).find("button");
+            let cardTextarea = $(card).find("textarea");
 
-            cardMenuButton.on("click", () => {
+            cardMenuButton.on("click", (e) => {
                 selectedCardId = cardId;
                 $("#card-menu-dialog").modal();
+            });
+
+            $(cardTextarea).on("change", (e) => {
+                $(card).tooltip("dispose");
+                $(card).tooltip({ title: $(e.target).val() });
+            });
+
+            $(cardTextarea).on("keyup", (e) => {
+                // escape key.
+                if (e.keyCode == 27) {
+                    cardTextarea.blur();
+                }
+            });
+
+            $(cardTextarea).on("focus", (e) => {
+                // auto expand.
+                if (1 <= currentScale) {
+                    return;
+                }
+                $(card)
+                    .css("transform-origin", "left top")
+                    .css("transform", "scale(" + (1 / currentScale) + ")");
+            });
+
+            $(cardTextarea).on("blur", (e) => {
+                // return expand.
+                setTimeout(() => {
+                    $(card)
+                        .css("transform-origin", "none")
+                        .css("transform", "none");
+                }, 500);//for car menu button.
             });
 
             card.attr("id", cardId);
@@ -365,40 +397,26 @@
 
             let scrollX = window.scrollX / currentScale;
             let scrollY = window.scrollY / currentScale;
-            var zIndex = 0;
-            $(".card").each((i, e) => {
-                let index = parseInt($(e).css("z-index"));
-                zIndex = zIndex < index ? index : zIndex;
-            });
+
             card.css("top", scrollY + 30 + "px");
             card.css("left", scrollX + 30 + "px");
-            card.css("z-index", zIndex + 1);
+            toFrontMostCard(card);
 
             card.on("mouseover", (e) => {
-                $(e.target).find(".card-menu-button").show();
-                $(e.target).parents(".card").find(".card-menu-button").show();
+                $(card).find(".card-menu-button").show();
             });
 
             card.on("mouseout", (e) => {
-                $(e.target).find(".card-menu-button").hide();
-                $(e.target).parents(".card").find(".card-menu-button").hide();
+                $(card).find(".card-menu-button").hide();
             });
 
-            $(card).find("textarea").on("change", (e) => {
-                $(e.target).parents(".sticky-note").tooltip("dispose");
-                $(e.target).parents(".sticky-note").tooltip({title:$(e.target).val()});
-            })
-            .on("keyup", (e) => {
-                // escape key.
-                if (e.keyCode == 27) {
-                    e.target.blur();
-                }
+            card.on("mousedown", (e) => {
+                toFrontMostCard($(card));
             });
 
             // add from this card on double clik .
             $(card).on("dblclick", (e) => {
-                let target = $(e.target).attr("id") ? $(e.target) : $(e.target).parents(".sticky-note");
-                addFrom(target);
+                addFrom(card);
             });
 
             $("#canvas").append(card);
@@ -406,6 +424,22 @@
             toDraggable(card);
 
             return card;
+        }
+
+        function toFrontMostCard(target) {
+            let targetIndex = parseInt($(target).css("z-index"));
+            var maxIndex = 0;
+            $(".sticky-note").each((i, v) => {
+                if ($(v) == $(target)) {
+                    return;
+                }
+                let myIndex = parseInt($(v).css("z-index"));
+                maxIndex = Math.max(maxIndex, myIndex);
+                if (myIndex > targetIndex) {
+                    $(v).css("z-index", myIndex - 1);
+                }
+            });
+            $(target).css("z-index", maxIndex);
         }
 
         function addFrom(from) {
@@ -423,10 +457,9 @@
             let filtered = $(target).attr("class").split(" ").filter((val) => {
                 return filterFunction(val);
             });
-            let result =  filtered.length == 0 ? null : filtered[0];
+            let result = filtered.length == 0 ? null : filtered[0];
             return result;
         }
-
 
         function toDraggable(card) {
             // In the case of zoom-in / zoom-out, since the position of the drag shifts, it is necessary to adjust it.
@@ -471,9 +504,9 @@
                         $(selected).css("top", ($(selected).attr("startY") - moveY) + "px");
                     });
                 },
-                stop : function(event) {
+                stop: function (event) {
                     // enable tooltip.
-                    $(event.target).tooltip({title:$(event.target).find("textarea").val()});
+                    $(event.target).tooltip({ title: $(event.target).find("textarea").val() });
                 }
             });
         }
@@ -521,7 +554,7 @@
                 var mostTop = Math.min.apply(null, $.map(selecteds, x => parseInt($(x).css("top"))));
                 $("#canvas")
                     .css("transform", "scale(" + currentScale + ")")
-                     .css("transform-origin", "left top");;
+                    .css("transform-origin", "left top");;
                 $(window).scrollLeft(mostLeft * currentScale - (30 * currentScale));
                 $(window).scrollTop(mostTop * currentScale - (30 * currentScale));
             }
