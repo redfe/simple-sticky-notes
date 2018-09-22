@@ -415,6 +415,14 @@
                 addFrom(card);
             });
 
+            // to selected.
+            $(card).on("click", (e) => {
+                if (!$(card).hasClass("ui-selected")) {
+                    $(".ui-selected").removeClass("ui-selected");
+                }
+                $(card).addClass("ui-selected");
+            });
+
             $("#canvas").append(card);
 
             toDraggable(card);
