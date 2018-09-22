@@ -21,7 +21,7 @@ very simple stikcy notes.
 - add image.
 - add clipboard image.
 - import/export.
-- repair selection range at zoom in/out.
+- [x] repair selection range at zoom in/out.
 
 ## Usage
 
