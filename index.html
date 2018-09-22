@@ -528,11 +528,20 @@
             });
             // for scaleable select.
             $.fn.outerWidth = function() {
-                return oldOuterWidth.apply($(this)) * currentScale;
+                var w = oldOuterWidth.apply($(this));
+                if ($(this).hasClass("sticky-note")) {
+                    return w * currentScale;
+                } else {
+                    return w;
+                }
             };
-            $.fn.outerHeight = function() 
-            {
-                return oldOuterHeight.apply($(this)) * currentScale;
+            $.fn.outerHeight = function() {
+                var h = oldOuterHeight.apply($(this));
+                if ($(this).hasClass("sticky-note")) {
+                    return h * currentScale;
+                } else {
+                    return h;
+                }
             };
         }
 
