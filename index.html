@@ -308,6 +308,10 @@
             y: 0
         };
 
+        // for scalable select..
+        let oldOuterWidth =  $.fn.outerWidth;
+        let oldOuterHeight =  $.fn.outerHeight;
+
         $(() => {
             $('[data-toggle="tooltip"]').tooltip();
             $("#add-button").on("click", add);
@@ -522,6 +526,14 @@
                     $(".sticky-note textarea").blur();
                 }
             });
+            // for scaleable select.
+            $.fn.outerWidth = function() {
+                return oldOuterWidth.apply($(this)) * currentScale;
+            };
+            $.fn.outerHeight = function() 
+            {
+                return oldOuterHeight.apply($(this)) * currentScale;
+            };
         }
 
         function zoomIn() {
