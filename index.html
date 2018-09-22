@@ -59,6 +59,10 @@
             border: solid 1px;
         }
 
+        .card:hover .card-menu-button {
+            display: inline;
+        }
+
         .card-body {
             padding: 0;
         }
@@ -401,14 +405,6 @@
             card.css("top", scrollY + 30 + "px");
             card.css("left", scrollX + 30 + "px");
             toFrontMostCard(card);
-
-            card.on("mouseover", (e) => {
-                $(card).find(".card-menu-button").show();
-            });
-
-            card.on("mouseout", (e) => {
-                $(card).find(".card-menu-button").hide();
-            });
 
             card.on("mousedown", (e) => {
                 toFrontMostCard($(card));
