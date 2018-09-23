@@ -219,23 +219,23 @@
                     <option value="white" class="color-white">White</option>
                     <option value="transparent">Transparent</option>
                 </select>
-                <button id="add-button" class="btn btn-primary btn-sml">add</button>
-                <button id="return-button" class="btn btn-primary btn-sml">return</button>
+                <button id="add-button" class="btn btn-primary btn-sm">add</button>
+                <button id="return-button" class="btn btn-primary btn-sm">return</button>
             </div>
             <div class="col-sm-3">
                 <div class="">Zoom</div>
                 <div class="btn-group">
-                    <button id="zoom-in-button" class="btn btn-secondary btn-sml">in</button>
-                    <button id="zoom-out-button" class="btn btn-secondary btn-sml">out</button>
-                    <button id="zoom-fit-button" class="btn btn-secondary btn-sml">fit</button>
-                    <button id="zoom-reset-button" class="btn btn-secondary btn-sml">reset</button>
+                    <button id="zoom-in-button" class="btn btn-secondary btn-sm">in</button>
+                    <button id="zoom-out-button" class="btn btn-secondary btn-sm">out</button>
+                    <button id="zoom-fit-button" class="btn btn-secondary btn-sm">fit</button>
+                    <button id="zoom-reset-button" class="btn btn-secondary btn-sm">reset</button>
                 </div>
             </div>
             <div class="col-sm-5">
                 <div>Canvas size</div>
                 <input type="number" name="canvas-width" />
                 <input type="number" name="canvas-height" />
-                <button id="set-canvas-size-button" class="btn btn-secondary btn-sml">set</button>
+                <button id="set-canvas-size-button" class="btn btn-secondary btn-sm">set</button>
             </div>
         </div>
     </div>
@@ -309,8 +309,8 @@
         };
 
         // for scalable select..
-        let oldOuterWidth =  $.fn.outerWidth;
-        let oldOuterHeight =  $.fn.outerHeight;
+        let oldOuterWidth = $.fn.outerWidth;
+        let oldOuterHeight = $.fn.outerHeight;
 
         $(() => {
             $('[data-toggle="tooltip"]').tooltip();
@@ -522,22 +522,25 @@
         function toSelectable(canvas) {
             $(canvas).selectable({
                 filter: ".sticky-note",
+                tolerance: "fit",
                 start: (e, ui) => {
                     $(".sticky-note textarea").blur();
                 }
             });
             // for scaleable select.
-            $.fn.outerWidth = function() {
+            $.fn.outerWidth = function () {
                 var w = oldOuterWidth.apply($(this));
-                if ($(this).hasClass("sticky-note")) {
+                if ($(this).hasClass("sticky-note")
+                    && $(this).hasClass("ui-selectee")) {
                     return w * currentScale;
                 } else {
                     return w;
                 }
             };
-            $.fn.outerHeight = function() {
+            $.fn.outerHeight = function () {
                 var h = oldOuterHeight.apply($(this));
-                if ($(this).hasClass("sticky-note")) {
+                if ($(this).hasClass("sticky-note")
+                    && $(this).hasClass("ui-selectee")) {
                     return h * currentScale;
                 } else {
                     return h;
