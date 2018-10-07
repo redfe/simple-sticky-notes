@@ -13,11 +13,11 @@
 
     <style>
         #canvas .ui-selecting {
-            box-shadow: 0px 0px 10px 10px white;
+            box-shadow: 0px 0px 3px 3px #007bff;
         }
 
         #canvas .ui-selected {
-            box-shadow: 0px 0px 10px 10px white;
+            box-shadow: 0px 0px 3px 3px #007bff;
         }
 
         body {
@@ -38,6 +38,22 @@
 
         #menu input[type='number'] {
             width: 70px;
+        }
+
+        #add-horizontal-line-button {
+            background-color: white;
+            padding: 0;
+            height: 2.22em;
+            width: 2.22em;
+            border-width: 1em 0.3em;
+        }
+
+        #add-vertical-line-button {
+            background-color: white;
+            padding: 0;
+            height: 2.22em;
+            width: 2.22em;
+            border-width: 0.3em 1em;
         }
 
         #main {
@@ -129,6 +145,22 @@
             opacity: 0.8;
         }
 
+        .line {
+            background-color:rgba(0,0,0,0.3);
+            position: absolute;
+            cursor: grab;
+        }
+
+        .horizontal-line {
+            width: 1000px;
+            height: 1em;
+        }
+
+        .vertical-line {
+            width: 1em;
+            height: 1000px;
+        }
+
         /* colors */
 
         .color-red,
@@ -208,7 +240,7 @@
 
     <div id="menu" class="container-fluid">
         <div class="row">
-            <div class="col-sm-4">
+            <div class="col-sm-3">
                 <div>Card</div>
                 <select id="color-selection" class="">
                     <option value="" selected>Choose...</option>
@@ -220,9 +252,18 @@
                     <option value="transparent">Transparent</option>
                 </select>
                 <button id="add-button" class="btn btn-primary btn-sm">add</button>
+            </div>
+            <div class="col-sm-2">
+                <div>Line</div>
+                <button id="add-horizontal-line-button" class="btn btn-primary btn-sm">&nbsp;</button>
+                <button id="add-vertical-line-button" class="btn btn-primary btn-sm">&nbsp;</button>
+            </div>
+            <div class="col-sm-2">
+                <div>Edit</div>
+                <button id="delete-item-button" class="btn btn-danger btn-sm">delete</button>
                 <button id="return-button" class="btn btn-primary btn-sm">return</button>
             </div>
-            <div class="col-sm-3">
+            <div class="col-sm-2">
                 <div class="">Zoom</div>
                 <div class="btn-group">
                     <button id="zoom-in-button" class="btn btn-secondary btn-sm">in</button>
@@ -231,7 +272,7 @@
                     <button id="zoom-reset-button" class="btn btn-secondary btn-sm">reset</button>
                 </div>
             </div>
-            <div class="col-sm-5">
+            <div class="col-sm-3">
                 <div>Canvas size</div>
                 <input type="number" name="canvas-width" />
                 <input type="number" name="canvas-height" />
@@ -263,8 +304,6 @@
                                 <option value="transparent">Transparent</option>
                             </select>
                         </div>
-                        <a id="delete-card-link" class="list-group-item list-group-item-action list-group-item-danger"
-                            data-dismiss="modal" href="#">Delete</a>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -273,7 +312,7 @@
         </div>
     </div>
 
-    <div id="card-template" class="d-none card sticky-note" data-toggle="tooltip" data-placement="top">
+    <div id="card-template" class="d-none card sticky-note canvas-item" data-toggle="tooltip" data-placement="top">
         <button class="card-menu-button"></button>
         <div class="card-body">
             <textarea></textarea>
@@ -312,7 +351,7 @@
         let oldOuterWidth = $.fn.outerWidth;
         let oldOuterHeight = $.fn.outerHeight;
 
-        $(() => {
+        $(function () {
             $('[data-toggle="tooltip"]').tooltip();
             $("#add-button").on("click", add);
             $("#return-button").on("click", returnCard);
@@ -321,7 +360,9 @@
             $("#zoom-fit-button").on("click", zoomFitWidth);
             $("#zoom-reset-button").on("click", zoomReset);
             $("#set-canvas-size-button").on("click", setCanvasSize);
-            $("#delete-card-link").on("click", deleteCard);
+            $("#delete-item-button").on("click", deleteItem);
+            $("#add-horizontal-line-button").on("click", addHorizonalLine);
+            $("#add-vertical-line-button").on("click", addVerticalLine);
             toSelectable($("#canvas"));
 
             $("#card-menu-dialog").on("hide.bs.modal", () => {
@@ -331,7 +372,7 @@
                 $("#card-menu-color-selection").val("");
             });
             $("#card-menu-color-selection").on("change", (e) => {
-                changeColor(getEditTargets(), $(e.target).val());
+                changeColor(getEditTargetCards(), $(e.target).val());
                 $("#card-menu-dialog").modal("hide");
             });
 
@@ -408,23 +449,15 @@
 
             card.css("top", scrollY + 30 + "px");
             card.css("left", scrollX + 30 + "px");
-            toFrontMostCard(card);
+            toFrontMostItem(card);
 
             card.on("mousedown", (e) => {
-                toFrontMostCard($(card));
+                toFrontMostItem($(card));
             });
 
             // add from this card on double clik .
             $(card).on("dblclick", (e) => {
-                addFrom(card);
-            });
-
-            // to selected.
-            $(card).on("click", (e) => {
-                if (!$(card).hasClass("ui-selected")) {
-                    $(".ui-selected").removeClass("ui-selected");
-                }
-                $(card).addClass("ui-selected");
+                addStickyNoteFrom(card);
             });
 
             $("#canvas").append(card);
@@ -434,10 +467,61 @@
             return card;
         }
 
-        function toFrontMostCard(target) {
+        function addHorizonalLine() {
+            addLine(false);
+        }
+
+        function addVerticalLine() {
+            addLine(true);
+        }
+
+        function addLine(isVertical) {
+            let lineId = cuid();
+            var line = $("<div></div>");
+            line.addClass("line canvas-item");
+            line.addClass(isVertical ? "vertical-line" : "horizontal-line");
+
+            line.attr("id", lineId);
+            line.removeClass("d-none");
+
+            let scrollX = window.scrollX / currentScale;
+            let scrollY = window.scrollY / currentScale;
+            line.css("top", scrollY + 30 + "px");
+            line.css("left", scrollX + 30 + "px");
+
+            toFrontMostItem(line);
+            let handles = isVertical ? "s" : "e";
+            line.resizable({
+                handles: handles,
+                resize: function (event, ui) {
+                    if (isVertical) {
+                        let length = ui.originalSize.height + ((ui.size.height - ui.originalSize.height) / currentScale);
+                        $(line).height(length);
+                    } else {
+                        let length = ui.originalSize.width + ((ui.size.width - ui.originalSize.width) / currentScale);
+                        $(line).width(length);
+                    }
+                }
+            });
+
+            line.on("mousedown", (e) => {
+                toFrontMostItem($(line));
+            });
+
+            // add from this line on double clik .
+            $(line).on("dblclick", (e) => {
+                addLineFrom(line);
+            });
+
+            $("#canvas").append(line);
+            toDraggable(line);
+            return line;
+        }
+
+        function toFrontMostItem(target) {
             let targetIndex = parseInt($(target).css("z-index"));
             var maxIndex = 0;
-            $(".sticky-note").each((i, v) => {
+            $(".canvas-item").each((i, v) => {
                 if ($(v) == $(target)) {
                     return;
                 }
@@ -450,7 +534,7 @@
             $(target).css("z-index", maxIndex);
         }
 
-        function addFrom(from) {
+        function addStickyNoteFrom(from) {
             let target = $(from).attr("id") ? $(from) : $(from).parents(".sticky-note");
             let added = add();
             let sourceLeft = parseFloat($(target).css("left"));
@@ -459,6 +543,21 @@
             changeColor(added, colorClass ? colorClass.substring(6) : "color-yellow");
             added.css("left", sourceLeft + 5 + "px");
             added.css("top", sourceTop + 5 + "px");
+        }
+
+        function addLineFrom(from) {
+            let target = $(from).attr("id") ? $(from) : $(from).parents(".line");
+            let isVertical = $(target).hasClass("vertical-line");
+            let added = addLine(isVertical);
+            let sourceLeft = parseFloat($(target).css("left"));
+            let sourceTop = parseFloat($(target).css("top"));
+            added.css("left", sourceLeft + 5 + "px");
+            added.css("top", sourceTop + 5 + "px");
+            if (isVertical) {
+                added.height($(target).height());
+            } else {
+                added.width($(target).width());
+            }
         }
 
         function findFirstClass(target, filterFunction) {
@@ -473,7 +572,7 @@
             // In the case of zoom-in / zoom-out, since the position of the drag shifts, it is necessary to adjust it.
             // see https://stackoverflow.com/questions/13882070/jquery-draggable-and-webkit-transform-scale
             $(card).draggable({
-                stack: ".sticky-note",
+                stack: ".canvas-item",
                 start: function (event) {
                     click.x = event.clientX;
                     click.y = event.clientY;
@@ -482,7 +581,9 @@
                         $(selected).attr("startY", parseInt($(selected).css("top")));
                     });
                     // dispose tooltip.
-                    $(event.target).tooltip("dispose");
+                    if ($(event.target).hasClass("sticky-note")) {
+                        $(event.target).tooltip("dispose");
+                    }
                 },
                 drag: function (event, ui) {
                     // This is the parameter for scale()
@@ -514,15 +615,16 @@
                 },
                 stop: function (event) {
                     // enable tooltip.
-                    $(event.target).tooltip({ title: $(event.target).find("textarea").val() });
+                    if ($(event.target).hasClass("sticky-note")) {
+                        $(event.target).tooltip({ title: $(event.target).find("textarea").val() });
+                    }
                 }
             });
         }
 
         function toSelectable(canvas) {
             $(canvas).selectable({
-                filter: ".sticky-note",
-                tolerance: "fit",
+                filter: ".canvas-item",
                 start: (e, ui) => {
                     $(".sticky-note textarea").blur();
                 }
@@ -530,7 +632,7 @@
             // for scaleable select.
             $.fn.outerWidth = function () {
                 var w = oldOuterWidth.apply($(this));
-                if ($(this).hasClass("sticky-note")
+                if ($(this).hasClass("canvas-item")
                     && $(this).hasClass("ui-selectee")) {
                     return w * currentScale;
                 } else {
@@ -539,7 +641,7 @@
             };
             $.fn.outerHeight = function () {
                 var h = oldOuterHeight.apply($(this));
-                if ($(this).hasClass("sticky-note")
+                if ($(this).hasClass("canvas-item")
                     && $(this).hasClass("ui-selectee")) {
                     return h * currentScale;
                 } else {
@@ -569,6 +671,10 @@
         }
 
         function applyScale() {
+            // do nothing while resizing.
+            if ($(".ui-resizable-resizing").length > 0) {
+                return;
+            }
             if ($(".ui-selected").length == 0) {
                 let scrollLeft = $(window).scrollLeft();
                 let scrollTop = $(window).scrollTop();
@@ -580,7 +686,7 @@
                 $(window).scrollLeft($(document).width() * (scrollLeft / beforeDocumentWidth));
                 $(window).scrollTop(($(document).height()) * (scrollTop / beforeDocumentHeight));
             } else {
-                let selecteds = $(".sticky-note.ui-selected");
+                let selecteds = $(".canvas-item.ui-selected");
                 var mostLeft = Math.min.apply(null, $.map(selecteds, x => parseInt($(x).css("left"))));
                 var mostTop = Math.min.apply(null, $.map(selecteds, x => parseInt($(x).css("top"))));
                 $("#canvas")
@@ -604,8 +710,8 @@
             targets.addClass("color-" + color);
         }
 
-        function deleteCard() {
-            let targets = getEditTargets();
+        function deleteItem() {
+            let targets = $(".ui-selected");
             $(targets).hide({
                 done: (target) => {
                     $(target.elem).removeClass("ui-selected");
@@ -614,9 +720,9 @@
             });
         }
 
-        function getEditTargets() {
-            if ($("#" + selectedCardId + ".ui-selected").length == 1) {
-                return $(".ui-selected");
+        function getEditTargetCards() {
+            if ($("#" + selectedCardId + ".ui-selected.sticky-note").length == 1) {
+                return $(".ui-selected.sticky-note");
             } else {
                 return $("#" + selectedCardId);
             }
