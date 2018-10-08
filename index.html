@@ -43,17 +43,17 @@
         #add-horizontal-line-button {
             background-color: white;
             padding: 0;
-            height: 2.22em;
-            width: 2.22em;
-            border-width: 1em 0.3em;
+            height: 2rem;
+            width: 2rem;
+            border-width: 0.9rem 0.3rem;
         }
 
         #add-vertical-line-button {
             background-color: white;
             padding: 0;
-            height: 2.22em;
-            width: 2.22em;
-            border-width: 0.3em 1em;
+            height: 2rem;
+            width: 2rem;
+            border-width: 0.3rem 0.9rem;
         }
 
         #main {
@@ -67,9 +67,8 @@
         }
 
         .card {
-            font-size: 0.75em;
             position: absolute;
-            padding: 2em 1em 0em 1em;
+            padding: 1rem 1rem 0rem 1rem;
             cursor: grab;
             box-shadow: 0px 5px 10px 0px rgba(0, 0, 0, 0.4);
             border: solid 1px;
@@ -84,8 +83,9 @@
         }
 
         .card-body textarea {
-            width: 14em;
-            height: 5.3em;
+            font-size: 48px;
+            width: 12rem;
+            height: 5rem;
             margin: 0;
             padding: 0;
             border: none;
@@ -93,12 +93,12 @@
         }
 
         .sticky-note-footer {
-            font-size: 0.75em;
+            font-size: 0.5rem;
             background-color: rgba(0,0,0,0);
             border-top: none;
             padding: 0;
             overflow: hidden;
-            height: 1.5em;
+            height: 1rem;
             color: rgba(0,0,0,0.3);
         }
 
@@ -108,6 +108,7 @@
 
         .sticky-note-footer div div {
             text-align: center;
+            padding: 0;
         }
 
         .ui-draggable-dragging {
@@ -126,10 +127,10 @@
         .card-menu-button {
             display: none;
             position: absolute;
-            width: 1.5em;
-            height: 1.5em;
-            right: 0.25em;
-            top: 0.25em;
+            width: 1rem;
+            height: 1rem;
+            right: 0.25rem;
+            top: 0.25rem;
             margin: 0;
             border: none;
             cursor: pointer;
@@ -141,7 +142,7 @@
         }
 
         .tooltip div {
-            font-size: 1em;
+            font-size: 1rem;
             opacity: 0.8;
         }
 
@@ -153,11 +154,11 @@
 
         .horizontal-line {
             width: 1000px;
-            height: 1em;
+            height: 1rem;
         }
 
         .vertical-line {
-            width: 1em;
+            width: 1rem;
             height: 1000px;
         }
 
@@ -439,6 +440,9 @@
                 }, 500);//for car menu button.
             });
 
+            toFontSizeAdjustable(cardTextarea);
+
+
             card.attr("id", cardId);
             card.removeClass("d-none");
             card.addClass("card");
@@ -463,6 +467,8 @@
             $("#canvas").append(card);
 
             toDraggable(card);
+
+            $(cardTextarea).attr("data-scroll-height", $(cardTextarea)[0].scrollHeight);
 
             return card;
         }
@@ -648,6 +654,45 @@
                     return h;
                 }
             };
+        }
+
+        function toFontSizeAdjustable(textarea) {
+            const minFontSize = 12;
+            const maxFontSize = 48;
+
+            const toSmall = function () {
+                const beforeScrollHeight = $(textarea).attr("data-scroll-height");
+                const fontSize = parseFloat($(textarea).css("font-size"));
+                if (fontSize <= minFontSize) {
+                    return;
+                }
+                if (beforeScrollHeight >= $(textarea)[0].scrollHeight) {
+                    return;
+                }
+                $(textarea).css("font-size", (fontSize - 1) + "px");
+                toSmall();
+            };
+
+            const toBig = function () {
+                const fontSize = parseFloat($(textarea).css("font-size"));
+                if (fontSize >= maxFontSize) {
+                    return;
+                }
+                $(textarea).css("font-size", (fontSize + 1) + "px");
+                adjustFontSize();
+            };
+
+            const adjustFontSize = function () {
+                const beforeScrollHeight = $(textarea).attr("data-scroll-height");
+                const currentScrollHeight = $(textarea)[0].scrollHeight;
+                if (beforeScrollHeight < currentScrollHeight) {
+                    toSmall();
+                } else {
+                    toBig();
+                }
+            };
+
+            $(textarea).on("keydown", adjustFontSize);
         }
 
         function zoomIn() {
