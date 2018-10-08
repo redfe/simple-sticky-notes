@@ -661,12 +661,12 @@
             const maxFontSize = 48;
 
             const toSmall = function () {
-                const beforeScrollHeight = $(textarea).attr("data-scroll-height");
                 const fontSize = parseFloat($(textarea).css("font-size"));
                 if (fontSize <= minFontSize) {
                     return;
                 }
-                if (beforeScrollHeight >= $(textarea)[0].scrollHeight) {
+                const minScrollHeight = $(textarea).attr("data-scroll-height");
+                if (minScrollHeight >= $(textarea)[0].scrollHeight) {
                     return;
                 }
                 $(textarea).css("font-size", (fontSize - 1) + "px");
@@ -683,9 +683,9 @@
             };
 
             const adjustFontSize = function () {
-                const beforeScrollHeight = $(textarea).attr("data-scroll-height");
+                const minScrollHeight = $(textarea).attr("data-scroll-height");
                 const currentScrollHeight = $(textarea)[0].scrollHeight;
-                if (beforeScrollHeight < currentScrollHeight) {
+                if (minScrollHeight < currentScrollHeight) {
                     toSmall();
                 } else {
                     toBig();
