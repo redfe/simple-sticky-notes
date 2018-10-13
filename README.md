@@ -19,7 +19,7 @@ very simple stikcy notes.
 
 - [x] add line(horizontal/vertical).
 - [x] add image.
-- [ ] add clipboard image.
+- [x] add clipboard image.
 - [ ] import/export.
 - [x] repair selection range at zoom in/out.
 
