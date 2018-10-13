@@ -352,12 +352,6 @@
                         <input type="file" class="custom-file-input" id="image-file-selection">
                         <label class="custom-file-label" for="image-file-selection">Choose file</label>
                     </div>
-                    <div clss="">
-                        <button id="add-image-item-button" class="btn btn-primary">Add</button>
-                    </div>
-                    <div id="image-load-area">
-                        no image.
-                    </div>
                 </div>
                 <div class="modal-footer">
                 </div>
@@ -419,6 +413,7 @@
             $("#add-image-button").on("click", (e) => {
                 $("#add-image-dialog").modal();
             });
+            $(document).on("paste", addImageFromClipboard);
             toSelectable($("#canvas"));
 
             // card menu dialog.
@@ -626,6 +621,20 @@
             $("#canvas").append(image);
             toDraggable(image);
             return image;
+        }
+
+        function addImageFromClipboard(event) {
+            var items = event.originalEvent.clipboardData.items;
+            for (var i = 0; i < items.length; i++) {
+                const item = items[i];
+                if (item.type.indexOf("image") != -1) {
+                    const file = item.getAsFile();
+                    console.log(file);
+                    readFileAsBase64Url(file, (dataUrl) => {
+                        addImage(dataUrl);
+                    });
+                }
+            }
         }
 
         function toFrontMostItem(target) {
@@ -895,15 +904,20 @@
             if (!file.type.startsWith("image")) {
                 return;
             }
+
+            readFileAsBase64Url(file, (dataUrl) => {
+                addImage(dataUrl);
+                event.target.value = null;
+                $("#add-image-dialog").modal("hide");
+            });
+        }
+
+        function readFileAsBase64Url(file, callback) {
             var reader = new FileReader();
             reader.readAsDataURL(file);
-
             reader.onloadend = function () {
                 var dataUrl = reader.result;
-                $("#image-load-area").html("<img src='" + dataUrl + "'>");
-                $("#image-file-selection").next().text(file.name);
-                // for read the same file.
-                event.target.value = null;
+                callback(dataUrl);
             }
         }
     </script>
