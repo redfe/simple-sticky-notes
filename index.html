@@ -70,10 +70,12 @@
             padding: 0;
         }
 
-        .card {
-            position: absolute;
-            padding: 1rem 1rem 0rem 1rem;
+        .canvas-item {
             cursor: grab;
+        }
+
+        .card {
+            padding: 1rem 1rem 0rem 1rem;
             box-shadow: 0px 5px 10px 0px rgba(0, 0, 0, 0.4);
             border: solid 1px;
             transition: transform 500ms 0s ease;
@@ -153,8 +155,6 @@
 
         .line {
             background-color:rgba(0,0,0,0.3);
-            position: absolute;
-            cursor: grab;
         }
 
         .horizontal-line {
@@ -165,6 +165,22 @@
         .vertical-line {
             width: 1rem;
             height: 1000px;
+        }
+
+        #image-load-area img {
+            width: 100%;
+        }
+
+        .canvas-item.image {
+            width: 14em;
+            box-shadow: 0px 5px 10px 0px rgba(0, 0, 0, 0.4);
+            padding: 0;
+            opacity: 0.8;
+        }
+
+        .canvas-item.image img {
+            width: 100%;
+            height: 100%;
         }
 
         /* colors */
@@ -259,17 +275,21 @@
                 </select>
                 <button id="add-button" class="btn btn-primary btn-sm">add</button>
             </div>
-            <div class="col-sm-2">
+            <div class="col-sm-1">
                 <div>Line</div>
                 <button id="add-horizontal-line-button" class="btn btn-primary btn-sm">&nbsp;</button>
                 <button id="add-vertical-line-button" class="btn btn-primary btn-sm">&nbsp;</button>
             </div>
-            <div class="col-sm-2">
+            <div class="col-sm-1">
+                <div>Image</div>
+                <button id="add-image-button" class="btn btn-primary btn-sm">add</button>
+            </div>
+            <div class="col-sm-3">
                 <div>Edit</div>
                 <button id="delete-item-button" class="btn btn-danger btn-sm">delete</button>
                 <button id="return-button" class="btn btn-primary btn-sm">return</button>
             </div>
-            <div class="col-sm-3">
+            <div class="col-sm-2">
                 <div class="">Zoom</div>
                 <div class="btn-group">
                     <button id="zoom-in-button" class="btn btn-secondary btn-sm">in</button>
@@ -310,6 +330,33 @@
                                 <option value="transparent">Transparent</option>
                             </select>
                         </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="add-image-dialog" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add image</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="custom-file">
+                        <input type="file" class="custom-file-input" id="image-file-selection">
+                        <label class="custom-file-label" for="image-file-selection">Choose file</label>
+                    </div>
+                    <div clss="">
+                        <button id="add-image-item-button" class="btn btn-primary">Add</button>
+                    </div>
+                    <div id="image-load-area">
+                        no image.
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -369,8 +416,12 @@
             $("#delete-item-button").on("click", deleteItem);
             $("#add-horizontal-line-button").on("click", addHorizonalLine);
             $("#add-vertical-line-button").on("click", addVerticalLine);
+            $("#add-image-button").on("click", (e) => {
+                $("#add-image-dialog").modal();
+            });
             toSelectable($("#canvas"));
 
+            // card menu dialog.
             $("#card-menu-dialog").on("hide.bs.modal", () => {
                 selectedCardId = null;
             });
@@ -381,6 +432,14 @@
                 changeColor(getEditTargetCards(), $(e.target).val());
                 $("#card-menu-dialog").modal("hide");
             });
+
+            // add image dialog
+            $("#image-file-selection").on("change", loadImageFromLocal);
+            $("#add-image-dialog").on("show.bs.modal", () => {
+                $("#image-file-selection").next().text("Choose file");
+                $("#image-load-area").html("no image.");
+            });
+            $("#add-image-item-button").on("click", addImageItemFromModal);
 
             // initialize width & height.
             $("#set-canvas-size-button").parent().find("input[name='canvas-width']").val($("#canvas").width());
@@ -529,6 +588,46 @@
             return line;
         }
 
+        function addImageItemFromModal() {
+            if ($("#image-load-area img").length == 0) {
+                return;
+            }
+            const base64Url = $("#image-load-area img").attr("src");
+            addImage(base64Url);
+            $("#add-image-dialog").modal("hide");
+        }
+
+        function addImage(base64Url) {
+            const imageId = cuid();
+            const image = $("<div></div>");
+            $(image).attr("id", imageId);
+            $(image).addClass("image canvas-item")
+            $(image).html("<img src='" + base64Url + "'>");
+
+            let scrollX = window.scrollX / currentScale;
+            let scrollY = window.scrollY / currentScale;
+            image.css("top", scrollY + 30 + "px");
+            image.css("left", scrollX + 30 + "px");
+
+            toFrontMostItem(image);
+            image.on("mousedown", (e) => {
+                toFrontMostItem($(image));
+            });
+            $(image).resizable({
+                alsoResize: ".canvas-item.image.ui-selected",
+                aspectRatio: true,
+                resize: function (event, ui) {
+                    let height = ui.originalSize.height + ((ui.size.height - ui.originalSize.height) / currentScale);
+                    $(image).height(height);
+                    let width = ui.originalSize.width + ((ui.size.width - ui.originalSize.width) / currentScale);
+                    $(image).width(width);
+                }
+            });
+            $("#canvas").append(image);
+            toDraggable(image);
+            return image;
+        }
+
         function toFrontMostItem(target) {
             let targetIndex = parseInt($(target).css("z-index"));
             var maxIndex = 0;
@@ -579,10 +678,11 @@
             return result;
         }
 
-        function toDraggable(card) {
+        function toDraggable(item) {
+            $(item).css("position", "absolute");
             // In the case of zoom-in / zoom-out, since the position of the drag shifts, it is necessary to adjust it.
             // see https://stackoverflow.com/questions/13882070/jquery-draggable-and-webkit-transform-scale
-            $(card).draggable({
+            $(item).draggable({
                 stack: ".canvas-item",
                 start: function (event) {
                     click.x = event.clientX;
@@ -615,7 +715,7 @@
                     let moveX = original.left / zoom - ui.position.left;
                     let moveY = original.top / zoom - ui.position.top;
 
-                    // move selected cards.
+                    // move selected item.
                     $(".ui-selected").each((i, selected) => {
                         if (!$(event.target) == selected) {
                             return;
@@ -785,6 +885,26 @@
 
         function adjustMainMarginTop() {
             $("#canvas").css("margin-top", $("#menu").innerHeight());
+        }
+
+        function loadImageFromLocal(event) {
+            if (event.target.files.length == 0) {
+                return;
+            }
+            const file = event.target.files[0];
+            if (!file.type.startsWith("image")) {
+                return;
+            }
+            var reader = new FileReader();
+            reader.readAsDataURL(file);
+
+            reader.onloadend = function () {
+                var dataUrl = reader.result;
+                $("#image-load-area").html("<img src='" + dataUrl + "'>");
+                $("#image-file-selection").next().text(file.name);
+                // for read the same file.
+                event.target.value = null;
+            }
         }
     </script>
 </body>
