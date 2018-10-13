@@ -18,7 +18,7 @@ very simple stikcy notes.
 ## TODO
 
 - [x] add line(horizontal/vertical).
-- [ ] add image.
+- [x] add image.
 - [ ] add clipboard image.
 - [ ] import/export.
 - [x] repair selection range at zoom in/out.
