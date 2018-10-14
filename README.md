@@ -14,13 +14,17 @@ very simple stikcy notes.
   - resizable canvas.
   - zoom in/out with selected cards as starting point.
   - tooltip.
+- add line.
+- add image.
+- paste image.
+- import/export.
 
 ## TODO
 
 - [x] add line(horizontal/vertical).
 - [x] add image.
 - [x] add clipboard image.
-- [ ] import/export.
+- [x] import/export.
 - [x] repair selection range at zoom in/out.
 
 ## Usage

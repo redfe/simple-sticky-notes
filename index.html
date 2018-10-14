@@ -37,7 +37,7 @@
         }
 
         #menu .row {
-            max-width: 1200px;
+            max-width: 1300px;
         }
 
         #menu input[type='number'] {
@@ -263,6 +263,11 @@
     <div id="menu" class="container-fluid">
         <div class="row">
             <div class="col-sm-2">
+                <div>File</div>
+                <button id="export-button" class="btn btn-success btn-sm">export</button>
+                <button id="import-button" class="btn btn-primary btn-sm">import</button>
+            </div>
+            <div class="col-sm-2">
                 <div>Card</div>
                 <select id="color-selection" class="">
                     <option value="" selected>Choose...</option>
@@ -284,7 +289,7 @@
                 <div>Image</div>
                 <button id="add-image-button" class="btn btn-primary btn-sm">add</button>
             </div>
-            <div class="col-sm-3">
+            <div class="col-sm-2">
                 <div>Edit</div>
                 <button id="delete-item-button" class="btn btn-danger btn-sm">delete</button>
                 <button id="return-button" class="btn btn-primary btn-sm">return</button>
@@ -298,10 +303,10 @@
                     <button id="zoom-reset-button" class="btn btn-secondary btn-sm">reset</button>
                 </div>
             </div>
-            <div class="col-sm-3">
+            <div class="col-sm-2">
                 <div>Canvas size</div>
-                <input type="number" name="canvas-width" />
-                <input type="number" name="canvas-height" />
+                <input type="number" id="canvas-width" />
+                <input type="number" id="canvas-height" />
                 <button id="set-canvas-size-button" class="btn btn-secondary btn-sm">set</button>
             </div>
         </div>
@@ -413,6 +418,8 @@
             $("#add-image-button").on("click", (e) => {
                 $("#add-image-dialog").modal();
             });
+            $("#export-button").on("click", exportData);
+            $("#import-button").on("click", importData);
             $(document).on("paste", addImageFromClipboard);
             toSelectable($("#canvas"));
 
@@ -437,8 +444,8 @@
             $("#add-image-item-button").on("click", addImageItemFromModal);
 
             // initialize width & height.
-            $("#set-canvas-size-button").parent().find("input[name='canvas-width']").val($("#canvas").width());
-            $("#set-canvas-size-button").parent().find("input[name='canvas-height']").val($("#canvas").height());
+            $("#canvas-width").val($("#canvas").width());
+            $("#canvas-height").val($("#canvas").height());
 
             // initialize margin of main.
             adjustMainMarginTop();
@@ -501,17 +508,12 @@
 
             toFontSizeAdjustable(cardTextarea);
 
-
             card.attr("id", cardId);
             card.removeClass("d-none");
             card.addClass("card");
             card.addClass("color-" + color);
 
-            let scrollX = window.scrollX / currentScale;
-            let scrollY = window.scrollY / currentScale;
-
-            card.css("top", scrollY + 30 + "px");
-            card.css("left", scrollX + 30 + "px");
+            initializePosition(card);
             toFrontMostItem(card);
 
             card.on("mousedown", (e) => {
@@ -545,15 +547,9 @@
             var line = $("<div></div>");
             line.addClass("line canvas-item");
             line.addClass(isVertical ? "vertical-line" : "horizontal-line");
-
             line.attr("id", lineId);
             line.removeClass("d-none");
-
-            let scrollX = window.scrollX / currentScale;
-            let scrollY = window.scrollY / currentScale;
-            line.css("top", scrollY + 30 + "px");
-            line.css("left", scrollX + 30 + "px");
-
+            initializePosition(line);
             toFrontMostItem(line);
             let handles = isVertical ? "s" : "e";
             line.resizable({
@@ -598,11 +594,7 @@
             $(image).attr("id", imageId);
             $(image).addClass("image canvas-item")
             $(image).html("<img src='" + base64Url + "'>");
-
-            let scrollX = window.scrollX / currentScale;
-            let scrollY = window.scrollY / currentScale;
-            image.css("top", scrollY + 30 + "px");
-            image.css("left", scrollX + 30 + "px");
+            initializePosition(image);
 
             toFrontMostItem(image);
             image.on("mousedown", (e) => {
@@ -629,12 +621,18 @@
                 const item = items[i];
                 if (item.type.indexOf("image") != -1) {
                     const file = item.getAsFile();
-                    console.log(file);
                     readFileAsBase64Url(file, (dataUrl) => {
                         addImage(dataUrl);
                     });
                 }
             }
+        }
+
+        function initializePosition(item) {
+            let scrollX = window.scrollX / currentScale;
+            let scrollY = window.scrollY / currentScale;
+            item.css("top", scrollY + 30 + "px");
+            item.css("left", scrollX + 30 + "px");
         }
 
         function toFrontMostItem(target) {
@@ -857,8 +855,8 @@
         }
 
         function setCanvasSize() {
-            let w = $("#set-canvas-size-button").parent().find("input[name='canvas-width']").val();
-            let h = $("#set-canvas-size-button").parent().find("input[name='canvas-height']").val();
+            let w = $("#canvas-width").val();
+            let h = $("#canvas-height").val();
             $("#canvas").width(w).height(h);
         }
 
@@ -920,6 +918,209 @@
                 callback(dataUrl);
             }
         }
+
+        function exportData() {
+            const obj = {
+                canvas: {
+                    width: $("#canvas-width").val(),
+                    height: $("#canvas-height").val()
+                },
+                items: []
+            };
+            $(".canvas-item:visible").each(function (i, elem) {
+                obj.items[i] = convertToDataForExport(elem);
+            });
+            const json = JSON.stringify(obj);
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(new Blob([json], { type: 'text/json' }));
+            a.download = "simple-sticky-note_" + getCurrentDatetimeString() + ".json";
+            a.style.display = "none";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        function importData() {
+            const input = document.createElement('input')
+            input.type = "file";
+            input.addEventListener("change", function (event) {
+                const file = event.target.files[0];
+                const reader = new FileReader();
+                reader.readAsText(file);
+                reader.onloadend = function () {
+                    var json = reader.result;
+                    importDataFromJson(json);
+                };
+            });
+            input.style.display = "none";
+            document.body.appendChild(input);
+            input.click();
+            document.body.removeChild(input);
+
+
+        }
+
+        function getCurrentDatetimeString() {
+            const date = new Date();
+            const year = date.getFullYear();
+            const month = date.getMonth() + 1;
+            const day = date.getDate();
+            const hour = date.getHours();
+            const minute = date.getMinutes();
+            const second = date.getSeconds();
+            return zeroPadding(year, 4) +
+                zeroPadding(month, 2) +
+                zeroPadding(day, 2) +
+                zeroPadding(hour, 2) +
+                zeroPadding(minute, 2) +
+                zeroPadding(second, 2)
+        }
+
+        function zeroPadding(num, length) {
+            const str = num.toString();
+            const addLen = str.length < length ? length - str.length : 0;
+            const sliceLen = str.length < length ? length : str.length;
+            var preZeros = "";
+            for (var i = 0; i < addLen; i++) {
+                preZeros = preZeros + "0";
+            }
+            return (preZeros + num).slice(-sliceLen);
+        }
+
+        function convertToDataForExport(elem) {
+            if ($(elem).hasClass("sticky-note")) {
+                return convertToStikyNoteDataForExport(elem);
+            } else if ($(elem).hasClass("vertical-line")) {
+                return convertToVerticalLineDataForExport(elem);
+            } else if ($(elem).hasClass("horizontal-line")) {
+                return convertToHorizontalLineDataForExport(elem);
+            } else if ($(elem).hasClass("image")) {
+                return convertToImageDataForExport(elem);
+            }
+            return null;
+        }
+
+        function convertToStikyNoteDataForExport(elem) {
+            $e = $(elem);
+            const colorClass = findFirstClass($e, (className) => className.startsWith("color-"));
+            return {
+                type: "sticky-note",
+                id: $e.attr("id"),
+                left: parseInt($e.css("left")),
+                top: parseInt($e.css("top")),
+                zIndex: $e.css("z-index"),
+                text: $e.find("textarea").val(),
+                color: colorClass
+            };
+        }
+
+        function drawStickyNoteFromData(data) {
+            var item = add();
+            $(item)
+                .attr("id", data.id)
+                .css("left", data.left)
+                .css("top", data.top)
+                .css("z-index", data.zIndex)
+                .removeClass("color-yellow")
+                .addClass(data.color)
+                .find("textarea").val(data.text);
+            $(item).tooltip({ title: data.text });
+            $(item).find("textarea").trigger("keydown");
+        }
+
+        function convertToVerticalLineDataForExport(elem) {
+            $e = $(elem);
+            return {
+                type: "vertical-line",
+                id: $e.attr("id"),
+                left: parseInt($e.css("left")),
+                top: parseInt($e.css("top")),
+                zIndex: $e.css("z-index"),
+                length: $e.height()
+            };
+        }
+
+        function drawVerticalLineFromData(data) {
+            var line = addLine(true);
+            $(line)
+                .attr("id", data.id)
+                .css("left", data.left)
+                .css("top", data.top)
+                .css("z-index", data.zIndex)
+                .height(data.length);
+        }
+
+        function convertToHorizontalLineDataForExport(elem) {
+            $e = $(elem);
+            return {
+                type: "horizontal-line",
+                id: $e.attr("id"),
+                left: parseInt($e.css("left")),
+                top: parseInt($e.css("top")),
+                zIndex: $e.css("z-index"),
+                length: $e.width()
+            };
+        }
+
+        function drawHorizontalLineFromData(data) {
+            var line = addLine(false);
+            $(line)
+                .attr("id", data.id)
+                .css("left", data.left)
+                .css("top", data.top)
+                .css("z-index", data.zIndex)
+                .width(data.length);
+        }
+
+        function convertToImageDataForExport(elem) {
+            $e = $(elem);
+            return {
+                type: "image",
+                id: $e.attr("id"),
+                left: parseInt($e.css("left")),
+                top: parseInt($e.css("top")),
+                width: $e.width(),
+                height: $e.height(),
+                zIndex: $e.css("z-index"),
+                src: $e.find("img").attr("src")
+            };
+        }
+
+        function drawImageFromData(data) {
+            var line = addImage(data.src);
+            $(line)
+                .attr("id", data.id)
+                .css("left", data.left)
+                .css("top", data.top)
+                .width(data.width)
+                .height(data.height)
+                .css("z-index", data.zIndex);
+        }
+
+        function importDataFromJson(json) {
+            const obj = JSON.parse(json);
+
+            $(".canvas-item:visible").remove();
+
+            $("#canvas-width").val(obj.canvas.width);
+            $("#canvas-height").val(obj.canvas.height);
+            setCanvasSize();
+            zoomFitWidth();
+
+            for (var i = 0; i < obj.items.length; i++) {
+                const data = obj.items[i];
+                if (data.type == "sticky-note") {
+                    drawStickyNoteFromData(data);
+                } else if (data.type == "vertical-line") {
+                    drawVerticalLineFromData(data);
+                } else if (data.type == "horizontal-line") {
+                    drawHorizontalLineFromData(data);
+                } else if (data.type == "image") {
+                    drawImageFromData(data);
+                }
+            }
+        }
+
     </script>
 </body>
 
