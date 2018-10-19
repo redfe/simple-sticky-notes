@@ -288,6 +288,7 @@
             <div class="col-sm-1">
                 <div>Image</div>
                 <button id="add-image-button" class="btn btn-primary btn-sm">add</button>
+                <input type="file" id="image-file-selection" hidden>
             </div>
             <div class="col-sm-2">
                 <div>Edit</div>
@@ -336,27 +337,6 @@
                                 <option value="transparent">Transparent</option>
                             </select>
                         </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="add-image-dialog" class="modal fade" tabindex="-1" role="dialog">
-        <div class="modal-dialog modal-md">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Add image</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="custom-file">
-                        <input type="file" class="custom-file-input" id="image-file-selection">
-                        <label class="custom-file-label" for="image-file-selection">Choose file</label>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -418,7 +398,7 @@
             $("#add-horizontal-line-button").on("click", addHorizonalLine);
             $("#add-vertical-line-button").on("click", addVerticalLine);
             $("#add-image-button").on("click", (e) => {
-                $("#add-image-dialog").modal();
+                $("#image-file-selection").click();
             });
             $("#export-button").on("click", exportData);
             $("#import-button").on("click", importData);
