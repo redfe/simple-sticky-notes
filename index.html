@@ -473,7 +473,7 @@
             let cardTextarea = $(card).find("textarea");
 
             cardMenuButton.on("click", (e) => {
-                selectedCardId = cardId;
+                selectedCardId = $(e.target).parent(".sticky-note").attr("id");
                 $("#card-menu-dialog").modal();
             });
 
