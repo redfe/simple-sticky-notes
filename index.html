@@ -292,7 +292,8 @@
             <div class="col-sm-2">
                 <div>Edit</div>
                 <button id="delete-item-button" class="btn btn-danger btn-sm">delete</button>
-                <button id="return-button" class="btn btn-primary btn-sm">return</button>
+                <button id="undo-button" class="btn btn-primary btn-sm">undo</button>
+                <button id="redo-button" class="btn btn-primary btn-sm">redo</button>
             </div>
             <div class="col-sm-2">
                 <div class="">Zoom</div>
@@ -406,7 +407,8 @@
         $(function () {
             $('[data-toggle="tooltip"]').tooltip();
             $("#add-button").on("click", add);
-            $("#return-button").on("click", returnCard);
+            $("#undo-button").on("click", undo);
+            $("#redo-button").on("click", redo);
             $("#zoom-in-button").on("click", zoomIn);
             $("#zoom-out-button").on("click", zoomOut);
             $("#zoom-fit-button").on("click", zoomFitWidth);
@@ -476,8 +478,10 @@
             });
 
             $(cardTextarea).on("change", (e) => {
-                $(card).tooltip("dispose");
-                $(card).tooltip({ title: $(e.target).val() });
+                const tooltipData = $(card).data()["bs.tooltip"];
+                const oldText = tooltipData ? tooltipData.config.title : "";
+                updateTooltip(card, $(e.target).val());
+                AppEvent.ChangeStickyNoteText.publish($(card), oldText);
             });
 
             $(cardTextarea).on("keyup", (e) => {
@@ -531,6 +535,8 @@
 
             $(cardTextarea).attr("data-scroll-height", $(cardTextarea)[0].scrollHeight);
 
+            AppEvent.AddItem.publish(card);
+
             return card;
         }
 
@@ -562,6 +568,13 @@
                         let length = ui.originalSize.width + ((ui.size.width - ui.originalSize.width) / currentScale);
                         $(line).width(length);
                     }
+                },
+                stop: function (event, ui) {
+                    if (isVertical) {
+                        AppEvent.ChangeVerticalLineLength.publish($(event.target), ui.originalSize.height);
+                    } else {
+                        AppEvent.ChangeHorizontalLineLength.publish($(event.target), ui.originalSize.width);
+                    }
                 }
             });
 
@@ -576,6 +589,9 @@
 
             $("#canvas").append(line);
             toDraggable(line);
+
+            AppEvent.AddItem.publish(line);
+
             return line;
         }
 
@@ -601,17 +617,22 @@
                 toFrontMostItem($(image));
             });
             $(image).resizable({
-                alsoResize: ".canvas-item.image.ui-selected",
                 aspectRatio: true,
                 resize: function (event, ui) {
                     let height = ui.originalSize.height + ((ui.size.height - ui.originalSize.height) / currentScale);
                     $(image).height(height);
                     let width = ui.originalSize.width + ((ui.size.width - ui.originalSize.width) / currentScale);
                     $(image).width(width);
+                },
+                stop: function (event, ui) {
+                    AppEvent.ResizeImage.publish($(event.target), ui.originalSize.width, ui.originalSize.height);
                 }
             });
             $("#canvas").append(image);
             toDraggable(image);
+
+            AppEvent.AddItem.publish(image);
+
             return image;
         }
 
@@ -652,14 +673,22 @@
         }
 
         function addStickyNoteFrom(from) {
-            let target = $(from).attr("id") ? $(from) : $(from).parents(".sticky-note");
-            let added = add();
-            let sourceLeft = parseFloat($(target).css("left"));
-            let sourceTop = parseFloat($(target).css("top"));
-            let colorClass = findFirstClass(target, (className) => className.startsWith("color-"));
-            changeColor(added, colorClass ? colorClass.substring(6) : "color-yellow");
-            added.css("left", sourceLeft + 5 + "px");
-            added.css("top", sourceTop + 5 + "px");
+            let added;
+            isRecordEvents = false;
+            try {
+                let target = $(from).attr("id") ? $(from) : $(from).parents(".sticky-note");
+                added = add();
+                let sourceLeft = parseFloat($(target).css("left"));
+                let sourceTop = parseFloat($(target).css("top"));
+                let colorClass = findFirstClass(target, (className) => className.startsWith("color-"));
+                isRecordEvents = false;
+                changeColor(added, colorClass ? colorClass.substring(6) : "color-yellow");
+                added.css("left", sourceLeft + 5 + "px");
+                added.css("top", sourceTop + 5 + "px");
+            } finally {
+                isRecordEvents = true;
+            }
+            AppEvent.AddItem.publish(added);
         }
 
         function addLineFrom(from) {
@@ -677,15 +706,35 @@
             }
         }
 
+        function updateTooltip(target, text) {
+            $(target).tooltip("dispose");
+            $(target).tooltip({ title: text });
+        }
+
+        function removeColorClass(target) {
+            target.removeClass(findClasses(target, (val) => val.startsWith("color-")).join(" "));
+        }
+
         function findFirstClass(target, filterFunction) {
-            let filtered = $(target).attr("class").split(" ").filter((val) => {
-                return filterFunction(val);
-            });
+            let filtered = findClasses(target, filterFunction);
             let result = filtered.length == 0 ? null : filtered[0];
             return result;
         }
 
+        function findClasses(target, filterFunction) {
+            return $(target).attr("class").split(" ").filter((val) => {
+                return filterFunction(val);
+            });
+        }
+
         function toDraggable(item) {
+            const getMoveTargets = function () {
+                if (!$(item).hasClass("ui-selected")) {
+                    return $(item);
+                } else {
+                    return $(".ui-selected");
+                }
+            };
             $(item).css("position", "absolute");
             // In the case of zoom-in / zoom-out, since the position of the drag shifts, it is necessary to adjust it.
             // see https://stackoverflow.com/questions/13882070/jquery-draggable-and-webkit-transform-scale
@@ -694,9 +743,9 @@
                 start: function (event) {
                     click.x = event.clientX;
                     click.y = event.clientY;
-                    $(".ui-selected").each((i, selected) => {
-                        $(selected).attr("startX", parseInt($(selected).css("left")));
-                        $(selected).attr("startY", parseInt($(selected).css("top")));
+                    $(getMoveTargets()).each((i, target) => {
+                        $(target).attr("startX", parseInt($(target).css("left")));
+                        $(target).attr("startY", parseInt($(target).css("top")));
                     });
                     // dispose tooltip.
                     if ($(event.target).hasClass("sticky-note")) {
@@ -715,27 +764,35 @@
                         top: (event.clientY - click.y + original.top) / zoom
                     };
 
-                    if (!$(event.target).hasClass("ui-selected")) {
-                        return;
-                    }
-
                     let moveX = original.left / zoom - ui.position.left;
                     let moveY = original.top / zoom - ui.position.top;
 
                     // move selected item.
-                    $(".ui-selected").each((i, selected) => {
-                        if (!$(event.target) == selected) {
-                            return;
-                        }
-                        $(selected).css("left", ($(selected).attr("startX") - moveX) + "px");
-                        $(selected).css("top", ($(selected).attr("startY") - moveY) + "px");
+                    $(getMoveTargets()).each((i, target) => {
+                        $(target).css("left", ($(target).attr("startX") - moveX) + "px");
+                        $(target).css("top", ($(target).attr("startY") - moveY) + "px");
                     });
                 },
-                stop: function (event) {
+                stop: function (event, ui) {
                     // enable tooltip.
                     if ($(event.target).hasClass("sticky-note")) {
                         $(event.target).tooltip({ title: $(event.target).find("textarea").val() });
                     }
+                    const ids = []
+                    const oldPositions = [];
+                    $(getMoveTargets()).each(function (i, elem) {
+                        ids.push($(elem).attr("id"));
+                        oldPositions.push({
+                            left: $(elem).attr("startX"),
+                            top: $(elem).attr("startY")
+                        });
+                    });
+
+                    const moveLeft = parseInt($(event.target).css("left")) - ui.originalPosition.left;
+                    const moveTop = parseInt($(event.target).css("top")) - ui.originalPosition.top;
+
+                    AppEvent.MoveItems.publish(ids, oldPositions, moveLeft, moveTop);
+
                 }
             });
         }
@@ -861,18 +918,27 @@
         }
 
         function changeColor(targets, color) {
+            const oldColors = [];
+            $(targets).each((i, target) => {
+                oldColors.push(findFirstClass(target, (className) => className.startsWith("color-")));
+            });
             let colors = $("#card-menu-color-selection").find("option").each((i, v) => {
                 targets.removeClass("color-" + $(v).val());
             });
-            targets.addClass("color-" + color);
+            const colorClass = "color-" + color;
+            targets.addClass(colorClass);
+            AppEvent.ChangeStickyNotesColor.publish(targets, oldColors, colorClass);
         }
 
         function deleteItem() {
             let targets = $(".ui-selected");
+
+            // clone() is not copy width.
+            AppEvent.DeleteItems.publish(targets);
+
             $(targets).hide({
                 done: (target) => {
-                    $(target.elem).removeClass("ui-selected");
-                    deletedCardIds.push($(target.elem).attr("id"));
+                    $(target.elem).remove();
                 }
             });
         }
@@ -956,8 +1022,6 @@
             document.body.appendChild(input);
             input.click();
             document.body.removeChild(input);
-
-
         }
 
         function getCurrentDatetimeString() {
@@ -1098,29 +1162,358 @@
         }
 
         function importDataFromJson(json) {
-            const obj = JSON.parse(json);
+            isRecordEvents = false;
+            try {
+                const obj = JSON.parse(json);
 
-            $(".canvas-item:visible").remove();
+                $(".canvas-item:visible").remove();
 
-            $("#canvas-width").val(obj.canvas.width);
-            $("#canvas-height").val(obj.canvas.height);
-            setCanvasSize();
-            zoomFitWidth();
+                $("#canvas-width").val(obj.canvas.width);
+                $("#canvas-height").val(obj.canvas.height);
+                setCanvasSize();
+                zoomFitWidth();
 
-            for (var i = 0; i < obj.items.length; i++) {
-                const data = obj.items[i];
-                if (data.type == "sticky-note") {
-                    drawStickyNoteFromData(data);
-                } else if (data.type == "vertical-line") {
-                    drawVerticalLineFromData(data);
-                } else if (data.type == "horizontal-line") {
-                    drawHorizontalLineFromData(data);
-                } else if (data.type == "image") {
-                    drawImageFromData(data);
+                for (var i = 0; i < obj.items.length; i++) {
+                    importItem(obj.items[i]);
+                }
+            } finally {
+                isRecordEvents = true;
+            }
+            clearEventStore();
+            clearForwardStore();
+        }
+
+        function importItem(item) {
+            isRecordEvents = false;
+            try {
+                if (item.type == "sticky-note") {
+                    drawStickyNoteFromData(item);
+                } else if (item.type == "vertical-line") {
+                    drawVerticalLineFromData(item);
+                } else if (item.type == "horizontal-line") {
+                    drawHorizontalLineFromData(item);
+                } else if (item.type == "image") {
+                    drawImageFromData(item);
+                }
+            } finally {
+                isRecordEvents = true;
+            }
+        }
+
+        var isRecordEvents = true;
+        const eventStore = [];
+        const forwardStore = [];
+
+        function undo() {
+            const event = eventStore.pop();
+            if (!event) {
+                return;
+            }
+            for (var key in AppEvent) {
+                const e = AppEvent[key];
+                if (e.isTargetType && e.isTargetType(event)) {
+                    e.back(event);
+                    forwardStore.push(event);
+                    return;
                 }
             }
         }
 
+        function redo() {
+            const event = forwardStore.pop();
+            if (!event) {
+                return;
+            }
+            for (var key in AppEvent) {
+                const e = AppEvent[key];
+                if (e.isTargetType && e.isTargetType(event)) {
+                    e.forward(event);
+                    eventStore.push(event);
+                    return;
+                }
+            }
+        }
+
+        function clearEventStore() {
+            eventStore.splice(0, eventStore.length);
+        }
+
+        function clearForwardStore() {
+            forwardStore.splice(0, forwardStore.length);
+        }
+
+        const AppEvent = {
+            AddItem: {
+                publish: function (elem) {
+                    if (!isRecordEvents) {
+                        return;
+                    }
+                    eventStore.push({
+                        eventType: "addItem",
+                        eventBody: convertToDataForExport(elem),
+                        occuredOn: new Date()
+                    });
+                    clearForwardStore();
+                },
+                isTargetType: function (event) {
+                    return event.eventType == "addItem";
+                },
+                back: function (event) {
+                    $("#" + event.eventBody.id).remove();
+                },
+                forward: function (event) {
+                    importItem(event.eventBody);
+                }
+            },
+            MoveItems: {
+                publish: function (ids, oldPositions, moveLeft, moveTop) {
+                    if (!isRecordEvents) {
+                        return;
+                    }
+                    eventStore.push({
+                        eventType: "moveItems",
+                        eventBody: {
+                            ids: ids,
+                            oldPositions: oldPositions,
+                            moveLeft: moveLeft,
+                            moveTop: moveTop
+                        },
+                        occuredOn: new Date()
+                    });
+                    clearForwardStore();
+                },
+                isTargetType: function (event) {
+                    return event.eventType == "moveItems";
+                },
+                back: function (event) {
+                    event.eventBody.ids.forEach(function (id, i) {
+                        const target = $("#" + id);
+                        const left = parseInt(target.css("left"));
+                        const top = parseInt(target.css("top"));
+                        target.css("left", event.eventBody.oldPositions[i].left + "px");
+                        target.css("top", event.eventBody.oldPositions[i].top + "px");
+                    });
+                },
+                forward: function (event) {
+                    const targets = [];
+                    event.eventBody.ids.forEach(function (id, i) {
+                        const target = $("#" + id);
+                        targets.push(target);
+                        const left = parseInt(target.css("left"));
+                        const top = parseInt(target.css("top"));
+                        target.css("left", left + event.eventBody.moveLeft);
+                        target.css("top", top + event.eventBody.moveTop);
+                    });
+                },
+            },
+            DeleteItems: {
+                publish: function (elems) {
+                    if (!isRecordEvents) {
+                        return;
+                    }
+                    const datas = [];
+                    $(elems).each(function (i, elem) {
+                        datas.push(convertToDataForExport(elem));
+                    });
+                    eventStore.push({
+                        eventType: "deleteItems",
+                        eventBody: { items: datas },
+                        occuredOn: new Date()
+                    });
+                    clearForwardStore();
+                },
+                isTargetType: function (event) {
+                    return event.eventType == "deleteItems";
+                },
+                back: function (event) {
+                    event.eventBody.items.forEach(function (item, i) {
+                        importItem(item);
+                    });
+                },
+                forward: function (event) {
+                    event.eventBody.items.forEach(function (item, i) {
+                        $("#" + item.id).remove();
+                    });
+                }
+            },
+            ChangeStickyNoteText: {
+                publish: function (elem, old) {
+                    if (!isRecordEvents) {
+                        return;
+                    }
+                    eventStore.push({
+                        eventType: "changeStickyNoteText",
+                        eventBody: {
+                            id: $(elem).attr("id"),
+                            from: old,
+                            to: $(elem).find("textarea").val()
+                        },
+                        occuredOn: new Date()
+                    });
+                    clearForwardStore();
+                },
+                isTargetType: function (event) {
+                    return event.eventType == "changeStickyNoteText";
+                },
+                back: function (event) {
+                    const target = $("#" + event.eventBody.id);
+                    const textarea = target.find("textarea");
+                    const text = event.eventBody.from;
+                    textarea.val(text);
+                    textarea.trigger("keydown");
+                    updateTooltip(target, text);
+                },
+                forward: function (event) {
+                    const target = $("#" + event.eventBody.id);
+                    const textarea = target.find("textarea");
+                    const text = event.eventBody.to;
+                    textarea.val(text);
+                    textarea.trigger("keydown");
+                    updateTooltip(target, text);
+                }
+            },
+            ChangeStickyNotesColor: {
+                publish: function (elems, froms, to) {
+                    if (!isRecordEvents) {
+                        return;
+                    }
+                    const ids = [];
+                    $(elems).each(function (i, elem) {
+                        ids.push($(elem).attr("id"));
+                    });
+                    eventStore.push({
+                        eventType: "changeStickyNotesColor",
+                        eventBody: {
+                            ids: ids,
+                            froms: froms,
+                            to: to
+                        },
+                        occuredOn: new Date()
+                    });
+                    clearForwardStore();
+                },
+                isTargetType: function (event) {
+                    return event.eventType == "changeStickyNotesColor";
+                },
+                back: function (event) {
+                    event.eventBody.ids.forEach(function (id, i) {
+                        const target = $("#" + id);
+                        removeColorClass(target);
+                        target.addClass(event.eventBody.froms[i]);
+                    });
+                },
+                forward: function (event) {
+                    event.eventBody.ids.forEach(function (id, i) {
+                        const target = $("#" + id);
+                        removeColorClass(target);
+                        target.addClass(event.eventBody.to);
+                    });
+                }
+            },
+            Template: {
+                publish: function (elem) {
+                    if (!isRecordEvents) {
+                        return;
+                    }
+                    eventStore.push({
+                        eventType: "",
+                        eventBody: {
+                        },
+                        occuredOn: new Date()
+                    });
+                    clearForwardStore();
+                },
+                isTargetType: function (event) {
+                    return event.eventType == "";
+                },
+                back: function (event) {
+                },
+                forward: function (event) {
+                }
+            },
+            ChangeVerticalLineLength: {
+                publish: function (elem, oldLength) {
+                    if (!isRecordEvents) {
+                        return;
+                    }
+                    eventStore.push({
+                        eventType: "changeVerticalLineLength",
+                        eventBody: {
+                            id: $(elem).attr("id"),
+                            from: oldLength,
+                            to: $(elem).height()
+                        },
+                        occuredOn: new Date()
+                    });
+                    clearForwardStore();
+                },
+                isTargetType: function (event) {
+                    return event.eventType == "changeVerticalLineLength";
+                },
+                back: function (event) {
+                    $("#" + event.eventBody.id).height(event.eventBody.from);
+                },
+                forward: function (event) {
+                    $("#" + event.eventBody.id).height(event.eventBody.to);
+                }
+            },
+            ChangeHorizontalLineLength: {
+                publish: function (elem, oldLength) {
+                    if (!isRecordEvents) {
+                        return;
+                    }
+                    eventStore.push({
+                        eventType: "changeHorizontalLineLength",
+                        eventBody: {
+                            id: $(elem).attr("id"),
+                            from: oldLength,
+                            to: $(elem).width()
+                        },
+                        occuredOn: new Date()
+                    });
+                    clearForwardStore();
+                },
+                isTargetType: function (event) {
+                    return event.eventType == "changeHorizontalLineLength";
+                },
+                back: function (event) {
+                    $("#" + event.eventBody.id).width(event.eventBody.from);
+                },
+                forward: function (event) {
+                    $("#" + event.eventBody.id).width(event.eventBody.to);
+                }
+            },
+            ResizeImage: {
+                publish: function (elem, oldWidth, oldHeight) {
+                    if (!isRecordEvents) {
+                        return;
+                    }
+                    eventStore.push({
+                        eventType: "resizeImage",
+                        eventBody: {
+                            id: $(elem).attr("id"),
+                            from: { width: oldWidth, height: oldHeight },
+                            to: { width: $(elem).width(), height: $(elem).height() }
+                        },
+                        occuredOn: new Date()
+                    });
+                    clearForwardStore();
+                },
+                isTargetType: function (event) {
+                    return event.eventType == "resizeImage";
+                },
+                back: function (event) {
+                    $("#" + event.eventBody.id)
+                        .width(event.eventBody.from.width)
+                        .height(event.eventBody.from.height);
+                },
+                forward: function (event) {
+                    $("#" + event.eventBody.id)
+                        .width(event.eventBody.to.width)
+                        .height(event.eventBody.to.height);
+                }
+            }
+        }
     </script>
 </body>
 
