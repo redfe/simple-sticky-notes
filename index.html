@@ -788,8 +788,8 @@
                         });
                     });
 
-                    const moveLeft = parseInt($(event.target).css("left")) - ui.originalPosition.left;
-                    const moveTop = parseInt($(event.target).css("top")) - ui.originalPosition.top;
+                    const moveLeft = parseInt($(event.target).css("left")) - $(event.target).attr("startX");
+                    const moveTop = parseInt($(event.target).css("top")) - $(event.target).attr("startY");
 
                     AppEvent.MoveItems.publish(ids, oldPositions, moveLeft, moveTop);
 
