@@ -378,7 +378,6 @@
         crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cuid/1.3.8/browser-cuid.min.js"></script>
     <script>
-
         let scaleStep = 0.1;
         var currentScale = 1.0;
         var selectedCardId = null;
@@ -394,6 +393,7 @@
         let oldOuterHeight = $.fn.outerHeight;
 
         $(function () {
+            setupShortcutKeys();
             $('[data-toggle="tooltip"]').tooltip();
             $("#add-button").on("click", add);
             $("#undo-button").on("click", undo);
@@ -497,11 +497,13 @@
                     $(card)
                         .css("transform-origin", "none")
                         .css("transform", "none");
-                        $(card).resizable("enable");
-                }, 500);//for car menu button.
+                    $(card).resizable("enable");
+                }, 500); //for car menu button.
             });
 
-            $(cardTextarea).on("keydown", function() { adjustFontSize(cardTextarea); });
+            $(cardTextarea).on("keydown", function () {
+                adjustFontSize(cardTextarea);
+            });
 
             card.attr("id", cardId);
             card.removeClass("d-none");
@@ -519,14 +521,16 @@
             $(card).find(".sticky-note-header").on("dblclick", (e) => {
                 addStickyNoteFrom(card);
             });
-            
+
             // resizable
             $(card).resizable({
                 aspectRatio: false,
                 resize: function (event, ui) {
-                    let height = ui.originalSize.height + ((ui.size.height - ui.originalSize.height) / currentScale);
+                    let height = ui.originalSize.height + ((ui.size.height - ui.originalSize.height) /
+                        currentScale);
                     $(card).height(height);
-                    let width = ui.originalSize.width + ((ui.size.width - ui.originalSize.width) / currentScale);
+                    let width = ui.originalSize.width + ((ui.size.width - ui.originalSize.width) /
+                        currentScale);
                     $(card).width(width);
                 },
                 stop: function (event, ui) {
@@ -566,10 +570,12 @@
                 handles: handles,
                 resize: function (event, ui) {
                     if (isVertical) {
-                        let length = ui.originalSize.height + ((ui.size.height - ui.originalSize.height) / currentScale);
+                        let length = ui.originalSize.height + ((ui.size.height - ui.originalSize.height) /
+                            currentScale);
                         $(line).height(length);
                     } else {
-                        let length = ui.originalSize.width + ((ui.size.width - ui.originalSize.width) / currentScale);
+                        let length = ui.originalSize.width + ((ui.size.width - ui.originalSize.width) /
+                            currentScale);
                         $(line).width(length);
                     }
                 },
@@ -619,9 +625,11 @@
             $(image).resizable({
                 aspectRatio: true,
                 resize: function (event, ui) {
-                    let height = ui.originalSize.height + ((ui.size.height - ui.originalSize.height) / currentScale);
+                    let height = ui.originalSize.height + ((ui.size.height - ui.originalSize.height) /
+                        currentScale);
                     $(image).height(height);
-                    let width = ui.originalSize.width + ((ui.size.width - ui.originalSize.width) / currentScale);
+                    let width = ui.originalSize.width + ((ui.size.width - ui.originalSize.width) /
+                        currentScale);
                     $(image).width(width);
                 },
                 stop: function (event, ui) {
@@ -710,7 +718,9 @@
 
         function updateTooltip(target, text) {
             $(target).tooltip("dispose");
-            $(target).tooltip({ title: text });
+            $(target).tooltip({
+                title: text
+            });
         }
 
         function removeColorClass(target) {
@@ -778,7 +788,9 @@
                 stop: function (event, ui) {
                     // enable tooltip.
                     if ($(event.target).hasClass("sticky-note")) {
-                        $(event.target).tooltip({ title: $(event.target).find("textarea").val() });
+                        $(event.target).tooltip({
+                            title: $(event.target).find("textarea").val()
+                        });
                     }
                     const ids = []
                     const oldPositions = [];
@@ -809,8 +821,8 @@
             // for scaleable select.
             $.fn.outerWidth = function () {
                 var w = oldOuterWidth.apply($(this));
-                if ($(this).hasClass("canvas-item")
-                    && $(this).hasClass("ui-selectee")) {
+                if ($(this).hasClass("canvas-item") &&
+                    $(this).hasClass("ui-selectee")) {
                     return w * currentScale;
                 } else {
                     return w;
@@ -818,8 +830,8 @@
             };
             $.fn.outerHeight = function () {
                 var h = oldOuterHeight.apply($(this));
-                if ($(this).hasClass("canvas-item")
-                    && $(this).hasClass("ui-selectee")) {
+                if ($(this).hasClass("canvas-item") &&
+                    $(this).hasClass("ui-selectee")) {
                     return h * currentScale;
                 } else {
                     return h;
@@ -877,6 +889,7 @@
             scrollTo(0, 0);
             applyScale();
         }
+
         function zoomReset() {
             currentScale = 1;
             applyScale();
@@ -996,7 +1009,9 @@
             });
             const json = JSON.stringify(obj);
             const a = document.createElement('a');
-            a.href = URL.createObjectURL(new Blob([json], { type: 'text/json' }));
+            a.href = URL.createObjectURL(new Blob([json], {
+                type: 'text/json'
+            }));
             a.download = "simple-sticky-note_" + getCurrentDatetimeString() + ".json";
             a.style.display = "none";
             document.body.appendChild(a);
@@ -1091,7 +1106,9 @@
                 .addClass(data.color)
                 .find("textarea").val(data.text);
 
-            $(item).tooltip({ title: data.text });
+            $(item).tooltip({
+                title: data.text
+            });
             $(item).find("textarea").trigger("keydown");
         }
 
@@ -1319,8 +1336,14 @@
                         eventBody: {
                             id: $(elem).attr("id"),
                             elementClass: $(elem).attr("class"),
-                            from: { width: oldWidth, height: oldHeight },
-                            to: { width: $(elem).width(), height: $(elem).height() }
+                            from: {
+                                width: oldWidth,
+                                height: oldHeight
+                            },
+                            to: {
+                                width: $(elem).width(),
+                                height: $(elem).height()
+                            }
                         },
                         occuredOn: new Date()
                     });
@@ -1357,7 +1380,9 @@
                     });
                     eventStore.push({
                         eventType: "deleteItems",
-                        eventBody: { items: datas },
+                        eventBody: {
+                            items: datas
+                        },
                         occuredOn: new Date()
                     });
                     clearForwardStore();
@@ -1450,6 +1475,103 @@
                     });
                 }
             }
+        }
+
+        function setupShortcutKeys() {
+            $(window).on("keydown", function (e) {
+                if (navigator.platform.indexOf("Mac") >= 0) {
+                    // delete (deleteItem)
+                    if (isFocusOnBody() && isTargetKeyEvent(e, false, false, false, false, 8)) {
+                        e.preventDefault();
+                        deleteItem();
+                    }
+                    // command(meta)+z (undo)
+                    else if (isFocusOnBody() && isTargetKeyEvent(e, false, false, false, true, 90)) {
+                        e.preventDefault();
+                        undo();
+                    }
+                    // command(meta)+shift+z (redo)
+                    else if (isFocusOnBody() && isTargetKeyEvent(e, false, true, false, true, 90)) {
+                        e.preventDefault();
+                        redo();
+                    }
+                    // command(meta)+a (select all)
+                    else if (isFocusOnBody() && isTargetKeyEvent(e, false, false, false, true, 65)) {
+                        e.preventDefault();
+                        $(".canvas-item:visible").addClass("ui-selected");
+                    }
+                    // escape (deselect all)
+                    else if (isFocusOnBody() && isTargetKeyEvent(e, false, false, false, false, 27)) {
+                        e.preventDefault();
+                        $(document.body).focus();
+                        $(".canvas-item:visible").removeClass("ui-selected");
+                    }
+                    // command(meta)+s (export)
+                    else if (isTargetKeyEvent(e, false, false, false, true, 83)) {
+                        e.preventDefault();
+                        $(document.body).focus();
+                        exportData();
+                    }
+                    // command(meta)+o (import)
+                    else if (isTargetKeyEvent(e, false, false, false, true, 79)) {
+                        e.preventDefault();
+                        $(document.body).focus();
+                        importData();
+                    }
+                } else {
+                    // delete (deleteItem)
+                    if (isFocusOnBody() && isTargetKeyEvent(e, false, false, false, false, 8)) {
+                        e.preventDefault();
+                        deleteItem();
+                    }
+                    // ctrl+z (undo)
+                    else if (isFocusOnBody() && isTargetKeyEvent(e, true, false, false, false, 90)) {
+                        e.preventDefault();
+                        undo();
+                    }
+                    // ctrl+y (redo)
+                    else if (isFocusOnBody() && isTargetKeyEvent(e, true, false, false, false, 89)) {
+                        e.preventDefault();
+                        redo();
+                    }
+                    // ctrl+a (select all)
+                    else if (isFocusOnBody() && isTargetKeyEvent(e, true, false, false, false, 65)) {
+                        e.preventDefault();
+                        $(".canvas-item:visible").addClass("ui-selected");
+                    }
+                    // escape (deselect all)
+                    else if (isFocusOnBody() && isTargetKeyEvent(e, false, false, false, false, 27)) {
+                        e.preventDefault();
+                        $(document.body).focus();
+                        $(".canvas-item:visible").removeClass("ui-selected");
+                    }
+                    // ctrl+s (export)
+                    else if (isTargetKeyEvent(e, true, false, false, false, 83)) {
+                        e.preventDefault();
+                        $(document.body).focus();
+                        exportData();
+                    }
+                    // ctrl+o (import)
+                    else if (isTargetKeyEvent(e, true, false, false, false, 79)) {
+                        e.preventDefault();
+                        $(document.body).focus();
+                        importData();
+                    }
+                }
+            });
+        }
+
+        function isTargetKeyEvent(e, isCtrlKey, isShiftKey, isAltKey, isMetaKey, keyCode) {
+            return e.ctrlKey == isCtrlKey &&
+                e.shiftKey == isShiftKey &&
+                e.altKey == isAltKey &&
+                e.metaKey == isMetaKey &&
+                e.keyCode == keyCode;
+        }
+
+        function isFocusOnBody() {
+            return document.activeElement.tagName == "BODY" ||
+                document.activeElement.tagName == "BUTTON";
         }
     </script>
 </body>
