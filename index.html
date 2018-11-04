@@ -76,6 +76,8 @@
 
         .card {
             padding: 1rem 1rem 0rem 1rem;
+            height: 120px;
+            width: 200px;
             box-shadow: 0px 5px 10px 0px rgba(0, 0, 0, 0.4);
             border: solid 1px;
             transition: transform 500ms 0s ease;
@@ -87,12 +89,13 @@
 
         .card-body {
             padding: 0;
+            height: calc(100% - 2rem)
         }
 
         .card-body textarea {
             font-size: 48px;
-            width: 12rem;
-            height: 5rem;
+            width: 100%;
+            height: 100%;
             margin: 0;
             padding: 0;
             border: none;
@@ -479,6 +482,7 @@
                 $(card)
                     .css("transform-origin", "left top")
                     .css("transform", "scale(" + (1 / currentScale) + ")");
+                $(card).resizable("disable");
             });
 
             $(cardTextarea).on("blur", (e) => {
@@ -487,10 +491,11 @@
                     $(card)
                         .css("transform-origin", "none")
                         .css("transform", "none");
+                        $(card).resizable("enable");
                 }, 500);//for car menu button.
             });
 
-            toFontSizeAdjustable(cardTextarea);
+            $(cardTextarea).on("keydown", function() { adjustFontSize(cardTextarea); });
 
             card.attr("id", cardId);
             card.removeClass("d-none");
@@ -508,12 +513,25 @@
             $(card).on("dblclick", (e) => {
                 addStickyNoteFrom(card);
             });
+            
+            // resizable
+            $(card).resizable({
+                aspectRatio: false,
+                resize: function (event, ui) {
+                    let height = ui.originalSize.height + ((ui.size.height - ui.originalSize.height) / currentScale);
+                    $(card).height(height);
+                    let width = ui.originalSize.width + ((ui.size.width - ui.originalSize.width) / currentScale);
+                    $(card).width(width);
+                },
+                stop: function (event, ui) {
+                    AppEvent.ResizeItem.publish($(event.target), ui.originalSize.width, ui.originalSize.height);
+                    adjustFontSize(cardTextarea);
+                }
+            });
 
             $("#canvas").append(card);
 
             toDraggable(card);
-
-            $(cardTextarea).attr("data-scroll-height", $(cardTextarea)[0].scrollHeight);
 
             AppEvent.AddItem.publish(card);
 
@@ -550,11 +568,7 @@
                     }
                 },
                 stop: function (event, ui) {
-                    if (isVertical) {
-                        AppEvent.ChangeVerticalLineLength.publish($(event.target), ui.originalSize.height);
-                    } else {
-                        AppEvent.ChangeHorizontalLineLength.publish($(event.target), ui.originalSize.width);
-                    }
+                    AppEvent.ResizeItem.publish($(event.target), ui.originalSize.width, ui.originalSize.height);
                 }
             });
 
@@ -605,7 +619,7 @@
                     $(image).width(width);
                 },
                 stop: function (event, ui) {
-                    AppEvent.ResizeImage.publish($(event.target), ui.originalSize.width, ui.originalSize.height);
+                    AppEvent.ResizeItem.publish($(event.target), ui.originalSize.width, ui.originalSize.height);
                 }
             });
             $("#canvas").append(image);
@@ -665,6 +679,8 @@
                 changeColor(added, colorClass ? colorClass.substring(6) : "color-yellow");
                 added.css("left", sourceLeft + 5 + "px");
                 added.css("top", sourceTop + 5 + "px");
+                added.width($(from).width());
+                added.height($(from).height());
             } finally {
                 isRecordEvents = true;
             }
@@ -805,16 +821,16 @@
             };
         }
 
-        function toFontSizeAdjustable(textarea) {
+        function adjustFontSize(textarea) {
             const minFontSize = 12;
-            const maxFontSize = 48;
+            const maxFontSize = 150;
 
             const toSmall = function () {
                 const fontSize = parseFloat($(textarea).css("font-size"));
                 if (fontSize <= minFontSize) {
                     return;
                 }
-                const minScrollHeight = $(textarea).attr("data-scroll-height");
+                const minScrollHeight = $(textarea).height();
                 if (minScrollHeight >= $(textarea)[0].scrollHeight) {
                     return;
                 }
@@ -828,20 +844,16 @@
                     return;
                 }
                 $(textarea).css("font-size", (fontSize + 1) + "px");
-                adjustFontSize();
+                adjustFontSize(textarea);
             };
 
-            const adjustFontSize = function () {
-                const minScrollHeight = $(textarea).attr("data-scroll-height");
-                const currentScrollHeight = $(textarea)[0].scrollHeight;
-                if (minScrollHeight < currentScrollHeight) {
-                    toSmall();
-                } else {
-                    toBig();
-                }
-            };
-
-            $(textarea).on("keydown", adjustFontSize);
+            const minScrollHeight = $(textarea).height();
+            const currentScrollHeight = $(textarea)[0].scrollHeight;
+            if (minScrollHeight < currentScrollHeight) {
+                toSmall();
+            } else {
+                toBig();
+            }
         }
 
         function zoomIn() {
@@ -1052,6 +1064,8 @@
                 id: $e.attr("id"),
                 left: parseInt($e.css("left")),
                 top: parseInt($e.css("top")),
+                width: $e.width(),
+                height: $e.height(),
                 zIndex: $e.css("z-index"),
                 text: $e.find("textarea").val(),
                 color: colorClass
@@ -1064,10 +1078,13 @@
                 .attr("id", data.id)
                 .css("left", data.left)
                 .css("top", data.top)
+                .width(data.width)
+                .height(data.height)
                 .css("z-index", data.zIndex)
                 .removeClass("color-yellow")
                 .addClass(data.color)
                 .find("textarea").val(data.text);
+
             $(item).tooltip({ title: data.text });
             $(item).find("textarea").trigger("keydown");
         }
@@ -1286,6 +1303,43 @@
                     });
                 },
             },
+            ResizeItem: {
+                publish: function (elem, oldWidth, oldHeight) {
+                    if (!isRecordEvents) {
+                        return;
+                    }
+                    eventStore.push({
+                        eventType: "resizeItem",
+                        eventBody: {
+                            id: $(elem).attr("id"),
+                            elementClass: $(elem).attr("class"),
+                            from: { width: oldWidth, height: oldHeight },
+                            to: { width: $(elem).width(), height: $(elem).height() }
+                        },
+                        occuredOn: new Date()
+                    });
+                    clearForwardStore();
+                },
+                isTargetType: function (event) {
+                    return event.eventType == "resizeItem";
+                },
+                back: function (event) {
+                    $("#" + event.eventBody.id)
+                        .width(event.eventBody.from.width)
+                        .height(event.eventBody.from.height);
+                    if (event.eventBody.elementClass.indexOf("sticky-note") >= 0) {
+                        adjustFontSize($("#" + event.eventBody.id).find("textarea"));
+                    }
+                },
+                forward: function (event) {
+                    $("#" + event.eventBody.id)
+                        .width(event.eventBody.to.width)
+                        .height(event.eventBody.to.height);
+                    if (event.eventBody.elementClass.indexOf("sticky-note") >= 0) {
+                        adjustFontSize($("#" + event.eventBody.id).find("textarea"));
+                    }
+                }
+            },
             DeleteItems: {
                 publish: function (elems) {
                     if (!isRecordEvents) {
@@ -1388,109 +1442,6 @@
                         removeColorClass(target);
                         target.addClass(event.eventBody.to);
                     });
-                }
-            },
-            Template: {
-                publish: function (elem) {
-                    if (!isRecordEvents) {
-                        return;
-                    }
-                    eventStore.push({
-                        eventType: "",
-                        eventBody: {
-                        },
-                        occuredOn: new Date()
-                    });
-                    clearForwardStore();
-                },
-                isTargetType: function (event) {
-                    return event.eventType == "";
-                },
-                back: function (event) {
-                },
-                forward: function (event) {
-                }
-            },
-            ChangeVerticalLineLength: {
-                publish: function (elem, oldLength) {
-                    if (!isRecordEvents) {
-                        return;
-                    }
-                    eventStore.push({
-                        eventType: "changeVerticalLineLength",
-                        eventBody: {
-                            id: $(elem).attr("id"),
-                            from: oldLength,
-                            to: $(elem).height()
-                        },
-                        occuredOn: new Date()
-                    });
-                    clearForwardStore();
-                },
-                isTargetType: function (event) {
-                    return event.eventType == "changeVerticalLineLength";
-                },
-                back: function (event) {
-                    $("#" + event.eventBody.id).height(event.eventBody.from);
-                },
-                forward: function (event) {
-                    $("#" + event.eventBody.id).height(event.eventBody.to);
-                }
-            },
-            ChangeHorizontalLineLength: {
-                publish: function (elem, oldLength) {
-                    if (!isRecordEvents) {
-                        return;
-                    }
-                    eventStore.push({
-                        eventType: "changeHorizontalLineLength",
-                        eventBody: {
-                            id: $(elem).attr("id"),
-                            from: oldLength,
-                            to: $(elem).width()
-                        },
-                        occuredOn: new Date()
-                    });
-                    clearForwardStore();
-                },
-                isTargetType: function (event) {
-                    return event.eventType == "changeHorizontalLineLength";
-                },
-                back: function (event) {
-                    $("#" + event.eventBody.id).width(event.eventBody.from);
-                },
-                forward: function (event) {
-                    $("#" + event.eventBody.id).width(event.eventBody.to);
-                }
-            },
-            ResizeImage: {
-                publish: function (elem, oldWidth, oldHeight) {
-                    if (!isRecordEvents) {
-                        return;
-                    }
-                    eventStore.push({
-                        eventType: "resizeImage",
-                        eventBody: {
-                            id: $(elem).attr("id"),
-                            from: { width: oldWidth, height: oldHeight },
-                            to: { width: $(elem).width(), height: $(elem).height() }
-                        },
-                        occuredOn: new Date()
-                    });
-                    clearForwardStore();
-                },
-                isTargetType: function (event) {
-                    return event.eventType == "resizeImage";
-                },
-                back: function (event) {
-                    $("#" + event.eventBody.id)
-                        .width(event.eventBody.from.width)
-                        .height(event.eventBody.from.height);
-                },
-                forward: function (event) {
-                    $("#" + event.eventBody.id)
-                        .width(event.eventBody.to.width)
-                        .height(event.eventBody.to.height);
                 }
             }
         }
