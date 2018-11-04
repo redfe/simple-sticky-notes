@@ -75,7 +75,7 @@
         }
 
         .card {
-            padding: 1rem 1rem 0rem 1rem;
+            padding: 0rem 1rem 0rem 1rem;
             height: 120px;
             width: 200px;
             box-shadow: 0px 5px 10px 0px rgba(0, 0, 0, 0.4);
@@ -83,16 +83,20 @@
             transition: transform 500ms 0s ease;
         }
 
+        .sticky-note-header {
+            height: 1rem;
+        }
+
         .card:hover .card-menu-button {
             display: inline;
         }
 
-        .card-body {
+        .sticky-note-body {
             padding: 0;
             height: calc(100% - 2rem)
         }
 
-        .card-body textarea {
+        .sticky-note-body textarea {
             font-size: 48px;
             width: 100%;
             height: 100%;
@@ -189,7 +193,7 @@
         /* colors */
 
         .color-red,
-        .color-red .card-body textarea {
+        .color-red .sticky-note-body textarea {
             background-color: rgba(255, 200, 255, 1);
             border-color: rgba(200, 150, 200, 1);
         }
@@ -199,7 +203,7 @@
         }
 
         .color-blue,
-        .color-blue .card-body textarea {
+        .color-blue .sticky-note-body textarea {
             background-color: rgba(150, 200, 255, 1);
             border-color: rgba(100, 150, 200, 1);
         }
@@ -209,7 +213,7 @@
         }
 
         .color-green,
-        .color-green .card-body textarea {
+        .color-green .sticky-note-body textarea {
             background-color: rgba(200, 255, 200, 1);
             border-color: rgba(150, 200, 150, 1);
         }
@@ -219,7 +223,7 @@
         }
 
         .color-yellow,
-        .color-yellow .card-body textarea {
+        .color-yellow .sticky-note-body textarea {
             background-color: rgba(255, 255, 200, 1);
             border-color: rgba(200, 200, 150, 1);
         }
@@ -229,7 +233,7 @@
         }
 
         .color-white,
-        .color-white .card-body textarea {
+        .color-white .sticky-note-body textarea {
             background-color: rgba(255, 255, 255, 1);
             border-color: rgba(150, 150, 150, 1);
         }
@@ -239,7 +243,7 @@
         }
 
         .color-transparent,
-        .color-transparent .card-body textarea {
+        .color-transparent .sticky-note-body textarea {
             background-color: unset;
             border-color: rgba(0, 0, 0, 0.3);
         }
@@ -349,8 +353,10 @@
     </div>
 
     <div id="card-template" class="d-none card sticky-note canvas-item" data-toggle="tooltip" data-placement="top">
-        <button class="card-menu-button"></button>
-        <div class="card-body">
+        <div class="sticky-note-header">
+            <button class="card-menu-button"></button>
+        </div>
+        <div class="sticky-note-body">
             <textarea></textarea>
         </div>
         <div class="sticky-note-footer container-fluid">
@@ -456,7 +462,7 @@
             let cardTextarea = $(card).find("textarea");
 
             cardMenuButton.on("click", (e) => {
-                selectedCardId = $(e.target).parent(".sticky-note").attr("id");
+                selectedCardId = $(e.target).parents(".sticky-note").attr("id");
                 $("#card-menu-dialog").modal();
             });
 
@@ -510,7 +516,7 @@
             });
 
             // add from this card on double clik .
-            $(card).on("dblclick", (e) => {
+            $(card).find(".sticky-note-header").on("dblclick", (e) => {
                 addStickyNoteFrom(card);
             });
             
