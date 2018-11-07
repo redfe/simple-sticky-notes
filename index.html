@@ -1487,29 +1487,30 @@
 
         function setupShortcutKeys() {
             $(window).on("keydown", function (e) {
+                const _isFocusOnBody = isFocusOnBody();
                 if (navigator.platform.indexOf("Mac") >= 0) {
                     // delete (deleteItem)
-                    if (isFocusOnBody() && isTargetKeyEvent(e, false, false, false, false, 8)) {
+                    if (_isFocusOnBody && isTargetKeyEvent(e, false, false, false, false, 8)) {
                         e.preventDefault();
                         deleteItem();
                     }
                     // command(meta)+z (undo)
-                    else if (isFocusOnBody() && isTargetKeyEvent(e, false, false, false, true, 90)) {
+                    else if (_isFocusOnBody && isTargetKeyEvent(e, false, false, false, true, 90)) {
                         e.preventDefault();
                         undo();
                     }
                     // command(meta)+shift+z (redo)
-                    else if (isFocusOnBody() && isTargetKeyEvent(e, false, true, false, true, 90)) {
+                    else if (_isFocusOnBody && isTargetKeyEvent(e, false, true, false, true, 90)) {
                         e.preventDefault();
                         redo();
                     }
                     // command(meta)+a (select all)
-                    else if (isFocusOnBody() && isTargetKeyEvent(e, false, false, false, true, 65)) {
+                    else if (_isFocusOnBody && isTargetKeyEvent(e, false, false, false, true, 65)) {
                         e.preventDefault();
                         $(".canvas-item:visible").addClass("ui-selected");
                     }
                     // escape (deselect all)
-                    else if (isFocusOnBody() && isTargetKeyEvent(e, false, false, false, false, 27)) {
+                    else if (_isFocusOnBody && isTargetKeyEvent(e, false, false, false, false, 27)) {
                         e.preventDefault();
                         $(document.body).focus();
                         $(".canvas-item:visible").removeClass("ui-selected");
@@ -1528,27 +1529,27 @@
                     }
                 } else {
                     // delete (deleteItem)
-                    if (isFocusOnBody() && isTargetKeyEvent(e, false, false, false, false, 46)) {
+                    if (_isFocusOnBody && isTargetKeyEvent(e, false, false, false, false, 46)) {
                         e.preventDefault();
                         deleteItem();
                     }
                     // ctrl+z (undo)
-                    else if (isFocusOnBody() && isTargetKeyEvent(e, true, false, false, false, 90)) {
+                    else if (_isFocusOnBody && isTargetKeyEvent(e, true, false, false, false, 90)) {
                         e.preventDefault();
                         undo();
                     }
                     // ctrl+y (redo)
-                    else if (isFocusOnBody() && isTargetKeyEvent(e, true, false, false, false, 89)) {
+                    else if (_isFocusOnBody && isTargetKeyEvent(e, true, false, false, false, 89)) {
                         e.preventDefault();
                         redo();
                     }
                     // ctrl+a (select all)
-                    else if (isFocusOnBody() && isTargetKeyEvent(e, true, false, false, false, 65)) {
+                    else if (_isFocusOnBody && isTargetKeyEvent(e, true, false, false, false, 65)) {
                         e.preventDefault();
                         $(".canvas-item:visible").addClass("ui-selected");
                     }
                     // escape (deselect all)
-                    else if (isFocusOnBody() && isTargetKeyEvent(e, false, false, false, false, 27)) {
+                    else if (_isFocusOnBody && isTargetKeyEvent(e, false, false, false, false, 27)) {
                         e.preventDefault();
                         $(document.body).focus();
                         $(".canvas-item:visible").removeClass("ui-selected");
