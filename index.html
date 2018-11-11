@@ -506,7 +506,6 @@
             $(cardTextarea).on("change", (e) => {
                 const tooltipData = $(card).data()["bs.tooltip"];
                 const oldText = tooltipData ? tooltipData.config.title : "";
-                updateTooltip(card, $(e.target).val());
                 AppEvent.ChangeStickyNoteText.publish($(card), oldText);
             });
 
@@ -525,6 +524,7 @@
                 $(card)
                     .css("transform-origin", "left top")
                     .css("transform", "scale(" + (1 / currentScale) + ")");
+                $(card).tooltip("dispose");
                 $(card).resizable("disable");
             });
 
@@ -536,6 +536,7 @@
                         .css("transform", "none");
                     $(card).resizable("enable");
                 }, 500); //for car menu button.
+                updateTooltip(card, $(e.target).val());
             });
 
             $(cardTextarea).on("keydown", function () {
