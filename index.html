@@ -674,6 +674,22 @@
                     AppEvent.ResizeItem.publish($(event.target), ui.originalSize.width, ui.originalSize.height);
                 }
             });
+            $(image).on("dblclick", (e) => {
+                isRecordEvents = false;
+                let added;
+                try {
+                    added = addImage($(image).find("img").attr("src"));
+                    let sourceLeft = parseFloat($(image).css("left"));
+                    let sourceTop = parseFloat($(image).css("top"));
+                    added.css("left", sourceLeft + 5 + "px");
+                    added.css("top", sourceTop + 5 + "px");
+                    added.width($(image).width());
+                    added.height($(image).height());
+                } finally {
+                    isRecordEvents = true;
+                }
+                AppEvent.AddItem.publish(added);
+            });
             $("#canvas").append(image);
             toDraggable(image);
 
