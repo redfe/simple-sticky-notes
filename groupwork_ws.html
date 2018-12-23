@@ -404,7 +404,7 @@
         <span>Let's Start Output!</span>
     </div>
 
-    <script src="http://localhost:3000/socket.io/socket.io.js"></script>
+    <script src="https://simple-websocket-server.herokuapp.com/socket.io/socket.io.js"></script>
     <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
         crossorigin="anonymous"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js" integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU="
@@ -1676,7 +1676,7 @@
 
         function setupWebsocket() {
             const roomId = initRoomId();
-            socket = io('http://localhost:3000/?roomId=' + roomId);
+            socket = io('https://simple-websocket-server.herokuapp.com/?roomId=' + roomId);
             socket.on('do event', function (event) {
                 if (event.publisherId == publisherId) {
                     return;
