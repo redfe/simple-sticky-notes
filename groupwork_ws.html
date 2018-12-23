@@ -466,11 +466,6 @@
 
             // add image dialog
             $("#image-file-selection").on("change", loadImageFromLocal);
-            $("#add-image-dialog").on("show.bs.modal", () => {
-                $("#image-file-selection").next().text("Choose file");
-                $("#image-load-area").html("no image.");
-            });
-            $("#add-image-item-button").on("click", addImageItemFromModal);
 
             // initialize width & height.
             $("#canvas-width").val($("#canvas").width());
@@ -640,16 +635,11 @@
             return line;
         }
 
-        function addImageItemFromModal() {
-            if ($("#image-load-area img").length == 0) {
+        function addImage(base64Url) {
+            if (base64Url.length * 3 / 4 > 20 * 1024) {
+                alert("image data is too big. please select below 20KB.")
                 return;
             }
-            const base64Url = $("#image-load-area img").attr("src");
-            addImage(base64Url);
-            $("#add-image-dialog").modal("hide");
-        }
-
-        function addImage(base64Url) {
             const imageId = cuid();
             const image = $("<div></div>");
             $(image).attr("id", imageId);
@@ -721,12 +711,18 @@
 
         function toFrontMostItem(target) {
             let targetIndex = parseInt($(target).css("z-index"));
+            if (!targetIndex) {
+                targetIndex = 0;
+            }
             var maxIndex = 0;
             $(".canvas-item").each((i, v) => {
                 if ($(v) == $(target)) {
                     return;
                 }
                 let myIndex = parseInt($(v).css("z-index"));
+                if (!myIndex) {
+                    myIndex = 0;
+                }
                 maxIndex = Math.max(maxIndex, myIndex);
                 if (myIndex > targetIndex) {
                     $(v).css("z-index", myIndex - 1);
@@ -1411,6 +1407,7 @@
                     const targets = [];
                     event.eventBody.ids.forEach(function (id, i) {
                         const target = $("#" + id);
+                        toFrontMostItem(target);
                         targets.push(target);
                         const left = parseInt(target.css("left"));
                         const top = parseInt(target.css("top"));
@@ -1455,11 +1452,12 @@
                     }
                 },
                 forward: function (event) {
-                    $("#" + event.eventBody.id)
+                    const target = $("#" + event.eventBody.id)
                         .width(event.eventBody.to.width)
                         .height(event.eventBody.to.height);
+                    toFrontMostItem(target);
                     if (event.eventBody.elementClass.indexOf("sticky-note") >= 0) {
-                        adjustFontSize($("#" + event.eventBody.id).find("textarea"));
+                        adjustFontSize(target.find("textarea"));
                     }
                 }
             },
@@ -1526,6 +1524,7 @@
                 },
                 forward: function (event) {
                     const target = $("#" + event.eventBody.id);
+                    toFrontMostItem(target);
                     const textarea = target.find("textarea");
                     const text = event.eventBody.to;
                     textarea.val(text);
@@ -1567,6 +1566,7 @@
                 forward: function (event) {
                     event.eventBody.ids.forEach(function (id, i) {
                         const target = $("#" + id);
+                        toFrontMostItem(target);
                         removeColorClass(target);
                         target.addClass(event.eventBody.to);
                     });
