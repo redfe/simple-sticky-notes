@@ -636,10 +636,6 @@
         }
 
         function addImage(base64Url) {
-            if (base64Url.length * 3 / 4 > 20 * 1024) {
-                alert("image data is too big. please select below 20KB.")
-                return;
-            }
             const imageId = cuid();
             const image = $("<div></div>");
             $(image).attr("id", imageId);
