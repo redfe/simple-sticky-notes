@@ -5,10 +5,7 @@ very simple stikcy notes.
 ## Features
 
 - 6 colors sticky notes.
-- drag and drop(multiple).
-- change color(multiple).
 - zoom in/out.
-- delete(multiple)/return.
 - support epic canvas.
   - fit width.
   - resizable canvas.
@@ -18,14 +15,7 @@ very simple stikcy notes.
 - add image.
 - paste image.
 - import/export.
-
-## TODO
-
-- [x] add line(horizontal/vertical).
-- [x] add image.
-- [x] add clipboard image.
-- [x] import/export.
-- [x] repair selection range at zoom in/out.
+- group work.
 
 ## Usage
 
