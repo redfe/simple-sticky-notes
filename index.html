@@ -749,18 +749,25 @@
         }
 
         function addLineFrom(from) {
-            let target = $(from).attr("id") ? $(from) : $(from).parents(".line");
-            let isVertical = $(target).hasClass("vertical-line");
-            let added = addLine(isVertical);
-            let sourceLeft = parseFloat($(target).css("left"));
-            let sourceTop = parseFloat($(target).css("top"));
-            added.css("left", sourceLeft + 5 + "px");
-            added.css("top", sourceTop + 5 + "px");
-            if (isVertical) {
-                added.height($(target).height());
-            } else {
-                added.width($(target).width());
+            var added;
+            isRecordEvents = false;
+            try {
+                let target = $(from).attr("id") ? $(from) : $(from).parents(".line");
+                let isVertical = $(target).hasClass("vertical-line");
+                added = addLine(isVertical);
+                let sourceLeft = parseFloat($(target).css("left"));
+                let sourceTop = parseFloat($(target).css("top"));
+                added.css("left", sourceLeft + 5 + "px");
+                added.css("top", sourceTop + 5 + "px");
+                if (isVertical) {
+                    added.height($(target).height());
+                } else {
+                    added.width($(target).width());
+                }
+            } finally {
+                isRecordEvents = true;
             }
+            AppEvent.AddItem.publish(added);
         }
 
         function updateTooltip(target, text) {
