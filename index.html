@@ -301,54 +301,57 @@
 
     <div id="menu" class="container-fluid">
         <div class="row">
-            <div class="col-sm-2">
-                <div>File</div>
-                <button id="export-button" class="btn btn-success btn-sm">export</button>
-                <button id="import-button" class="btn btn-primary btn-sm">import</button>
-            </div>
-            <div class="col-sm-2">
-                <div>Card</div>
-                <select id="color-selection" class="">
-                    <option value="" selected>Choose...</option>
-                    <option value="red" class="color-red">Red</option>
-                    <option value="blue" class="color-blue">Blue</option>
-                    <option value="green" class="color-green">Green</option>
-                    <option value="yellow" class="color-yellow">Yellow</option>
-                    <option value="white" class="color-white">White</option>
-                    <option value="transparent">Transparent</option>
-                </select>
-                <button id="add-button" class="btn btn-primary btn-sm">add</button>
-            </div>
-            <div class="col-sm-1">
-                <div>Line</div>
-                <button id="add-horizontal-line-button" class="btn btn-primary btn-sm">&nbsp;</button>
-                <button id="add-vertical-line-button" class="btn btn-primary btn-sm">&nbsp;</button>
-            </div>
-            <div class="col-sm-1">
-                <div>Image</div>
-                <button id="add-image-button" class="btn btn-primary btn-sm">add</button>
-                <input type="file" id="image-file-selection" hidden>
-            </div>
-            <div class="col-sm-2">
-                <div>Edit</div>
-                <button id="delete-item-button" class="btn btn-danger btn-sm">delete</button>
-                <button id="undo-button" class="btn btn-primary btn-sm">undo</button>
-                <button id="redo-button" class="btn btn-primary btn-sm">redo</button>
-            </div>
-            <div class="col-sm-2">
-                <div class="">Zoom</div>
-                <div class="">
-                    <button id="zoom-in-button" class="btn btn-secondary btn-sm">＋</button>
-                    <button id="zoom-out-button" class="btn btn-secondary btn-sm">ー</button>
-                    <button id="zoom-fit-button" class="btn btn-secondary btn-sm">fit</button>
-                    <button id="zoom-reset-button" class="btn btn-secondary btn-sm">reset</button>
+            <div class="col-sm-8">
+                <div class="row">
+                    <div class="col-sm-3">
+                        <div>File</div>
+                        <button id="export-button" class="btn btn-success btn-sm">export</button>
+                        <button id="import-button" class="btn btn-primary btn-sm">import</button>
+                    </div>
+                    <div class="col-sm-1">
+                        <div>Card</div>
+                        <button id="add-button" class="btn btn-primary btn-sm">add</button>
+                    </div>
+                    <div class="col-sm-1">
+                        <div>Image</div>
+                        <button id="add-image-button" class="btn btn-primary btn-sm">add</button>
+                        <input type="file" id="image-file-selection" hidden>
+                    </div>
+                    <div class="col-sm-2">
+                        <div>Line</div>
+                        <button id="add-horizontal-line-button" class="btn btn-primary btn-sm">&nbsp;</button>
+                        <button id="add-vertical-line-button" class="btn btn-primary btn-sm">&nbsp;</button>
+                    </div>
+                    <div class="col-sm-3">
+                        <div>Edit</div>
+                        <button id="delete-item-button" class="btn btn-danger btn-sm">delete</button>
+                        <button id="undo-button" class="btn btn-primary btn-sm">undo</button>
+                        <button id="redo-button" class="btn btn-primary btn-sm">redo</button>
+                    </div>
+                    <div class="col-sm-2">
+                        <div>Group Work</div>
+                        <button id="sync-button" class="btn btn-warning btn-sm">Sync</button>
+                    </div>
                 </div>
             </div>
-            <div class="col-sm-2">
-                <div>Canvas size</div>
-                <input type="number" id="canvas-width" />
-                <input type="number" id="canvas-height" />
-                <button id="set-canvas-size-button" class="btn btn-secondary btn-sm">set</button>
+            <div class="col-sm-4">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="">Zoom</div>
+                        <div class="">
+                            <button id="zoom-in-button" class="btn btn-secondary btn-sm">＋</button>
+                            <button id="zoom-out-button" class="btn btn-secondary btn-sm">ー</button>
+                            <button id="zoom-fit-button" class="btn btn-secondary btn-sm">fit</button>
+                            <button id="zoom-reset-button" class="btn btn-secondary btn-sm">reset</button>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div>Canvas size</div>
+                        <input type="number" id="canvas-width" />
+                        <input type="number" id="canvas-height" />
+                        <button id="set-canvas-size-button" class="btn btn-secondary btn-sm">set</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -377,6 +380,25 @@
                             </select>
                         </div>
                     </div>
+                </div>
+                <div class="modal-footer">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="yesno-dialog" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Sync?</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <button class="no btn btn-secondary" data-dismiss="modal">No</button>
+                    <button class="yes btn btn-primary">Yes</button>
                 </div>
                 <div class="modal-footer">
                 </div>
@@ -449,6 +471,7 @@
             $("#export-button").on("click", exportData);
             $("#import-button").on("click", importData);
             $(document).on("paste", addImageFromClipboard);
+            $("#sync-button").on("click", sync);
             toSelectable($("#canvas"));
 
             // card menu dialog.
@@ -484,10 +507,7 @@
 
         function add() {
 
-            let color = $("#color-selection").val();
-            if (color == "") {
-                color = "yellow";
-            }
+            let color = "yellow";
             let cardId = cuid();
             let card = $("#card-template").clone();
             let cardMenuButton = $(card).find("button");
@@ -1045,6 +1065,19 @@
         }
 
         function exportData() {
+            const json = JSON.stringify(createExportData());
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(new Blob([json], {
+                type: 'text/json'
+            }));
+            a.download = "simple-sticky-note_" + getCurrentDatetimeString() + ".json";
+            a.style.display = "none";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        function createExportData() {
             const obj = {
                 canvas: {
                     width: $("#canvas-width").val(),
@@ -1055,16 +1088,7 @@
             $(".canvas-item:visible").each(function (i, elem) {
                 obj.items[i] = convertToDataForExport(elem);
             });
-            const json = JSON.stringify(obj);
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(new Blob([json], {
-                type: 'text/json'
-            }));
-            a.download = "simple-sticky-note_" + getCurrentDatetimeString() + ".json";
-            a.style.display = "none";
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
+            return obj;
         }
 
         function importData() {
@@ -1230,19 +1254,21 @@
         }
 
         function importDataFromJson(json) {
+            importDataFromData(JSON.parse(json));
+        }
+
+        function importDataFromData(data) {
             isRecordEvents = false;
             try {
-                const obj = JSON.parse(json);
-
                 $(".canvas-item:visible").remove();
 
-                $("#canvas-width").val(obj.canvas.width);
-                $("#canvas-height").val(obj.canvas.height);
+                $("#canvas-width").val(data.canvas.width);
+                $("#canvas-height").val(data.canvas.height);
                 setCanvasSize();
                 zoomFitWidth();
 
-                for (var i = 0; i < obj.items.length; i++) {
-                    importItem(obj.items[i]);
+                for (var i = 0; i < data.items.length; i++) {
+                    importItem(data.items[i]);
                 }
             } finally {
                 isRecordEvents = true;
@@ -1669,7 +1695,9 @@
                 document.activeElement.tagName == "BUTTON";
         }
 
+
         var socket;
+        setupWebsocket();
 
         function setupWebsocket() {
             const roomId = initRoomId();
@@ -1679,6 +1707,13 @@
                     return;
                 }
                 console.log(event);
+                // sync?
+                if (event.eventType == "sync") {
+                    confirmYesNo("accept sync?", function () {
+                        importDataFromData(event.eventBody);
+                    });
+                    return;
+                }
                 for (var key in AppEvent) {
                     const e = AppEvent[key];
                     if (e.isTargetType && e.isTargetType(event)) {
@@ -1724,7 +1759,27 @@
             return roomId;
         }
 
-        setupWebsocket();
+        function sync() {
+            console.log("exexute sync!");
+            confirmYesNo("sync?", function () {
+                const data = createExportData();
+                socket.emit('do event', {
+                    publisherId: publisherId,
+                    eventType: "sync",
+                    eventBody: data
+                });
+
+            });
+        }
+
+        function confirmYesNo(message, callbackOfYes) {
+            $("#yesno-dialog .modal-title").text(message);
+            $("#yesno-dialog .yes").one("click", function () {
+                callbackOfYes();
+                $("#yesno-dialog").modal("hide");
+            });
+            $("#yesno-dialog").modal();
+        }
     </script>
 </body>
 
