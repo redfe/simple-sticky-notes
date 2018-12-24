@@ -418,7 +418,6 @@
         let scaleStep = 0.1;
         var currentScale = 1.0;
         var selectedCardId = null;
-        let deletedCardIds = new Array();
 
         var click = {
             x: 0,
@@ -1014,11 +1013,6 @@
             } else {
                 return $("#" + selectedCardId);
             }
-        }
-
-        function returnCard() {
-            let cardId = deletedCardIds.pop();
-            $("#" + cardId).show("middle");
         }
 
         function adjustMainMarginTop() {
