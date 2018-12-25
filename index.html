@@ -60,7 +60,7 @@
             border-bottom: solid 1px rgb(200, 200, 200);
         }
         
-        #menu .row {
+        #menu>.row {
             max-width: 1300px;
         }
         
@@ -222,6 +222,19 @@
             height: 100%;
         }
         
+        .pointer {
+            width: 10px;
+            height: 10px;
+            border-radius: 10px;
+            background-color: red;
+            opacity: 0.5;
+            white-space:nowrap;
+        }
+
+        .pointer .name {
+            position: absolute;
+            margin: -7px 0 0 10px;
+        }
         /* colors */
         
         .color-red,
@@ -301,7 +314,7 @@
 
     <div id="menu" class="container-fluid">
         <div class="row">
-            <div class="col-sm-8">
+            <div class="col-sm-6">
                 <div class="row">
                     <div class="col-sm-3">
                         <div>File</div>
@@ -322,21 +335,21 @@
                         <button id="add-horizontal-line-button" class="btn btn-primary btn-sm">&nbsp;</button>
                         <button id="add-vertical-line-button" class="btn btn-primary btn-sm">&nbsp;</button>
                     </div>
-                    <div class="col-sm-3">
+                    <div class="col-sm-5">
                         <div>Edit</div>
                         <button id="delete-item-button" class="btn btn-danger btn-sm">delete</button>
                         <button id="undo-button" class="btn btn-primary btn-sm">undo</button>
                         <button id="redo-button" class="btn btn-primary btn-sm">redo</button>
                     </div>
-                    <div class="col-sm-2">
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="row">
+                    <div class="col-sm-3">
                         <div>Group Work</div>
                         <button id="sync-button" class="btn btn-warning btn-sm">Sync</button>
                     </div>
-                </div>
-            </div>
-            <div class="col-sm-4">
-                <div class="row">
-                    <div class="col-sm-6">
+                    <div class="col-sm-4">
                         <div class="">Zoom</div>
                         <div class="">
                             <button id="zoom-in-button" class="btn btn-secondary btn-sm">＋</button>
@@ -345,11 +358,15 @@
                             <button id="zoom-reset-button" class="btn btn-secondary btn-sm">reset</button>
                         </div>
                     </div>
-                    <div class="col-sm-6">
+                    <div class="col-sm-4">
                         <div>Canvas size</div>
                         <input type="number" id="canvas-width" />
                         <input type="number" id="canvas-height" />
                         <button id="set-canvas-size-button" class="btn btn-secondary btn-sm">set</button>
+                    </div>
+                    <div class="col-sm-1">
+                        <div>Pointer</div>
+                        <button id="clear-pointers-button" class="btn btn-secondary btn-sm">clear</button>
                     </div>
                 </div>
             </div>
@@ -399,9 +416,9 @@
                 <div class="modal-body">
                 </div>
                 <div class="modal-footer">
-                        <button class="no btn btn-secondary" data-dismiss="modal">No</button>
-                        <button class="yes btn btn-primary">Yes</button>
-                    </div>
+                    <button class="no btn btn-secondary" data-dismiss="modal">No</button>
+                    <button class="yes btn btn-primary">Yes</button>
+                </div>
             </div>
         </div>
     </div>
@@ -472,6 +489,8 @@
             $("#import-button").on("click", importData);
             $(document).on("paste", addImageFromClipboard);
             $("#sync-button").on("click", sync);
+            $("#canvas").on("mousemove", syncMousePosition)
+            $("#clear-pointers-button").on("click", clearPointers);
             toSelectable($("#canvas"));
 
             // card menu dialog.
@@ -1705,12 +1724,30 @@
                 if (event.publisherId == publisherId) {
                     return;
                 }
-                console.log(event);
+                //console.log(event);
                 // sync?
                 if (event.eventType == "sync") {
                     confirmYesNo("Overwrite with pushed content?", function () {
                         importDataFromData(event.eventBody);
                     });
+                    return;
+                }
+                if (event.eventType == "moveMouse") {
+                    const pointerId = "pointer-" + event.publisherId;
+                    var pointer = $("#" + pointerId);
+                    if (pointer.length < 1) {
+                        var pointer = $("<div></div>");
+                        pointer.addClass("pointer");
+                        pointer.attr("id", "pointer-" + event.publisherId);
+                        pointer.append("<p class='name'>" + publisherId + "</p>");
+                        $("body").append(pointer);
+                    }
+                    pointer.offset({
+                        left: event.eventBody.x * currentScale,
+                        top: $("#menu").outerHeight() + (event.eventBody.y * currentScale)
+                    });
+
+
                     return;
                 }
                 for (var key in AppEvent) {
@@ -1725,7 +1762,7 @@
                 if (event.publisherId == publisherId) {
                     return;
                 }
-                console.log(event);
+                //console.log(event);
                 for (var key in AppEvent) {
                     const e = AppEvent[key];
                     if (e.isTargetType && e.isTargetType(event)) {
@@ -1777,6 +1814,21 @@
                 $("#yesno-dialog").modal("hide");
             });
             $("#yesno-dialog").modal();
+        }
+
+        function syncMousePosition(event) {
+            socket.emit('do event', {
+                publisherId: publisherId,
+                eventType: "moveMouse",
+                eventBody: {
+                    x: (window.scrollX + event.clientX) / currentScale,
+                    y: ((window.scrollY + event.clientY) / currentScale) - $("#menu").outerHeight()
+                }
+            });
+        }
+
+        function clearPointers() {
+            $(".pointer").remove();
         }
     </script>
 </body>
