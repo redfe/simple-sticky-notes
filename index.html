@@ -1265,7 +1265,6 @@
                 $("#canvas-width").val(data.canvas.width);
                 $("#canvas-height").val(data.canvas.height);
                 setCanvasSize();
-                zoomFitWidth();
 
                 for (var i = 0; i < data.items.length; i++) {
                     importItem(data.items[i]);
@@ -1709,7 +1708,7 @@
                 console.log(event);
                 // sync?
                 if (event.eventType == "sync") {
-                    confirmYesNo("accept sync?", function () {
+                    confirmYesNo("Overwrite with pushed content?", function () {
                         importDataFromData(event.eventBody);
                     });
                     return;
@@ -1760,8 +1759,7 @@
         }
 
         function sync() {
-            console.log("exexute sync!");
-            confirmYesNo("sync?", function () {
+            confirmYesNo("Do you want to push this content?", function () {
                 const data = createExportData();
                 socket.emit('do event', {
                     publisherId: publisherId,
