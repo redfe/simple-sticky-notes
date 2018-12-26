@@ -235,6 +235,12 @@
             position: absolute;
             margin: -7px 0 0 10px;
         }
+
+        input.user-name {
+            font-size: 0.9em;
+            width: 75px;
+        }
+
         /* colors */
         
         .color-red,
@@ -347,6 +353,7 @@
                 <div class="row">
                     <div class="col-sm-3">
                         <div>Group Work</div>
+                        <input class="user-name" type="text" placeholder="your name"/>
                         <button id="sync-button" class="btn btn-warning btn-sm">Sync</button>
                     </div>
                     <div class="col-sm-4">
@@ -1739,9 +1746,10 @@
                         var pointer = $("<div></div>");
                         pointer.addClass("pointer");
                         pointer.attr("id", "pointer-" + event.publisherId);
-                        pointer.append("<p class='name'>" + publisherId + "</p>");
+                        pointer.append("<p class='name'></p>");
                         $("body").append(pointer);
                     }
+                    $(pointer).find(".name").text(event.eventBody.userName);
                     pointer.offset({
                         left: event.eventBody.x * currentScale,
                         top: $("#menu").outerHeight() + (event.eventBody.y * currentScale)
@@ -1821,6 +1829,7 @@
                 publisherId: publisherId,
                 eventType: "moveMouse",
                 eventBody: {
+                    userName: getUserName(),
                     x: (window.scrollX + event.clientX) / currentScale,
                     y: ((window.scrollY + event.clientY) / currentScale) - $("#menu").outerHeight()
                 }
@@ -1829,6 +1838,10 @@
 
         function clearPointers() {
             $(".pointer").remove();
+        }
+
+        function getUserName() {
+            return $("input.user-name").val();
         }
     </script>
 </body>
