@@ -580,7 +580,7 @@
                 updateTooltip(card, $(e.target).val());
             });
 
-            $(cardTextarea).on("keydown", function () {
+            $(cardTextarea).on("keydown keyup", function () {
                 adjustFontSize(cardTextarea);
             });
 
