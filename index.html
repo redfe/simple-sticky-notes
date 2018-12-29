@@ -986,7 +986,7 @@
         function zoomFitWidth() {
             currentScale = window.innerWidth / $("#canvas").width();
             scrollTo(0, 0);
-            applyScale();
+            applyScale(true);
         }
 
         function zoomReset() {
@@ -994,28 +994,31 @@
             applyScale();
         }
 
-        function applyScale() {
+        function applyScale(disableAnchor) {
             // do nothing while resizing.
             if ($(".ui-resizable-resizing").length > 0) {
                 return;
             }
-            if ($(".ui-selected").length == 0) {
+            const resize = () => {
+                $("#canvas")
+                    .css("transform", "scale(" + currentScale + ")")
+                    .css("transform-origin", "left top");
+            };
+            if (disableAnchor) {
+                resize();
+            } else if ($(".ui-selected").length == 0) {
                 let scrollLeft = $(window).scrollLeft();
                 let scrollTop = $(window).scrollTop();
                 let beforeDocumentWidth = $(document).width();
                 let beforeDocumentHeight = $(document).height();
-                $("#canvas")
-                    .css("transform", "scale(" + currentScale + ")")
-                    .css("transform-origin", "left top");
+                resize();
                 $(window).scrollLeft($(document).width() * (scrollLeft / beforeDocumentWidth));
                 $(window).scrollTop(($(document).height()) * (scrollTop / beforeDocumentHeight));
             } else {
                 let selecteds = $(".canvas-item.ui-selected");
                 var mostLeft = Math.min.apply(null, $.map(selecteds, x => parseInt($(x).css("left"))));
                 var mostTop = Math.min.apply(null, $.map(selecteds, x => parseInt($(x).css("top"))));
-                $("#canvas")
-                    .css("transform", "scale(" + currentScale + ")")
-                    .css("transform-origin", "left top");;
+                resize();
                 $(window).scrollLeft(mostLeft * currentScale - (30 * currentScale));
                 $(window).scrollTop(mostTop * currentScale - (30 * currentScale));
             }
