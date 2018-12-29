@@ -787,6 +787,7 @@
                 added.css("top", sourceTop + 5 + "px");
                 added.width($(from).width());
                 added.height($(from).height());
+                adjustFontSize(added.find("textarea"));
             } finally {
                 isRecordEvents = true;
             }
