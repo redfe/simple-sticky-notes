@@ -17,7 +17,6 @@ very simple stikcy notes.
 - import/export.
 - group work.
 
-## Usage
+## Deom
 
-open `index.html` in your web browser.
-or access to https://redfe.github.io/simple-sticky-notes/.
+access to [Deomo](https://redfe.github.io/simple-sticky-notes/)ß.

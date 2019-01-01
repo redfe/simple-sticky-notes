@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Simple Sticky Notes</title>
+    <title>Deom of Simple Sticky Notes</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
@@ -61,7 +61,7 @@
         }
         
         #menu>.row {
-            max-width: 1300px;
+            max-width: 1500px;
         }
         
         #menu input[type='number'] {
@@ -241,6 +241,44 @@
             width: 75px;
         }
 
+        .markdown {
+            width: 200px;
+            height: 120px;
+            padding: 10px 10px 10px 10px;
+            border: solid 1px black;
+            overflow: none;
+            min-width: 200px;
+            min-height: 100px;
+            background-color: white;
+            border-color: silver;
+        }
+
+        .markdown .md-editor {
+            width: auto;
+            height: 100%;
+        }
+
+        .markdown .md-editor textarea {
+            margin-top: 5px;
+            resize: none;
+            width: 100%;
+            height: calc(100% - 5px);
+            background-color: rgba(0, 0, 0, 0);
+            border: solid 1px silver;
+        }
+
+        .markdown .tab-content {
+            word-break: break-all;
+            width: 100%;
+            overflow-y: hidden;
+            height: calc(100% - 33px);
+        }
+
+        .markdown .nav-tabs a {
+            font-size: 0.5em;
+            padding: .3rem .3rem;
+        }
+
         /* colors */
         
         .color-red,
@@ -323,26 +361,21 @@
             <div class="col-sm-6">
                 <div class="row">
                     <div class="col-sm-3">
-                        <div>File</div>
+                        <div class="">File</div>
                         <button id="export-button" class="btn btn-success btn-sm">export</button>
                         <button id="import-button" class="btn btn-primary btn-sm">import</button>
                     </div>
-                    <div class="col-sm-1">
-                        <div>Card</div>
-                        <button id="add-button" class="btn btn-primary btn-sm">add</button>
-                    </div>
-                    <div class="col-sm-1">
-                        <div>Image</div>
-                        <button id="add-image-button" class="btn btn-primary btn-sm">add</button>
+                    <div class="col-sm-5">
+                        <div class="">Item</div>
+                        <button id="add-button" class="btn btn-primary btn-sm">card</button>
+                        <button id="add-markdown-button" class="btn btn-primary btn-sm">markdown</button>
+                        <button id="add-image-button" class="btn btn-primary btn-sm">image</button>
                         <input type="file" id="image-file-selection" hidden>
-                    </div>
-                    <div class="col-sm-2">
-                        <div>Line</div>
                         <button id="add-horizontal-line-button" class="btn btn-primary btn-sm">&nbsp;</button>
                         <button id="add-vertical-line-button" class="btn btn-primary btn-sm">&nbsp;</button>
                     </div>
-                    <div class="col-sm-5">
-                        <div>Edit</div>
+                    <div class="col-sm-4">
+                        <div class="">Edit</div>
                         <button id="delete-item-button" class="btn btn-danger btn-sm">delete</button>
                         <button id="undo-button" class="btn btn-primary btn-sm">undo</button>
                         <button id="redo-button" class="btn btn-primary btn-sm">redo</button>
@@ -352,8 +385,8 @@
             <div class="col-sm-6">
                 <div class="row">
                     <div class="col-sm-3">
-                        <div>Group Work</div>
-                        <input class="user-name" type="text" placeholder="your name"/>
+                        <div class="">Groop Work</div>
+                        <input class="user-name" type="text" placeholder="your name" />
                         <button id="sync-button" class="btn btn-warning btn-sm">Push</button>
                     </div>
                     <div class="col-sm-4">
@@ -446,6 +479,23 @@
         </div>
     </div>
 
+    <div id="markdown-template" class="d-none markdown card canvas-item">
+        <ul class="nav nav-tabs" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active md-view" data-toggle="tab" href="" role="tab" aria-controls="" aria-selected="true">View</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link md-editor" data-toggle="tab" href="" role="tab" aria-controls="" aria-selected="false">Edit</a>
+            </li>
+        </ul>
+        <div class="tab-content">
+            <div class="md-view tab-pane show active"></div>
+            <div class="md-editor tab-pane">
+                <textarea></textarea>
+            </div>
+        </div>
+    </div>
+
     <div id="first-message">
         <span>Let's Start Output!</span>
     </div>
@@ -460,6 +510,8 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
         crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cuid/1.3.8/browser-cuid.min.js"></script>
+    <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script>
         let scaleStep = 0.1;
         var currentScale = 1.0;
@@ -492,6 +544,7 @@
             $("#add-image-button").on("click", (e) => {
                 $("#image-file-selection").click();
             });
+            $("#add-markdown-button").on("click", addMarkdown);
             $("#export-button").on("click", exportData);
             $("#import-button").on("click", importData);
             $(document).on("paste", addImageFromClipboard);
@@ -529,6 +582,8 @@
                 console.log(".");
                 return 'jquery beforeunload';
             });
+
+            setupMarkdownRenderWithMermaid();
         });
 
         function add() {
@@ -613,7 +668,8 @@
                     $(card).width(width);
                 },
                 stop: function (event, ui) {
-                    AppEvent.ResizeItem.publish($(event.target), ui.originalSize.width, ui.originalSize.height);
+                    AppEvent.ResizeItem.publish($(event.target), ui.originalSize.width, ui.originalSize
+                        .height);
                     adjustFontSize(cardTextarea);
                 }
             });
@@ -641,7 +697,6 @@
             line.addClass("line canvas-item");
             line.addClass(isVertical ? "vertical-line" : "horizontal-line");
             line.attr("id", lineId);
-            line.removeClass("d-none");
             initializePosition(line);
             toFrontMostItem(line);
             let handles = isVertical ? "s" : "e";
@@ -659,7 +714,8 @@
                     }
                 },
                 stop: function (event, ui) {
-                    AppEvent.ResizeItem.publish($(event.target), ui.originalSize.width, ui.originalSize.height);
+                    AppEvent.ResizeItem.publish($(event.target), ui.originalSize.width, ui.originalSize
+                        .height);
                 }
             });
 
@@ -703,7 +759,8 @@
                     $(image).width(width);
                 },
                 stop: function (event, ui) {
-                    AppEvent.ResizeItem.publish($(event.target), ui.originalSize.width, ui.originalSize.height);
+                    AppEvent.ResizeItem.publish($(event.target), ui.originalSize.width, ui.originalSize
+                        .height);
                 }
             });
             $(image).on("dblclick", (e) => {
@@ -741,6 +798,112 @@
                     });
                 }
             }
+        }
+
+        function addMarkdown() {
+            const itemId = cuid();
+            const markdown = $("#markdown-template").clone();
+            const viewButton = $(markdown).find("a.md-view");
+            const editButton = $(markdown).find("a.md-editor");
+            const viewArea = $(markdown).find("div.md-view");
+            const editArea = $(markdown).find("div.md-editor");
+
+            // setup bootstrap navtab.
+            viewArea.attr("id", cuid());
+            viewButton.attr("href", "#" + viewArea.attr("id"));
+            viewButton.attr("aria-controls", viewArea.attr("id"));
+            editArea.attr("id", cuid());
+            editButton.attr("href", "#" + editArea.attr("id"));
+            editButton.attr("aria-controls", editArea.attr("id"));
+
+            $(editArea).find("textarea").on("change", () => {
+                const oldText = getMarkdownTextData($(markdown));
+                setMarkdownTextData($(markdown), $(markdown).find("textarea").val());
+                AppEvent.ChangeMarkdownText.publish($(markdown), oldText);
+            });
+
+            $(viewButton).on("click", () => {
+                $(viewArea).html("");
+                setTimeout(() => {
+                    $(markdown).find("div.tab-content").css("overflow-y", "scroll");
+                    renderMarkdown($(editArea).find("textarea").val(), $(viewArea));
+                }, 100);
+            });
+            $(editButton).on("click", () => {
+                $(markdown).find("div.tab-content").css("overflow-y", "hidden");
+                setTimeout(() => $(editArea).find("textarea").focus(), 500);
+            });
+
+            markdown.attr("id", itemId);
+            markdown.removeClass("d-none");
+
+            initializePosition(markdown);
+            toFrontMostItem(markdown);
+
+            markdown.on("mousedown", (e) => {
+                toFrontMostItem($(markdown));
+            });
+
+            // add from this markdown on double clik .
+            $(markdown).on("dblclick", (e) => {
+                addMarkdownFrom(markdown);
+            });
+
+            // resizable
+            $(markdown).resizable({
+                aspectRatio: false,
+                resize: function (event, ui) {
+                    let height = ui.originalSize.height + ((ui.size.height - ui.originalSize.height) /
+                        currentScale);
+                    $(markdown).height(height);
+                    let width = ui.originalSize.width + ((ui.size.width - ui.originalSize.width) /
+                        currentScale);
+                    $(markdown).width(width);
+                },
+                stop: function (event, ui) {
+                    AppEvent.ResizeItem.publish($(markdown), ui.originalSize.width, ui.originalSize
+                        .height);
+                }
+            });
+
+            $("#canvas").append(markdown);
+
+            toDraggable(markdown);
+
+            AppEvent.AddItem.publish(markdown);
+
+            return markdown;
+        }
+
+        function setupMarkdownRenderWithMermaid() {
+            var renderer = new marked.Renderer();
+            renderer.code = function (code, language) {
+                if (code.match(/^sequenceDiagram/) || code.match(/^graph/) || code.match(/^gantt/)) {
+                    return '<div class="mermaid">' + code + '</div>';
+                } else {
+                    return '<pre><code>' + code + '</code></pre>';
+                }
+            };
+            marked.setOptions({
+                renderer: renderer
+            });
+        }
+
+        function renderMarkdown(text, view) {
+            $(view).html("<div></div>");
+            $(view).find("div").html(marked(text));
+            try {
+                mermaid.init(undefined, $(view).find(".mermaid"));
+            } catch (error) {}
+        }
+
+        function setMarkdownTextData(markdown, text) {
+            $(markdown).data("text", text);
+        }
+
+        function getMarkdownTextData(markdown) {
+            const val = $(markdown).data("text");
+            return !val ? "" : val;
         }
 
         function initializePosition(item) {
@@ -810,6 +973,24 @@
                 } else {
                     added.width($(target).width());
                 }
+            } finally {
+                isRecordEvents = true;
+            }
+            AppEvent.AddItem.publish(added);
+        }
+
+        function addMarkdownFrom(from) {
+            let added;
+            isRecordEvents = false;
+            try {
+                let target = $(from).attr("id") ? $(from) : $(from).parents(".markdown");
+                added = addMarkdown();
+                let sourceLeft = parseFloat($(target).css("left"));
+                let sourceTop = parseFloat($(target).css("top"));
+                added.css("left", sourceLeft + 5 + "px");
+                added.css("top", sourceTop + 5 + "px");
+                added.width($(from).width());
+                added.height($(from).height());
             } finally {
                 isRecordEvents = true;
             }
@@ -902,8 +1083,10 @@
                         });
                     });
 
-                    const moveLeft = parseInt($(event.target).css("left")) - $(event.target).attr("startX");
-                    const moveTop = parseInt($(event.target).css("top")) - $(event.target).attr("startY");
+                    const moveLeft = parseInt($(event.target).css("left")) - $(event.target).attr(
+                        "startX");
+                    const moveTop = parseInt($(event.target).css("top")) - $(event.target).attr(
+                        "startY");
 
                     AppEvent.MoveItems.publish(ids, oldPositions, moveLeft, moveTop);
 
@@ -1175,6 +1358,8 @@
                 return convertToHorizontalLineDataForExport(elem);
             } else if ($(elem).hasClass("image")) {
                 return convertToImageDataForExport(elem);
+            } else if ($(elem).hasClass("markdown")) {
+                return convertToMarkdownDataForExport(elem);
             }
             return null;
         }
@@ -1283,6 +1468,33 @@
                 .css("z-index", data.zIndex);
         }
 
+        function convertToMarkdownDataForExport(elem) {
+            $e = $(elem);
+            return {
+                type: "markdown",
+                id: $e.attr("id"),
+                left: parseInt($e.css("left")),
+                top: parseInt($e.css("top")),
+                width: $e.width(),
+                height: $e.height(),
+                zIndex: $e.css("z-index"),
+                text: $e.find("textarea").val()
+            };
+        }
+
+        function drawMarkdownFromData(data) {
+            var item = addMarkdown();
+            $(item)
+                .attr("id", data.id)
+                .css("left", data.left)
+                .css("top", data.top)
+                .width(data.width)
+                .height(data.height)
+                .css("z-index", data.zIndex)
+                .find("textarea").val(data.text);
+            $(item).find("a.md-view").trigger("click");
+        }
+
         function importDataFromJson(json) {
             importDataFromData(JSON.parse(json));
         }
@@ -1317,6 +1529,8 @@
                     drawHorizontalLineFromData(item);
                 } else if (item.type == "image") {
                     drawImageFromData(item);
+                } else if (item.type == "markdown") {
+                    drawMarkdownFromData(item);
                 }
             } finally {
                 isRecordEvents = true;
@@ -1343,7 +1557,7 @@
                 return event;
             },
             clear: function () {
-                this._store.splice(0, eventStore.length);
+                this._store.splice(0, eventStore._store.length);
             }
         };
 
@@ -1357,7 +1571,7 @@
                 return msg;
             },
             clear: function () {
-                this._store.splice(0, forwardStore.length);
+                this._store.splice(0, forwardStore._store.length);
             }
         };
 
@@ -1623,6 +1837,44 @@
                         target.addClass(event.eventBody.to);
                     });
                 }
+            },
+            ChangeMarkdownText: {
+                publish: function (elem, old) {
+                    if (!isRecordEvents) {
+                        return;
+                    }
+                    eventStore.push({
+                        publisherId: publisherId,
+                        eventType: "changeMarkdownText",
+                        eventBody: {
+                            id: $(elem).attr("id"),
+                            from: old,
+                            to: $(elem).find("textarea").val()
+                        },
+                        occuredOn: new Date()
+                    });
+                    clearForwardStore();
+                },
+                isTargetType: function (event) {
+                    return event.eventType == "changeMarkdownText";
+                },
+                back: function (event) {
+                    const target = $("#" + event.eventBody.id);
+                    const textarea = target.find("textarea");
+                    const text = event.eventBody.from;
+                    textarea.val(text);
+                    setMarkdownTextData(target, text);
+                    target.find("a.md-view").trigger("click");
+                },
+                forward: function (event) {
+                    const target = $("#" + event.eventBody.id);
+                    toFrontMostItem(target);
+                    const textarea = target.find("textarea");
+                    const text = event.eventBody.to;
+                    textarea.val(text);
+                    setMarkdownTextData(target, text);
+                    target.find("a.md-view").trigger("click");
+                }
             }
         }
 
@@ -1724,7 +1976,6 @@
                 document.activeElement.tagName == "BUTTON";
         }
 
-
         var socket;
         setupWebsocket();
 
@@ -1810,12 +2061,14 @@
         function sync() {
             confirmYesNo("Do you want to push this content?", function () {
                 const data = createExportData();
+                if (!socket) {
+                    return;
+                }
                 socket.emit('do event', {
                     publisherId: publisherId,
                     eventType: "sync",
                     eventBody: data
                 });
-
             });
         }
 
@@ -1829,6 +2082,9 @@
         }
 
         function syncMousePosition(event) {
+            if (!socket) {
+                return;
+            }
             socket.emit('do event', {
                 publisherId: publisherId,
                 eventType: "moveMouse",
