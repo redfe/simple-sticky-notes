@@ -13,6 +13,7 @@ very simple stikcy notes.
   - tooltip.
 - add line.
 - add image.
+- add markdown.
 - paste image.
 - import/export.
 - group work.
