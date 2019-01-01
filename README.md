@@ -19,4 +19,4 @@ very simple stikcy notes.
 
 ## Deom
 
-access to [Deomo](https://redfe.github.io/simple-sticky-notes/)ß.
+access to [Deomo](https://redfe.github.io/simple-sticky-notes/).
