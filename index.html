@@ -50,6 +50,7 @@
         }
         
         #menu {
+            padding-left: -10px;
             padding-top: 10px;
             position: fixed;
             top: 0;
@@ -60,6 +61,10 @@
             border-bottom: solid 1px rgb(200, 200, 200);
         }
         
+        #menu a {
+            cursor: pointer;
+        }
+
         #menu>.row {
             max-width: 1500px;
         }
@@ -67,23 +72,14 @@
         #menu input[type='number'] {
             width: 70px;
         }
-        
-        #add-horizontal-line-button {
-            background-color: white;
-            padding: 0;
-            height: 2rem;
-            width: 2rem;
-            border-width: 0.9rem 0.3rem;
+
+        #menu .btn-group>button {
+            font-size: 14px;
+            height: 31px;
+            padding-top: 4px;
+            padding-bottom: 4px;
         }
-        
-        #add-vertical-line-button {
-            background-color: white;
-            padding: 0;
-            height: 2rem;
-            width: 2rem;
-            border-width: 0.3rem 0.9rem;
-        }
-        
+                
         #zoom-in-button {
             font-weight: bold;
         }
@@ -279,6 +275,25 @@
             padding: .3rem .3rem;
         }
 
+        .markdown .md-view table {
+            border: solid 1px;
+        }
+
+        .markdown .md-view table {
+            border-collapse:collapse;
+        }
+
+        .markdown .md-view table th {
+            border: solid 1px black;
+            background-color: silver;
+            color: white;
+            font-weight: normal;
+        }
+
+        .markdown .md-view table td {
+            border: solid 1px;
+        }
+
         /* colors */
         
         .color-red,
@@ -358,57 +373,69 @@
 
     <div id="menu" class="container-fluid">
         <div class="row">
-            <div class="col-sm-6">
-                <div class="row">
-                    <div class="col-sm-3">
-                        <div class="">File</div>
-                        <button id="export-button" class="btn btn-success btn-sm">export</button>
-                        <button id="import-button" class="btn btn-primary btn-sm">import</button>
+            <div class="col-sm-4 container-fluid">
+                <div>Main Menu</div>
+                <div class="btn-group" role="group">
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"
+                            aria-haspopup="true" aria-expanded="false">
+                            File
+                        </button>
+                        <div class="dropdown-menu">
+                            <a id="export-button" class="dropdown-item">Export</a>
+                            <a id="import-button" class="dropdown-item">Import</a>
+                        </div>
                     </div>
-                    <div class="col-sm-5">
-                        <div class="">Item</div>
-                        <button id="add-button" class="btn btn-primary btn-sm">card</button>
-                        <button id="add-markdown-button" class="btn btn-primary btn-sm">markdown</button>
-                        <button id="add-image-button" class="btn btn-primary btn-sm">image</button>
-                        <input type="file" id="image-file-selection" hidden>
-                        <button id="add-horizontal-line-button" class="btn btn-primary btn-sm">&nbsp;</button>
-                        <button id="add-vertical-line-button" class="btn btn-primary btn-sm">&nbsp;</button>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"
+                            aria-haspopup="true" aria-expanded="false">
+                            Add
+                        </button>
+                        <div class="dropdown-menu">
+                            <a id="add-button" class="dropdown-item">Card</a>
+                            <a id="add-markdown-button" class="dropdown-item">Markdown</a>
+                            <a id="add-image-button" class="dropdown-item">Image</a>
+                            <a id="add-horizontal-line-button" class="dropdown-item">Horizontal Line</a>
+                            <a id="add-vertical-line-button" class="dropdown-item">Vertical Line</a>
+                            <input type="file" id="image-file-selection" hidden>
+                        </div>
                     </div>
-                    <div class="col-sm-4">
-                        <div class="">Edit</div>
-                        <button id="delete-item-button" class="btn btn-danger btn-sm">delete</button>
-                        <button id="undo-button" class="btn btn-primary btn-sm">undo</button>
-                        <button id="redo-button" class="btn btn-primary btn-sm">redo</button>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"
+                            aria-haspopup="true" aria-expanded="false">
+                            Edit
+                        </button>
+                        <div class="dropdown-menu">
+                            <a id="undo-button" class="dropdown-item">Undo</a>
+                            <a id="redo-button" class="dropdown-item">Redo</a>
+                            <a id="delete-item-button" class="dropdown-item bg-danger text-white">Delete</a>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="col-sm-6">
-                <div class="row">
-                    <div class="col-sm-3">
-                        <div class="">Groop Work</div>
-                        <input class="user-name" type="text" placeholder="your name" />
-                        <button id="sync-button" class="btn btn-warning btn-sm">Push</button>
-                    </div>
-                    <div class="col-sm-4">
-                        <div class="">Zoom</div>
-                        <div class="">
-                            <button id="zoom-in-button" class="btn btn-secondary btn-sm">＋</button>
-                            <button id="zoom-out-button" class="btn btn-secondary btn-sm">ー</button>
-                            <button id="zoom-fit-button" class="btn btn-secondary btn-sm">fit</button>
-                            <button id="zoom-reset-button" class="btn btn-secondary btn-sm">reset</button>
-                        </div>
-                    </div>
-                    <div class="col-sm-4">
-                        <div>Canvas size</div>
-                        <input type="number" id="canvas-width" />
-                        <input type="number" id="canvas-height" />
-                        <button id="set-canvas-size-button" class="btn btn-secondary btn-sm">set</button>
-                    </div>
-                    <div class="col-sm-1">
-                        <div>Pointer</div>
-                        <button id="clear-pointers-button" class="btn btn-secondary btn-sm">clear</button>
-                    </div>
+            <div class="col-sm-2">
+                <div class="">Groop Work</div>
+                <input class="user-name" type="text" placeholder="your name" />
+                <button id="sync-button" class="btn btn-warning btn-sm">Push</button>
+            </div>
+            <div class="col-sm-2">
+                <div class="">Zoom</div>
+                <div class="">
+                    <button id="zoom-in-button" class="btn btn-secondary btn-sm">＋</button>
+                    <button id="zoom-out-button" class="btn btn-secondary btn-sm">ー</button>
+                    <button id="zoom-fit-button" class="btn btn-secondary btn-sm">Fit</button>
+                    <button id="zoom-reset-button" class="btn btn-secondary btn-sm">Reset</button>
                 </div>
+            </div>
+            <div class="col-sm-2">
+                <div>Canvas Size</div>
+                <input type="number" id="canvas-width" />
+                <input type="number" id="canvas-height" />
+                <button id="set-canvas-size-button" class="btn btn-secondary btn-sm">Set</button>
+            </div>
+            <div class="col-sm-2">
+                <div>Pointer</div>
+                <button id="clear-pointers-button" class="btn btn-secondary btn-sm">Clear</button>
             </div>
         </div>
     </div>
@@ -581,6 +608,14 @@
             $(window).on('beforeunload', function (event) {
                 console.log(".");
                 return 'jquery beforeunload';
+            });
+
+            // setup main menu.
+            $("button.dropdown-toggle").on("mouseover", e => {
+                if ($(e.target).attr("aria-expanded") == "true") {
+                    return;
+                }
+                $(e.target).trigger("click");
             });
 
             setupMarkdownRenderWithMermaid();

@@ -13,10 +13,11 @@ very simple stikcy notes.
   - tooltip.
 - add line.
 - add image.
+- add markdown.
 - paste image.
 - import/export.
 - group work.
 
-## Deom
+## Demo
 
-access to [Deomo](https://redfe.github.io/simple-sticky-notes/).
+access to [Demo](https://redfe.github.io/simple-sticky-notes/).
