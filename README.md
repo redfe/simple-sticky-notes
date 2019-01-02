@@ -18,6 +18,6 @@ very simple stikcy notes.
 - import/export.
 - group work.
 
-## Deom
+## Demo
 
 access to [Demo](https://redfe.github.io/simple-sticky-notes/).
