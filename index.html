@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Deom of Simple Sticky Notes</title>
+    <title>Demo of Simple Sticky Notes</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
@@ -416,7 +416,8 @@
             <div class="col-sm-2">
                 <div class="">Groop Work</div>
                 <input class="user-name" type="text" placeholder="your name" />
-                <button id="sync-button" class="btn btn-warning btn-sm">Push</button>
+                <button id="push-button" class="btn btn-warning btn-sm">Push</button>
+                <button id="call-button" class="btn btn-secondary btn-sm">&#x270B Call</button>
             </div>
             <div class="col-sm-2">
                 <div class="">Zoom</div>
@@ -575,7 +576,8 @@
             $("#export-button").on("click", exportData);
             $("#import-button").on("click", importData);
             $(document).on("paste", addImageFromClipboard);
-            $("#sync-button").on("click", sync);
+            $("#push-button").on("click", push);
+            $("#call-button").on("click", call);
             $("#canvas").on("mousemove", syncMousePosition)
             $("#clear-pointers-button").on("click", clearPointers);
             toSelectable($("#canvas"));
@@ -1579,9 +1581,17 @@
                 if (!event) {
                     return;
                 }
-                this._store.push(event);
+                var normalizedEvent = Object.assign(event, {
+                    id: cuid(),
+                    publisherId: publisherId,
+                    userName: getUserName(),
+                    occuredOn: new Date()
+                });
+                if (!(normalizedEvent.forwardOnly)) {
+                    this._store.push(normalizedEvent);
+                }
                 if (socket) {
-                    socket.emit('do event', event);
+                    socket.emit('do event', normalizedEvent);
                 }
             },
             pop: function () {
@@ -1657,10 +1667,8 @@
                         return;
                     }
                     eventStore.push({
-                        publisherId: publisherId,
                         eventType: "addItem",
-                        eventBody: convertToDataForExport(elem),
-                        occuredOn: new Date()
+                        eventBody: convertToDataForExport(elem)
                     });
                     clearForwardStore();
                 },
@@ -1680,15 +1688,13 @@
                         return;
                     }
                     eventStore.push({
-                        publisherId: publisherId,
                         eventType: "moveItems",
                         eventBody: {
                             ids: ids,
                             oldPositions: oldPositions,
                             moveLeft: moveLeft,
                             moveTop: moveTop
-                        },
-                        occuredOn: new Date()
+                        }
                     });
                     clearForwardStore();
                 },
@@ -1723,7 +1729,6 @@
                         return;
                     }
                     eventStore.push({
-                        publisherId: publisherId,
                         eventType: "resizeItem",
                         eventBody: {
                             id: $(elem).attr("id"),
@@ -1736,8 +1741,7 @@
                                 width: $(elem).width(),
                                 height: $(elem).height()
                             }
-                        },
-                        occuredOn: new Date()
+                        }
                     });
                     clearForwardStore();
                 },
@@ -1772,12 +1776,10 @@
                         datas.push(convertToDataForExport(elem));
                     });
                     eventStore.push({
-                        publisherId: publisherId,
                         eventType: "deleteItems",
                         eventBody: {
                             items: datas
-                        },
-                        occuredOn: new Date()
+                        }
                     });
                     clearForwardStore();
                 },
@@ -1801,14 +1803,12 @@
                         return;
                     }
                     eventStore.push({
-                        publisherId: publisherId,
                         eventType: "changeStickyNoteText",
                         eventBody: {
                             id: $(elem).attr("id"),
                             from: old,
                             to: $(elem).find("textarea").val()
-                        },
-                        occuredOn: new Date()
+                        }
                     });
                     clearForwardStore();
                 },
@@ -1843,14 +1843,12 @@
                         ids.push($(elem).attr("id"));
                     });
                     eventStore.push({
-                        publisherId: publisherId,
                         eventType: "changeStickyNotesColor",
                         eventBody: {
                             ids: ids,
                             froms: froms,
                             to: to
-                        },
-                        occuredOn: new Date()
+                        }
                     });
                     clearForwardStore();
                 },
@@ -1879,14 +1877,12 @@
                         return;
                     }
                     eventStore.push({
-                        publisherId: publisherId,
                         eventType: "changeMarkdownText",
                         eventBody: {
                             id: $(elem).attr("id"),
                             from: old,
                             to: $(elem).find("textarea").val()
-                        },
-                        occuredOn: new Date()
+                        }
                     });
                     clearForwardStore();
                 },
@@ -1910,8 +1906,86 @@
                     setMarkdownTextData(target, text);
                     target.find("a.md-view").trigger("click");
                 }
+            },
+            Push: {
+                publish: function () {
+                    confirmYesNo("Do you want to push this content?", function () {
+                        const data = createExportData();
+                        eventStore.push({
+                            eventType: "push",
+                            eventBody: data,
+                            forwardOnly: true,
+                        });
+                    });
+                },
+                isTargetType: function (event) {
+                    return event.eventType == "push";
+                },
+                forward: function (event) {
+                    confirmYesNo("Overwrite with pushed content?", function () {
+                        importDataFromData(event.eventBody);
+                    });
+                }
+            },
+            Call: {
+                publish: function () {
+                    eventStore.push({
+                        eventType: "call",
+                        eventBody: {
+                        },
+                        forwardOnly: true
+                    });
+                },
+                isTargetType: function (event) {
+                    return event.eventType == "call";
+                },
+                forward: function (event) {
+                    if (!('Notification' in window)) {
+                        alert('\u270B ' + event.userName);
+                        return;
+                    }
+                    Notification.requestPermission()
+                        .then((permission) => {
+                            if (permission === 'granted') {
+                                var title = '\u270B ' + event.userName;
+                                var n = new Notification(title);
+                                setTimeout(n.close.bind(n), 5000);
+                            } else if (permission == 'denied') {} else if (permission == 'default') {}
+                        });
+                }
+            },
+            MoveMouse: {
+                publish(x, y) {
+                    eventStore.push({
+                        eventType: "moveMouse",
+                        eventBody: {
+                            x: x,
+                            y: y
+                        }
+                    });
+                },
+                isTargetType: function (event) {
+                    return event.eventType == "moveMouse";
+                },
+                forward: function (event) {
+                    const pointerId = "pointer-" + event.publisherId;
+                    var pointer = $("#" + pointerId);
+                    if (pointer.length < 1) {
+                        var pointer = $("<div></div>");
+                        pointer.addClass("pointer");
+                        pointer.attr("id", "pointer-" + event.publisherId);
+                        pointer.append("<p class='name'></p>");
+                        $("body").append(pointer);
+                    }
+                    $(pointer).find(".name").text(event.userName);
+                    pointer.offset({
+                        left: event.eventBody.x * currentScale,
+                        top: $("#menu").outerHeight() + (event.eventBody.y *
+                            currentScale)
+                    });
+                }
             }
-        }
+        };
 
         function setupShortcutKeys() {
             $(window).on("keydown", function (e) {
@@ -1923,7 +1997,8 @@
                         deleteItem();
                     }
                     // command(meta)+z (undo)
-                    else if (_isFocusOnBody && isTargetKeyEvent(e, false, false, false, true, 90)) {
+                    else if (_isFocusOnBody && isTargetKeyEvent(e, false, false, false, true,
+                            90)) {
                         e.preventDefault();
                         undo();
                     }
@@ -1933,12 +2008,14 @@
                         redo();
                     }
                     // command(meta)+a (select all)
-                    else if (_isFocusOnBody && isTargetKeyEvent(e, false, false, false, true, 65)) {
+                    else if (_isFocusOnBody && isTargetKeyEvent(e, false, false, false, true,
+                            65)) {
                         e.preventDefault();
                         $(".canvas-item:visible").addClass("ui-selected");
                     }
                     // escape (deselect all)
-                    else if (_isFocusOnBody && isTargetKeyEvent(e, false, false, false, false, 27)) {
+                    else if (_isFocusOnBody && isTargetKeyEvent(e, false, false, false, false,
+                            27)) {
                         e.preventDefault();
                         $(document.body).focus();
                         $(".canvas-item:visible").removeClass("ui-selected");
@@ -1962,22 +2039,26 @@
                         deleteItem();
                     }
                     // ctrl+z (undo)
-                    else if (_isFocusOnBody && isTargetKeyEvent(e, true, false, false, false, 90)) {
+                    else if (_isFocusOnBody && isTargetKeyEvent(e, true, false, false, false,
+                            90)) {
                         e.preventDefault();
                         undo();
                     }
                     // ctrl+y (redo)
-                    else if (_isFocusOnBody && isTargetKeyEvent(e, true, false, false, false, 89)) {
+                    else if (_isFocusOnBody && isTargetKeyEvent(e, true, false, false, false,
+                            89)) {
                         e.preventDefault();
                         redo();
                     }
                     // ctrl+a (select all)
-                    else if (_isFocusOnBody && isTargetKeyEvent(e, true, false, false, false, 65)) {
+                    else if (_isFocusOnBody && isTargetKeyEvent(e, true, false, false, false,
+                            65)) {
                         e.preventDefault();
                         $(".canvas-item:visible").addClass("ui-selected");
                     }
                     // escape (deselect all)
-                    else if (_isFocusOnBody && isTargetKeyEvent(e, false, false, false, false, 27)) {
+                    else if (_isFocusOnBody && isTargetKeyEvent(e, false, false, false, false,
+                            27)) {
                         e.preventDefault();
                         $(document.body).focus();
                         $(".canvas-item:visible").removeClass("ui-selected");
@@ -2022,32 +2103,6 @@
                     return;
                 }
                 //console.log(event);
-                // sync?
-                if (event.eventType == "sync") {
-                    confirmYesNo("Overwrite with pushed content?", function () {
-                        importDataFromData(event.eventBody);
-                    });
-                    return;
-                }
-                if (event.eventType == "moveMouse") {
-                    const pointerId = "pointer-" + event.publisherId;
-                    var pointer = $("#" + pointerId);
-                    if (pointer.length < 1) {
-                        var pointer = $("<div></div>");
-                        pointer.addClass("pointer");
-                        pointer.attr("id", "pointer-" + event.publisherId);
-                        pointer.append("<p class='name'></p>");
-                        $("body").append(pointer);
-                    }
-                    $(pointer).find(".name").text(event.eventBody.userName);
-                    pointer.offset({
-                        left: event.eventBody.x * currentScale,
-                        top: $("#menu").outerHeight() + (event.eventBody.y * currentScale)
-                    });
-
-
-                    return;
-                }
                 for (var key in AppEvent) {
                     const e = AppEvent[key];
                     if (e.isTargetType && e.isTargetType(event)) {
@@ -2057,7 +2112,7 @@
                 }
             });
             socket.on('undo event', function (event) {
-                if (event.publisherId == publisherId) {
+                if (!event || event.publisherId == publisherId) {
                     return;
                 }
                 //console.log(event);
@@ -2093,18 +2148,8 @@
             return roomId;
         }
 
-        function sync() {
-            confirmYesNo("Do you want to push this content?", function () {
-                const data = createExportData();
-                if (!socket) {
-                    return;
-                }
-                socket.emit('do event', {
-                    publisherId: publisherId,
-                    eventType: "sync",
-                    eventBody: data
-                });
-            });
+        function push() {
+            AppEvent.Push.publish();
         }
 
         function confirmYesNo(message, callbackOfYes) {
@@ -2117,18 +2162,9 @@
         }
 
         function syncMousePosition(event) {
-            if (!socket) {
-                return;
-            }
-            socket.emit('do event', {
-                publisherId: publisherId,
-                eventType: "moveMouse",
-                eventBody: {
-                    userName: getUserName(),
-                    x: (window.scrollX + event.clientX) / currentScale,
-                    y: ((window.scrollY + event.clientY) / currentScale) - $("#menu").outerHeight()
-                }
-            });
+            const x = (window.scrollX + event.clientX) / currentScale;
+            const y = ((window.scrollY + event.clientY) / currentScale) - $("#menu").outerHeight();
+            AppEvent.MoveMouse.publish(x, y);
         }
 
         function clearPointers() {
@@ -2137,6 +2173,10 @@
 
         function getUserName() {
             return $("input.user-name").val();
+        }
+
+        function call() {
+            AppEvent.Call.publish()
         }
     </script>
 </body>
