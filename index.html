@@ -580,7 +580,6 @@ b --> c
         let oldOuterHeight = $.fn.outerHeight;
 
         $(function () {
-            alert("###");
             $("#first-message").fadeOut(1000);
             setupShortcutKeys();
             $('[data-toggle="tooltip"]').tooltip();
@@ -635,8 +634,9 @@ b --> c
 
             // setup conrifm
             $(window).on('beforeunload', function (event) {
-                console.log(".");
-                return 'jquery beforeunload';
+                const message = `Are you sure you want to leave?`;
+                event.returnValue = message;
+                return message;
             });
 
             // setup main menu.
@@ -2188,7 +2188,6 @@ b --> c
                     }
                 }
             }
-            alert("### roomId=" + roomId);
             if (roomId) {
                 setupWebsocket(roomId);
             }
