@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Deom of Simple Sticky Notes</title>
+    <title>Demo of Simple Sticky Notes</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
@@ -417,6 +417,7 @@
                 <div class="">Groop Work</div>
                 <input class="user-name" type="text" placeholder="your name" />
                 <button id="sync-button" class="btn btn-warning btn-sm">Push</button>
+                <button id="call-button" class="btn btn-secondary btn-sm">&#x270B Call</button>
             </div>
             <div class="col-sm-2">
                 <div class="">Zoom</div>
@@ -576,6 +577,7 @@
             $("#import-button").on("click", importData);
             $(document).on("paste", addImageFromClipboard);
             $("#sync-button").on("click", sync);
+            $("#call-button").on("click", call);
             $("#canvas").on("mousemove", syncMousePosition)
             $("#clear-pointers-button").on("click", clearPointers);
             toSelectable($("#canvas"));
@@ -2044,8 +2046,22 @@
                         left: event.eventBody.x * currentScale,
                         top: $("#menu").outerHeight() + (event.eventBody.y * currentScale)
                     });
-
-
+                    return;
+                }
+                if (event.eventType == "call") {
+                    if (!('Notification' in window)) {
+                        alert('\u270B ' + event.eventBody.userName);
+                        return;
+                    }
+                    Notification.requestPermission()
+                        .then((permission) => {
+                            if (permission === 'granted') {
+                                var title = '\u270B ' + event.eventBody.userName;
+                                var n = new Notification(title);
+                                console.log(n);
+                                setTimeout(n.close.bind(n), 5000);
+                            } else if (permission == 'denied') {} else if (permission == 'default') {}
+                        });
                     return;
                 }
                 for (var key in AppEvent) {
@@ -2137,6 +2153,16 @@
 
         function getUserName() {
             return $("input.user-name").val();
+        }
+
+        function call(event) {
+            socket.emit('do event', {
+                publisherId: publisherId,
+                eventType: "call",
+                eventBody: {
+                    userName: getUserName()
+                }
+            });
         }
     </script>
 </body>
