@@ -238,8 +238,8 @@
         }
 
         .markdown {
-            width: 200px;
-            height: 120px;
+            width: 400px;
+            height: 300px;
             padding: 10px 10px 10px 10px;
             border: solid 1px black;
             overflow: none;
@@ -292,6 +292,16 @@
 
         .markdown .md-view table td {
             border: solid 1px;
+        }
+
+        /*
+        Copyright (c) @Thiago (https://codepen.io/thiagobraga/pen/bhDdn)
+        Released under the MIT license
+        http://opensource.org/licenses/mit-license.php
+        */
+        .markdown a[target="_blank"]:after {
+            content: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAQElEQVR42qXKwQkAIAxDUUdxtO6/RBQkQZvSi8I/pL4BoGw/XPkh4XigPmsUgh0626AjRsgxHTkUThsG2T/sIlzdTsp52kSS1wAAAABJRU5ErkJggg==);
+            margin: 0 3px 0 5px;
         }
 
         /* colors */
@@ -519,7 +529,21 @@
         <div class="tab-content">
             <div class="md-view tab-pane show active"></div>
             <div class="md-editor tab-pane">
-                <textarea></textarea>
+                <textarea>### Default Sample
+
+see [Marked](https://marked.js.org/) and [Mermaidjs](https://mermaidjs.github.io/)
+
+|xxx|yyy|zzz|
+|-|-|-|
+|xxxxx|yyyyy|zzzzz|
+|xxxxx|yyyyy|zzzzz|
+
+```
+graph LR
+a --> b
+b --> c
+```
+</textarea>
             </div>
         </div>
     </div>
@@ -868,7 +892,12 @@
             });
             $(editButton).on("click", () => {
                 $(markdown).find("div.tab-content").css("overflow-y", "hidden");
-                setTimeout(() => $(editArea).find("textarea").focus(), 500);
+                setTimeout(() => {
+                    const textarea = $(editArea).find("textarea");
+                    textarea[0].selectionStart = 0;
+                    textarea[0].selectionEnd = 0;
+                    textarea.focus();
+                }, 300);
             });
 
             markdown.attr("id", itemId);
@@ -907,6 +936,9 @@
 
             toDraggable(markdown);
 
+            // view
+            viewButton.trigger("click");
+
             AppEvent.AddItem.publish(markdown);
 
             return markdown;
@@ -922,13 +954,17 @@
                 }
             };
             marked.setOptions({
-                renderer: renderer
+                renderer: renderer,
+                sanitize: true
             });
         }
 
         function renderMarkdown(text, view) {
             $(view).html("<div></div>");
             $(view).find("div").html(marked(text));
+            if ($(view).find("a").attr("href").startsWith("http")) {
+                $(view).find("a").attr("target", "_blank");
+            }
             try {
                 mermaid.init(undefined, $(view).find(".mermaid"));
             } catch (error) {}
@@ -1921,8 +1957,9 @@
                 isTargetType: function (event) {
                     return event.eventType == "push";
                 },
+                back: function () {},
                 forward: function (event) {
-                    confirmYesNo("Overwrite with pushed content?", function () {
+                    confirmYesNo("Overwrite with pushed content from " + event.userName + "?", function () {
                         importDataFromData(event.eventBody);
                     });
                 }
@@ -1931,14 +1968,14 @@
                 publish: function () {
                     eventStore.push({
                         eventType: "call",
-                        eventBody: {
-                        },
+                        eventBody: {},
                         forwardOnly: true
                     });
                 },
                 isTargetType: function (event) {
                     return event.eventType == "call";
                 },
+                back: function () {},
                 forward: function (event) {
                     if (!('Notification' in window)) {
                         alert('\u270B ' + event.userName);
@@ -1961,12 +1998,14 @@
                         eventBody: {
                             x: x,
                             y: y
-                        }
+                        },
+                        forwardOnly: true
                     });
                 },
                 isTargetType: function (event) {
                     return event.eventType == "moveMouse";
                 },
+                back: function () {},
                 forward: function (event) {
                     const pointerId = "pointer-" + event.publisherId;
                     var pointer = $("#" + pointerId);
