@@ -580,6 +580,7 @@ b --> c
         let oldOuterHeight = $.fn.outerHeight;
 
         $(function () {
+            alert("###");
             $("#first-message").fadeOut(1000);
             setupShortcutKeys();
             $('[data-toggle="tooltip"]').tooltip();
@@ -2187,6 +2188,7 @@ b --> c
                     }
                 }
             }
+            alert("### roomId=" + roomId);
             if (roomId) {
                 setupWebsocket(roomId);
             }
