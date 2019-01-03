@@ -383,7 +383,7 @@
 
     <div id="menu" class="container-fluid">
         <div class="row">
-            <div class="col-sm-4 container-fluid">
+            <div class="col-sm-3 container-fluid">
                 <div>Main Menu</div>
                 <div class="btn-group" role="group">
                     <div class="btn-group">
@@ -423,9 +423,10 @@
                     </div>
                 </div>
             </div>
-            <div class="col-sm-2">
+            <div class="col-sm-3">
                 <div class="">Groop Work</div>
                 <input class="user-name" type="text" placeholder="your name" />
+                <button id="create-room-button" class="btn btn-secondary btn-sm">Create room</button>
                 <button id="push-button" class="btn btn-warning btn-sm">Push</button>
                 <button id="call-button" class="btn btn-secondary btn-sm">&#x270B Call</button>
             </div>
@@ -600,6 +601,7 @@ b --> c
             $("#export-button").on("click", exportData);
             $("#import-button").on("click", importData);
             $(document).on("paste", addImageFromClipboard);
+            $("#create-room-button").on("click", createRoom);
             $("#push-button").on("click", push);
             $("#call-button").on("click", call);
             $("#canvas").on("mousemove", syncMousePosition)
@@ -645,6 +647,8 @@ b --> c
             });
 
             setupMarkdownRenderWithMermaid();
+
+            initRoom();
         });
 
         function add() {
@@ -962,9 +966,12 @@ b --> c
         function renderMarkdown(text, view) {
             $(view).html("<div></div>");
             $(view).find("div").html(marked(text));
-            if ($(view).find("a").attr("href").startsWith("http")) {
-                $(view).find("a").attr("target", "_blank");
-            }
+            $(view).find("a").each((i, e) => {
+                const href = $(e).attr("href");
+                if (href && href.startsWith("http")) {
+                    $(e).attr("target", "_blank");
+                }
+            });
             try {
                 mermaid.init(undefined, $(view).find(".mermaid"));
             } catch (error) {}
@@ -2132,10 +2139,8 @@ b --> c
         }
 
         var socket;
-        setupWebsocket();
 
-        function setupWebsocket() {
-            const roomId = initRoomId();
+        function setupWebsocket(roomId) {
             socket = io('https://simple-websocket-server.herokuapp.com/?roomId=' + roomId);
             socket.on('do event', function (event) {
                 if (event.publisherId == publisherId) {
@@ -2163,9 +2168,10 @@ b --> c
                     }
                 }
             });
+            return socket;
         }
 
-        function initRoomId() {
+        function initRoom() {
             var query = location.search;
             var roomId
             if (query) {
@@ -2180,11 +2186,14 @@ b --> c
                         roomId = temp;
                     }
                 }
-            } else {
-                roomId = cuid();
-                location.search = "?roomId=" + roomId;
             }
-            return roomId;
+            if (roomId) {
+                setupWebsocket(roomId);
+            }
+        }
+
+        function createRoom() {
+            location.search = "?roomId=" + cuid();
         }
 
         function push() {
