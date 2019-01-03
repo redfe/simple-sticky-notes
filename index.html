@@ -2187,13 +2187,14 @@ b --> c
                     }
                 }
             }
+            console.log("###" + roomId);
             if (roomId) {
                 setupWebsocket(roomId);
             }
         }
 
         function createRoom() {
-            location.search = "?roomId=" + cuid();
+            //location.search = "?roomId=" + cuid();
         }
 
         function push() {
