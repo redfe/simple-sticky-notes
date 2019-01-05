@@ -294,6 +294,12 @@
             border: solid 1px;
         }
 
+        [data-notify="container"][class*="alert"] {
+            width: 200px;
+            overflow: hidden;
+            background-color: rgba(209,236,241,0.8);
+        }
+
         /*
         Copyright (c) @Thiago (https://codepen.io/thiagobraga/pen/bhDdn)
         Released under the MIT license
@@ -565,6 +571,8 @@ b --> c
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cuid/1.3.8/browser-cuid.min.js"></script>
     <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mouse0270-bootstrap-notify/3.1.7/bootstrap-notify.min.js"
+        integrity="sha256-LlN0a0J3hMkDLO1mhcMwy+GIMbIRV7kvKHx4oCxNoxI=" crossorigin="anonymous"></script>
     <script>
         let scaleStep = 0.1;
         var currentScale = 1.0;
@@ -1985,18 +1993,15 @@ b --> c
                 },
                 back: function () {},
                 forward: function (event) {
-                    if (!('Notification' in window)) {
-                        alert('\u270B ' + event.userName);
-                        return;
-                    }
-                    Notification.requestPermission()
-                        .then((permission) => {
-                            if (permission === 'granted') {
-                                var title = '\u270B ' + event.userName;
-                                var n = new Notification(title);
-                                setTimeout(n.close.bind(n), 5000);
-                            } else if (permission == 'denied') {} else if (permission == 'default') {}
-                        });
+                    $.notify({
+                        message: '\u270B ' + event.userName
+                    }, {
+                        allow_dismiss: true,
+                        offset: {
+                            x: 20,
+                            y: 100
+                        }
+                    });
                 }
             },
             MoveMouse: {
