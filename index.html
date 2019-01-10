@@ -647,14 +647,6 @@ b --> c
                 return message;
             });
 
-            // setup main menu.
-            $("button.dropdown-toggle").on("mouseover", e => {
-                if ($(e.target).attr("aria-expanded") == "true") {
-                    return;
-                }
-                $(e.target).trigger("click");
-            });
-
             setupMarkdownRenderWithMermaid();
 
             initRoom();
