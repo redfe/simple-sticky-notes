@@ -240,13 +240,21 @@
         .markdown {
             width: 400px;
             height: 300px;
-            padding: 10px 10px 10px 10px;
+            padding: 0px 10px 10px 10px;
             border: solid 1px black;
             overflow: none;
             min-width: 200px;
             min-height: 100px;
             background-color: white;
             border-color: silver;
+        }
+
+        .markdown .markdown-header {
+            height: 10px;
+        }
+
+        .markdown .nav-item.spacer {
+            width: calc(100% - 5em);
         }
 
         .markdown .md-editor {
@@ -525,6 +533,7 @@
     </div>
 
     <div id="markdown-template" class="d-none markdown card canvas-item">
+        <div class="markdown-header"></div>
         <ul class="nav nav-tabs" role="tablist">
             <li class="nav-item">
                 <a class="nav-link active md-view" data-toggle="tab" href="" role="tab" aria-controls="" aria-selected="true">View</a>
@@ -532,6 +541,7 @@
             <li class="nav-item">
                 <a class="nav-link md-editor" data-toggle="tab" href="" role="tab" aria-controls="" aria-selected="false">Edit</a>
             </li>
+            <li class="nav-item spacer"></li>
         </ul>
         <div class="tab-content">
             <div class="md-view tab-pane show active"></div>
@@ -916,7 +926,7 @@ b --> c
             });
 
             // add from this markdown on double clik .
-            $(markdown).on("dblclick", (e) => {
+            $(markdown).find(".markdown-header,.spacer").on("dblclick", (e) => {
                 addMarkdownFrom(markdown);
             });
 
