@@ -159,7 +159,7 @@
         
         #canvas {
             position: relative;
-            background: linear-gradient(135deg, rgb(247, 237, 225), rgb(231, 134, 102));
+            background: linear-gradient(135deg, rgb(247, 237, 225), rgb(212, 80, 36));
             width: 5000px;
             height:3000px;
             overflow: hidden;
@@ -318,6 +318,49 @@
             margin: 0 3px 0 5px;
         }
 
+        #video-container {
+            display: none;
+            padding: 0;
+            margin: 0;
+            position: fixed;
+            bottom: 0;
+            height: 100px;
+            padding-left: 55px;
+            width: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        #video-view-controller {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 100px;
+        }
+
+        #video-view-controller>div {
+            width: 50px;
+            height: 25px;
+            border: none;
+            font-size: 0.8rem;
+            font-weight: unset;
+            cursor: pointer;
+            border-radius: unset;
+            padding: 5px 0 0 0;
+            margin-top: -3px;
+        }
+
+        #video-container .video {
+            margin-left: -5px;
+            display: inline-block;
+        }
+
+        #video-container .video img {
+            height: 120px;
+            padding:0;
+            margin: 0;
+        }
         /* colors */
         
         .color-red,
@@ -569,6 +612,27 @@ b --> c
 </textarea>
             </div>
         </div>
+    </div>
+
+    <div id="video-container">
+        <div id="my-video" class="video">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Everest_North_Face_toward_Base_Camp_Tibet_Luca_Galuzzi_2006.jpg/300px-Everest_North_Face_toward_Base_Camp_Tibet_Luca_Galuzzi_2006.jpg"></img>
+        </div>
+        <div class="video">
+            <img src="http://photohito.k-img.com/uploads/photo82/user81498/3/6/36c3410c2356c89ca76fa8a99909a884/36c3410c2356c89ca76fa8a99909a884_l.jpg"></img>
+        </div>
+        <div class="video">
+            <img src="https://tripnote.imgix.net/post/article/179/17896-BNnMUwUZNUUgaN0dySKd_src.jpg?w=768&h=474&fit=crop"></img>
+        </div>
+        <div class="video">
+            <img src="https://eigo.plus/wp-content/uploads/2016/10/shutterstock_57161524-1-e1529213876521.jpg"></img>
+        </div>
+    </div>
+    <div id="video-view-controller">
+        <div id="video-view-menu-button" class="btn btn-secondary">setting</div>
+        <div id="video-view-expand-button" class="btn btn-secondary">all</div>
+        <div id="video-view-up-button" class="btn btn-secondary">up</div>
+        <div id="video-view-down-button" class="btn btn-secondary">down</div>
     </div>
 
     <div id="first-message">
@@ -2214,6 +2278,7 @@ b --> c
             }
             if (roomId) {
                 setupWebsocket(roomId);
+                setupVideoAudio(roomId);
             }
         }
 
@@ -2250,6 +2315,11 @@ b --> c
 
         function call() {
             AppEvent.Call.publish()
+        }
+
+        function setupVideoAudio(roomId) {
+            $("#video-container").show();
+            $("#video-view-controller").show();
         }
     </script>
 </body>
