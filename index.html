@@ -380,10 +380,16 @@
             background-image: url('https://mdbootstrap.com/img/svg/hamburger6.svg?color=aaa');
         }
         
-        .color-transparent.card {
+        .color-transparent.card:hover {
             box-shadow: unset;
+            border: 1px solid rgba(0,0,0,0.3);
         }
         
+        .color-transparent.card {
+            box-shadow: unset;
+            border: 1px solid rgba(0,0,0,0);
+        }
+
         /* colors end */
         
     </style>
@@ -977,7 +983,7 @@ b --> c
         function sanitize(s) {
             // TODO do properly.
             if (s) {
-                return s.replace(/</g,"&lt;").replace(/>/g, "&gt;");
+                return s.replace(/</g, "&lt;").replace(/>/g, "&gt;");
             }
             return s;
         }
