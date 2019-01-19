@@ -673,6 +673,11 @@ b --> c
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mouse0270-bootstrap-notify/3.1.7/bootstrap-notify.min.js"
         integrity="sha256-LlN0a0J3hMkDLO1mhcMwy+GIMbIRV7kvKHx4oCxNoxI=" crossorigin="anonymous"></script>
     <script>
+        const config = {
+            socketioServer: "https://simple-websocket-server.herokuapp.com",
+            socketioScript: "/socket.io/socket.io.js", 
+            skyWayApiKey: '6a3a377a-d7fb-468c-86b4-a411d69110d8',
+        };
         let scaleStep = 0.1;
         var currentScale = 1.0;
         var selectedCardId = null;
@@ -2249,8 +2254,8 @@ b --> c
             if (window["io"]) {
                 return;
             }
-            $.getScript("https://simple-websocket-server.herokuapp.com/socket.io/socket.io.js", () => {
-                socket = io('https://simple-websocket-server.herokuapp.com/?roomId=' + roomId);
+            $.getScript(config.socketioServer + config.socketioScript, () => {
+                socket = io(config.socketioServer + '/?roomId=' + roomId);
                 socket.on('do event', function (event) {
                     if (event.publisherId == publisherId) {
                         return;
@@ -2354,7 +2359,6 @@ b --> c
         let localStream;
         let room;
         let peer;
-        const skyWayApiKey = '6a3a377a-d7fb-468c-86b4-a411d69110d8';
 
         function initializeVideoAudioSelection() {
             // set up audio and video input selectors
