@@ -575,7 +575,6 @@ b --> c
         <span>Let's Start Output!</span>
     </div>
 
-    <script src="https://simple-websocket-server.herokuapp.com/socket.io/socket.io.js"></script>
     <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
         crossorigin="anonymous"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js" integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU="
@@ -2163,34 +2162,38 @@ b --> c
         var socket;
 
         function setupWebsocket(roomId) {
-            socket = io('https://simple-websocket-server.herokuapp.com/?roomId=' + roomId);
-            socket.on('do event', function (event) {
-                if (event.publisherId == publisherId) {
-                    return;
-                }
-                //console.log(event);
-                for (var key in AppEvent) {
-                    const e = AppEvent[key];
-                    if (e.isTargetType && e.isTargetType(event)) {
-                        e.forward(event);
+            if (window["io"]) {
+                return;
+            }
+            $.getScript("https://simple-websocket-server.herokuapp.com/socket.io/socket.io.js", () => {
+                socket = io('https://simple-websocket-server.herokuapp.com/?roomId=' + roomId);
+                socket.on('do event', function (event) {
+                    if (event.publisherId == publisherId) {
                         return;
                     }
-                }
-            });
-            socket.on('undo event', function (event) {
-                if (!event || event.publisherId == publisherId) {
-                    return;
-                }
-                //console.log(event);
-                for (var key in AppEvent) {
-                    const e = AppEvent[key];
-                    if (e.isTargetType && e.isTargetType(event)) {
-                        e.back(event);
+                    //console.log(event);
+                    for (var key in AppEvent) {
+                        const e = AppEvent[key];
+                        if (e.isTargetType && e.isTargetType(event)) {
+                            e.forward(event);
+                            return;
+                        }
+                    }
+                });
+                socket.on('undo event', function (event) {
+                    if (!event || event.publisherId == publisherId) {
                         return;
                     }
-                }
+                    //console.log(event);
+                    for (var key in AppEvent) {
+                        const e = AppEvent[key];
+                        if (e.isTargetType && e.isTargetType(event)) {
+                            e.back(event);
+                            return;
+                        }
+                    }
+                });
             });
-            return socket;
         }
 
         function initRoom() {
