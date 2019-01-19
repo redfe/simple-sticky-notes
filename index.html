@@ -356,8 +356,8 @@
             display: inline-block;
         }
 
-        #video-container .video img {
-            height: 120px;
+        #video-container .video video {
+            height: 100px;
             padding:0;
             margin: 0;
         }
@@ -565,6 +565,35 @@
         </div>
     </div>
 
+    <div id="videochat-setting-dialog" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Videochat Setting</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group row">
+                        <label for="audioSource" class="col-sm-2 col-form-label">Audio</label>
+                        <div class="col-sm-10">
+                            <select id="audio-source" class="form-control"></select>
+                        </div>
+                        <label for="videoSource" class="col-sm-2 col-form-label">Video</label>
+                        <div class="col-sm-10">
+                            <select id="video-source" class="form-control"></select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="cancel btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button class="ok btn btn-primary">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id="card-template" class="d-none card sticky-note canvas-item" data-toggle="tooltip" data-placement="top">
         <div class="sticky-note-header">
             <button class="card-menu-button"></button>
@@ -616,16 +645,7 @@ b --> c
 
     <div id="video-container">
         <div id="my-video" class="video">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Everest_North_Face_toward_Base_Camp_Tibet_Luca_Galuzzi_2006.jpg/300px-Everest_North_Face_toward_Base_Camp_Tibet_Luca_Galuzzi_2006.jpg"></img>
-        </div>
-        <div class="video">
-            <img src="http://photohito.k-img.com/uploads/photo82/user81498/3/6/36c3410c2356c89ca76fa8a99909a884/36c3410c2356c89ca76fa8a99909a884_l.jpg"></img>
-        </div>
-        <div class="video">
-            <img src="https://tripnote.imgix.net/post/article/179/17896-BNnMUwUZNUUgaN0dySKd_src.jpg?w=768&h=474&fit=crop"></img>
-        </div>
-        <div class="video">
-            <img src="https://eigo.plus/wp-content/uploads/2016/10/shutterstock_57161524-1-e1529213876521.jpg"></img>
+            <video muted="true" autoplay playsinline></video>
         </div>
     </div>
     <div id="video-view-controller">
@@ -2318,8 +2338,123 @@ b --> c
         }
 
         function setupVideoAudio(roomId) {
+            $("#video-view-menu-button").on("click", () => {
+                $("#videochat-setting-dialog").modal();
+            });
             $("#video-container").show();
             $("#video-view-controller").show();
+            $("#videochat-setting-dialog .ok").on("click", () => {
+                initializeMyVideo();
+                $("#videochat-setting-dialog").modal("hide");
+            });
+            initializeVideoAudioSelection();
+            initializeMyVideo();
+        }
+
+        let localStream;
+        let room;
+        let peer;
+        const skyWayApiKey = '6a3a377a-d7fb-468c-86b4-a411d69110d8';
+
+        function initializeVideoAudioSelection() {
+            // set up audio and video input selectors
+            const audioSelect = $('#audio-source');
+            const videoSelect = $('#video-source');
+            const selectors = [audioSelect, videoSelect];
+
+            navigator.mediaDevices.enumerateDevices()
+                .then(deviceInfos => {
+                    const values = selectors.map(select => select.val() || '');
+                    selectors.forEach(select => {
+                        const children = select.children(':first');
+                        while (children.length) {
+                            select.remove(children);
+                        }
+                    });
+
+                    for (let i = 0; i !== deviceInfos.length; ++i) {
+                        const deviceInfo = deviceInfos[i];
+                        const option = $('<option>').val(deviceInfo.deviceId);
+
+                        if (deviceInfo.kind === 'audioinput') {
+                            option.text(deviceInfo.label || 'Microphone ' + (audioSelect.children().length + 1));
+                            audioSelect.append(option);
+                        } else if (deviceInfo.kind === 'videoinput') {
+                            option.text(deviceInfo.label || 'Camera ' + (videoSelect.children().length + 1));
+                            videoSelect.append(option);
+                        }
+                    }
+
+                    selectors.forEach((select, selectorIndex) => {
+                        if (Array.prototype.slice.call(select.children()).some(n => {
+                                return n.value === values[selectorIndex];
+                            })) {
+                            select.val(values[selectorIndex]);
+                        }
+                    });
+
+                    audioSelect.append($('<option>').val("unuse").text("--- unuse ---"));
+                    videoSelect.append($('<option>').val("unuse").text("--- unuse ---"));
+                });
+        }
+
+        function initializeMyVideo() {
+            // Get audio/video stream
+            const audioSource = $('#audio-source').val();
+            const videoSource = $('#video-source').val();
+            const constrains = {
+                audio: {
+                    deviceId: (audioSource && audioSource != "unuse") ? {
+                        exact: audioSource
+                    } : undefined
+                },
+                video: {
+                    deviceId: (videoSource && videoSource != "unuse") ? {
+                        exact: videoSource
+                    } : undefined
+                },
+            };
+
+            if (audioSource == "unuse") {
+                stopAudio();
+                constrains.audio = false;
+            }
+            if (videoSource == "unuse") {
+                stopVideo();
+                constrains.video = false;
+            }
+
+            if (constrains.audio === false && constrains.video === false) {
+                return;
+            }
+
+            navigator.mediaDevices.getUserMedia(constrains).then(stream => {
+                $('#my-video video').each((i, e) => {
+                    e.srcObject = stream;
+                });
+                localStream = stream;
+
+                if (room) {
+                    room.replaceStream(straem);
+                    return;
+                }
+            }).catch(err => {
+                console.error(err);
+            });
+        }
+
+        function stopVideo() {
+            const myVideo = $("#my-video video").get(0).srcObject;
+            myVideo.getVideoTracks().forEach((track) => {
+                track.stop();
+            });
+        }
+
+        function stopAudio() {
+            const myVideo = $("#my-video video").get(0).srcObject;
+            myVideo.getAudioTracks().forEach((track) => {
+                track.stop();
+            });
         }
     </script>
 </body>
