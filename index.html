@@ -324,6 +324,7 @@
             margin: 0;
             position: fixed;
             bottom: 0;
+            overflow-y: hidden;
             height: 100px;
             padding-left: 55px;
             width: 100%;
@@ -675,8 +676,9 @@ b --> c
     <script>
         const config = {
             socketioServer: "https://simple-websocket-server.herokuapp.com",
-            socketioScript: "/socket.io/socket.io.js", 
+            socketioScript: "/socket.io/socket.io.js",
             skyWayApiKey: '6a3a377a-d7fb-468c-86b4-a411d69110d8',
+            skyWayScript: "https://cdn.webrtc.ecl.ntt.com/skyway-latest.js",
         };
         let scaleStep = 0.1;
         var currentScale = 1.0;
@@ -2343,17 +2345,49 @@ b --> c
         }
 
         function setupVideoAudio(roomId) {
-            $("#video-view-menu-button").on("click", () => {
-                $("#videochat-setting-dialog").modal();
-            });
-            $("#video-container").show();
-            $("#video-view-controller").show();
-            $("#videochat-setting-dialog .ok").on("click", () => {
+            $.getScript(config.skyWayScript, () => {
+                $("#video-view-menu-button").on("click", () => {
+                    $("#videochat-setting-dialog").modal();
+                });
+                $("#video-container").show();
+                $("#video-view-controller").show();
+                $("#videochat-setting-dialog .ok").on("click", () => {
+                    initializeMyVideo();
+                    $("#videochat-setting-dialog").modal("hide");
+                });
+                const videoHeight = 100;
+                $("#video-view-expand-button").on('click', () => {
+                    if ($("#video-container").height() === videoHeight) {
+                        $("#video-container").height("auto");
+                        if ($("#video-container").height() < (videoHeight * 2)) {
+                            $("#video-container").height(videoHeight);
+                        }
+                    } else {
+                        $("#video-container").height(videoHeight);
+                    }
+                    if ($("#video-container").height() === videoHeight) {
+                        $("#video-view-expand-button").text("all");
+                    } else {
+                        $("#video-view-expand-button").text("close");
+                    }
+                });
+                $("#video-view-up-button").on('click', () => {
+                    const current = $("#video-container").scrollTop();
+                    $("#video-container").scrollTop(current - (videoHeight + 6));
+                });
+                $("#video-view-down-button").on('click', () => {
+                    const current = $("#video-container").scrollTop();
+                    $("#video-container").scrollTop(current + (videoHeight + 6));
+                    if ($("#video-container").scrollTop() % (videoHeight + 6) !== 0) {
+                        $("#video-container").scrollTop(current);
+                    }
+                });
+
+                initializeVideoAudioSelection();
                 initializeMyVideo();
-                $("#videochat-setting-dialog").modal("hide");
+                initializePeer();
+                setTimeout(connectTheirVideos, 3000);
             });
-            initializeVideoAudioSelection();
-            initializeMyVideo();
         }
 
         let localStream;
@@ -2439,7 +2473,7 @@ b --> c
                 localStream = stream;
 
                 if (room) {
-                    room.replaceStream(straem);
+                    room.replaceStream(stream);
                     return;
                 }
             }).catch(err => {
@@ -2459,6 +2493,62 @@ b --> c
             myVideo.getAudioTracks().forEach((track) => {
                 track.stop();
             });
+        }
+
+        function initializePeer() {
+            if (peer) {
+                return;
+            }
+            peer = new Peer({
+                key: config.skyWayApiKey,
+                debug: 3,
+            });
+            peer.on('open', () => {
+                //$('#my-id').text(peer.id);
+                // Get things startd
+                initializeMyVideo();
+            });
+
+            peer.on('error', err => {
+                alert(err.message);
+                // Return to step 2 if error occurs
+                disconnectTheirVideos();
+            });
+
+        }
+
+        function disconnectTheirVideos() {
+            $('.their-video').remove();
+        }
+
+        function connectTheirVideos(roomId) {
+            const roomName = roomId;
+            room = peer.joinRoom('sfu_video_' + roomName, {
+                mode: 'sfu',
+                stream: localStream
+            });
+            room.on('stream', stream => {
+                const peerId = stream.peerId;
+                const id = 'video_' + peerId + '_' + stream.id.replace('{', '').replace('}', '');
+                $('#video-container').append($(
+                    '<div class="video their-video video_' + peerId + '" id="' + id + '">' +
+                    '<video class="" autoplay playsinline>' +
+                    '</div>'));
+                const el = $('#' + id).find('video').get(0);
+                el.srcObject = stream;
+                el.play();
+            });
+
+            room.on('removeStream', stream => {
+                const peerId = stream.peerId;
+                $('#video_' + peerId + '_' + stream.id.replace('{', '').replace('}', '')).remove();
+            });
+
+            room.on('close', initializePeer);
+            room.on('peerLeave', peerId => {
+                $('.video_' + peerId).remove();
+            });
+
         }
     </script>
 </body>
