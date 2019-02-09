@@ -985,6 +985,13 @@ b --> c
         }
 
         function addImageFromClipboard(event) {
+            const active = document.activeElement;
+            if (active["type"]) {
+                const focusType = active.type.toLowerCase();
+                if (focusType == "text" || focusType == "textarea") {
+                    return;
+                }
+            }
             var items = event.originalEvent.clipboardData.items;
             for (var i = 0; i < items.length; i++) {
                 const item = items[i];
@@ -1099,7 +1106,7 @@ b --> c
             };
             marked.setOptions({
                 renderer: renderer,
-                sanitize: true
+                //sanitize: true
             });
         }
 
