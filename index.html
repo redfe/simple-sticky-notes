@@ -945,8 +945,8 @@ b --> c
                     added = addImage($(image).find("img").attr("src"));
                     let sourceLeft = parseFloat($(image).css("left"));
                     let sourceTop = parseFloat($(image).css("top"));
-                    added.css("left", sourceLeft + 5 + "px");
-                    added.css("top", sourceTop + 5 + "px");
+                    added.css("left", sourceLeft + 3 + "px");
+                    added.css("top", sourceTop - 3 + "px");
                     added.width($(image).width());
                     added.height($(image).height());
                 } finally {
@@ -1144,8 +1144,8 @@ b --> c
                 let colorClass = findFirstClass(target, (className) => className.startsWith("color-"));
                 isRecordEvents = false;
                 changeColor(added, colorClass ? colorClass.substring(6) : "color-yellow");
-                added.css("left", sourceLeft + 5 + "px");
-                added.css("top", sourceTop + 5 + "px");
+                added.css("left", sourceLeft + 3 + "px");
+                added.css("top", sourceTop - 3 + "px");
                 added.width($(from).width());
                 added.height($(from).height());
                 adjustFontSize(added.find("textarea"));
@@ -1164,8 +1164,8 @@ b --> c
                 added = addLine(isVertical);
                 let sourceLeft = parseFloat($(target).css("left"));
                 let sourceTop = parseFloat($(target).css("top"));
-                added.css("left", sourceLeft + 5 + "px");
-                added.css("top", sourceTop + 5 + "px");
+                added.css("left", sourceLeft + 3 + "px");
+                added.css("top", sourceTop - 3 + "px");
                 if (isVertical) {
                     added.height($(target).height());
                 } else {
@@ -1185,8 +1185,8 @@ b --> c
                 added = addMarkdown();
                 let sourceLeft = parseFloat($(target).css("left"));
                 let sourceTop = parseFloat($(target).css("top"));
-                added.css("left", sourceLeft + 5 + "px");
-                added.css("top", sourceTop + 5 + "px");
+                added.css("left", sourceLeft + 3 + "px");
+                added.css("top", sourceTop - 3 + "px");
                 added.width($(from).width());
                 added.height($(from).height());
             } finally {
