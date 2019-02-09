@@ -187,9 +187,8 @@
             background-repeat: no-repeat;
         }
         
-        .tooltip div {
-            font-size: 1rem;
-            opacity: 0.8;
+        .tooltip {
+            display: none;
         }
         
         .line {
@@ -778,6 +777,7 @@ b --> c
                 const tooltipData = $(card).data()["bs.tooltip"];
                 const oldText = tooltipData ? tooltipData.config.title : "";
                 AppEvent.ChangeStickyNoteText.publish($(card), oldText);
+                updateTooltip(card, $(e.target).val());
             });
 
             $(cardTextarea).on("keyup", (e) => {
@@ -807,7 +807,6 @@ b --> c
                         .css("transform", "none");
                     $(card).resizable("enable");
                 }, 500); //for car menu button.
-                updateTooltip(card, $(e.target).val());
             });
 
             $(cardTextarea).on("keydown keyup", function () {
