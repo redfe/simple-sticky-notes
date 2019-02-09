@@ -10,7 +10,8 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
         crossorigin="anonymous">
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr"
+        crossorigin="anonymous">
     <style>
         #first-message {
             width: 100%;
@@ -105,6 +106,10 @@
         .canvas-item .ui-icon {
             background-image: none;
         }
+
+        .canvas-item:hover {
+            box-shadow: 0px 0px 3px 3px #ff3c00 !important;
+        }
         
         .card {
             padding: 0rem 1rem 0rem 1rem;
@@ -161,12 +166,7 @@
             text-align: center;
             padding: 0;
         }
-        
-        .ui-draggable-dragging {
-            cursor: grabbing;
-            box-shadow: 0px 5px 10px 0px rgba(0, 0, 0, 0.4);
-        }
-        
+                
         #canvas {
             position: relative;
             background: linear-gradient(135deg, rgb(247, 237, 225), rgb(212, 80, 36));
@@ -936,13 +936,14 @@ b --> c
             return line;
         }
 
-        function addImage(base64Url) {
+        function addImage(sourceUrl) {
             const imageId = cuid();
             const image = $("<div></div>");
             $(image).attr("id", imageId);
             $(image).addClass("image canvas-item")
-            $(image).html("<img src='" + base64Url + "'>");
+            $(image).html("<img>");
             initializePosition(image);
+            $(image).find("img").attr("src", sourceUrl);
 
             toFrontMostItem(image);
             image.on("mousedown", (e) => {
@@ -995,6 +996,13 @@ b --> c
                     const file = item.getAsFile();
                     readFileAsBase64Url(file, (dataUrl) => {
                         addImage(dataUrl);
+                    });
+                } else if (item.type == "text/plain") {
+                    item.getAsString(v => {
+                        console.log(v);
+                        if (v.toLowerCase().startsWith("http")) {
+                            addImage(v);
+                        }
                     });
                 }
             }
@@ -1687,7 +1695,7 @@ b --> c
                 .css("left", data.left)
                 .css("top", data.top)
                 .width(data.width)
-                .height("auto")
+                .height(data.height)
                 .css("z-index", data.zIndex);
         }
 
