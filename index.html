@@ -10,7 +10,8 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
         crossorigin="anonymous">
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr"
+        crossorigin="anonymous">
     <style>
         #first-message {
             width: 100%;
@@ -101,12 +102,19 @@
         .canvas-item {
             cursor: grab;
         }
+
+        .canvas-item .ui-icon {
+            background-image: none;
+        }
+
+        .canvas-item:hover {
+            box-shadow: 0px 0px 3px 3px #ff3c00 !important;
+        }
         
         .card {
             padding: 0rem 1rem 0rem 1rem;
             height: 120px;
             width: 200px;
-            box-shadow: 0px 5px 10px 0px rgba(0, 0, 0, 0.4);
             border: solid 1px;
             transition: transform 500ms 0s ease;
         }
@@ -115,13 +123,10 @@
             height: 1rem;
         }
         
-        .card:hover .card-menu-button {
-            display: inline;
-        }
-        
         .sticky-note-body {
             padding: 0;
-            height: calc(100% - 2rem)
+            height: calc(100% - 2rem);
+            position: relative;
         }
         
         .sticky-note-body textarea {
@@ -132,6 +137,15 @@
             padding: 0;
             border: none;
             resize: none;
+        }
+
+        .sticky-note-body .textarea-cover {
+            position: absolute;
+            top:0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
         }
         
         .sticky-note-footer {
@@ -152,11 +166,7 @@
             text-align: center;
             padding: 0;
         }
-        
-        .ui-draggable-dragging {
-            cursor: grabbing;
-        }
-        
+                
         #canvas {
             position: relative;
             background: linear-gradient(135deg, rgb(247, 237, 225), rgb(212, 80, 36));
@@ -166,26 +176,36 @@
             z-index: 0;
         }
         
-        .card-menu-button {
+        .sticky-note .menuset {
             display: none;
             position: absolute;
-            width: 1rem;
-            height: 1rem;
-            right: 0.25rem;
+            right: 1.5rem;
             top: 0.25rem;
             margin: 0;
-            border: none;
+            top: 0px;
+            height: 1rem;
+            right: 0px;
+            margin: 0 0.5rem 0 auto;
+        }
+        
+        .sticky-note:hover .menuset {
+            display: inline;
+        }
+
+        .sticky-note .menuset * {
+            opacity: 0.3;
+        }
+
+        .sticky-note .menuset *:hover {
+            opacity: 0.7;
+        }
+
+        .sticky-note:hover .menuset * {
             cursor: pointer;
         }
-        
-        .card-menu-button {
-            background-color: rgba(0,0,0,0);
-            background-repeat: no-repeat;
-        }
-        
-        .tooltip div {
-            font-size: 1rem;
-            opacity: 0.8;
+
+        .tooltip {
+            display: none;
         }
         
         .line {
@@ -208,7 +228,6 @@
         
         .canvas-item.image {
             width: 14em;
-            box-shadow: 0px 5px 10px 0px rgba(0, 0, 0, 0.4);
             padding: 0;
             opacity: 1;
         }
@@ -308,6 +327,18 @@
             background-color: rgba(209,236,241,0.8);
         }
 
+        textarea.editing {
+            background-color: rgba(200, 200, 200, 0.4) !important;
+        }
+
+        input[type="text"], 
+        input[type="password"], 
+        button,
+        textarea, 
+        select {
+            outline: none;
+        }
+
         /*
         Copyright (c) @Thiago (https://codepen.io/thiagobraga/pen/bhDdn)
         Released under the MIT license
@@ -370,18 +401,10 @@
             border-color: rgba(200, 150, 200, 1);
         }
         
-        .color-red .card-menu-button {
-            background-image: url('https://mdbootstrap.com/img/svg/hamburger6.svg?color=a33');
-        }
-        
         .color-blue,
         .color-blue .sticky-note-body textarea {
             background-color: rgba(150, 200, 255, 1);
             border-color: rgba(100, 150, 200, 1);
-        }
-        
-        .color-blue .card-menu-button {
-            background-image: url('https://mdbootstrap.com/img/svg/hamburger6.svg?color=33a');
         }
         
         .color-green,
@@ -390,18 +413,10 @@
             border-color: rgba(150, 200, 150, 1);
         }
         
-        .color-green .card-menu-button {
-            background-image: url('https://mdbootstrap.com/img/svg/hamburger6.svg?color=3a3');
-        }
-        
         .color-yellow,
         .color-yellow .sticky-note-body textarea {
             background-color: rgba(255, 255, 200, 1);
             border-color: rgba(200, 200, 150, 1);
-        }
-        
-        .color-yellow .card-menu-button {
-            background-image: url('https://mdbootstrap.com/img/svg/hamburger6.svg?color=aa3');
         }
         
         .color-white,
@@ -410,18 +425,10 @@
             border-color: rgba(150, 150, 150, 1);
         }
         
-        .color-white .card-menu-button {
-            background-image: url('https://mdbootstrap.com/img/svg/hamburger6.svg?color=aaa');
-        }
-        
         .color-transparent,
         .color-transparent .sticky-note-body textarea {
             background-color: unset;
             border-color: rgba(0, 0, 0, 0.3);
-        }
-        
-        .color-transparent .card-menu-button {
-            background-image: url('https://mdbootstrap.com/img/svg/hamburger6.svg?color=aaa');
         }
         
         .color-transparent.card:hover {
@@ -597,10 +604,10 @@
 
     <div id="card-template" class="d-none card sticky-note canvas-item" data-toggle="tooltip" data-placement="top">
         <div class="sticky-note-header">
-            <button class="card-menu-button"></button>
         </div>
         <div class="sticky-note-body">
             <textarea></textarea>
+            <div class="textarea-cover"></div>
         </div>
         <div class="sticky-note-footer container-fluid">
             <div class="row">
@@ -608,6 +615,10 @@
                 <div class="col-sm-4"></div>
                 <div class="col-sm-4"></div>
             </div>
+        </div>
+        <div class="menuset">
+            <div class="edit icon fas fa-edit"></div>
+            <div class="menu icon fas fa-bars"></div>
         </div>
     </div>
 
@@ -625,7 +636,7 @@
         <div class="tab-content">
             <div class="md-view tab-pane show active"></div>
             <div class="md-editor tab-pane">
-                <textarea>### Default Sample
+                <textarea class="editing">### Default Sample
 
 see [Marked](https://marked.js.org/) and [Mermaidjs](https://mermaidjs.github.io/)
 
@@ -763,7 +774,8 @@ b --> c
             let color = "yellow";
             let cardId = cuid();
             let card = $("#card-template").clone();
-            let cardMenuButton = $(card).find("button");
+            let cardMenuButton = $(card).find(".menu.icon");
+            let cardEditButton = $(card).find(".edit.icon");
             let cardTextarea = $(card).find("textarea");
 
             cardMenuButton.on("click", (e) => {
@@ -771,10 +783,20 @@ b --> c
                 $("#card-menu-dialog").modal();
             });
 
+            cardEditButton.on("click", (e) => {
+                card.find(".textarea-cover").hide();
+                cardTextarea.addClass("editing");
+                const len = cardTextarea.val().length;
+                cardTextarea[0].selectionStart = len;
+                cardTextarea[0].selectionEnd = len;
+                cardTextarea.focus();
+            });
+
             $(cardTextarea).on("change", (e) => {
                 const tooltipData = $(card).data()["bs.tooltip"];
                 const oldText = tooltipData ? tooltipData.config.title : "";
                 AppEvent.ChangeStickyNoteText.publish($(card), oldText);
+                updateTooltip(card, $(e.target).val());
             });
 
             $(cardTextarea).on("keyup", (e) => {
@@ -804,7 +826,8 @@ b --> c
                         .css("transform", "none");
                     $(card).resizable("enable");
                 }, 500); //for car menu button.
-                updateTooltip(card, $(e.target).val());
+                cardTextarea.removeClass("editing");
+                card.find(".textarea-cover").show();
             });
 
             $(cardTextarea).on("keydown keyup", function () {
@@ -824,9 +847,14 @@ b --> c
             });
 
             // add from this card on double clik .
-            $(card).find(".sticky-note-header").on("dblclick", (e) => {
+            $(card).on("dblclick", (e) => {
                 addStickyNoteFrom(card);
             });
+            $(cardTextarea).on("dblclick", (e) => {
+                e.stopPropagation();
+                return false;
+            });
+
 
             // resizable
             $(card).resizable({
@@ -908,13 +936,14 @@ b --> c
             return line;
         }
 
-        function addImage(base64Url) {
+        function addImage(sourceUrl) {
             const imageId = cuid();
             const image = $("<div></div>");
             $(image).attr("id", imageId);
             $(image).addClass("image canvas-item")
-            $(image).html("<img src='" + base64Url + "'>");
+            $(image).html("<img>");
             initializePosition(image);
+            $(image).find("img").attr("src", sourceUrl);
 
             toFrontMostItem(image);
             image.on("mousedown", (e) => {
@@ -942,8 +971,8 @@ b --> c
                     added = addImage($(image).find("img").attr("src"));
                     let sourceLeft = parseFloat($(image).css("left"));
                     let sourceTop = parseFloat($(image).css("top"));
-                    added.css("left", sourceLeft + 5 + "px");
-                    added.css("top", sourceTop + 5 + "px");
+                    added.css("left", sourceLeft + 3 + "px");
+                    added.css("top", sourceTop - 3 + "px");
                     added.width($(image).width());
                     added.height($(image).height());
                 } finally {
@@ -967,6 +996,13 @@ b --> c
                     const file = item.getAsFile();
                     readFileAsBase64Url(file, (dataUrl) => {
                         addImage(dataUrl);
+                    });
+                } else if (item.type == "text/plain") {
+                    item.getAsString(v => {
+                        console.log(v);
+                        if (v.toLowerCase().startsWith("http")) {
+                            addImage(v);
+                        }
                     });
                 }
             }
@@ -1141,8 +1177,8 @@ b --> c
                 let colorClass = findFirstClass(target, (className) => className.startsWith("color-"));
                 isRecordEvents = false;
                 changeColor(added, colorClass ? colorClass.substring(6) : "color-yellow");
-                added.css("left", sourceLeft + 5 + "px");
-                added.css("top", sourceTop + 5 + "px");
+                added.css("left", sourceLeft + 3 + "px");
+                added.css("top", sourceTop - 3 + "px");
                 added.width($(from).width());
                 added.height($(from).height());
                 adjustFontSize(added.find("textarea"));
@@ -1161,8 +1197,8 @@ b --> c
                 added = addLine(isVertical);
                 let sourceLeft = parseFloat($(target).css("left"));
                 let sourceTop = parseFloat($(target).css("top"));
-                added.css("left", sourceLeft + 5 + "px");
-                added.css("top", sourceTop + 5 + "px");
+                added.css("left", sourceLeft + 3 + "px");
+                added.css("top", sourceTop - 3 + "px");
                 if (isVertical) {
                     added.height($(target).height());
                 } else {
@@ -1182,8 +1218,8 @@ b --> c
                 added = addMarkdown();
                 let sourceLeft = parseFloat($(target).css("left"));
                 let sourceTop = parseFloat($(target).css("top"));
-                added.css("left", sourceLeft + 5 + "px");
-                added.css("top", sourceTop + 5 + "px");
+                added.css("left", sourceLeft + 3 + "px");
+                added.css("top", sourceTop - 3 + "px");
                 added.width($(from).width());
                 added.height($(from).height());
             } finally {
@@ -1318,7 +1354,7 @@ b --> c
         }
 
         function adjustFontSize(textarea) {
-            const minFontSize = 12;
+            const minFontSize = 10;
             const maxFontSize = 150;
 
             const toSmall = function () {
@@ -1659,7 +1695,7 @@ b --> c
                 .css("left", data.left)
                 .css("top", data.top)
                 .width(data.width)
-                .height("auto")
+                .height(data.height)
                 .css("z-index", data.zIndex);
         }
 
@@ -2305,7 +2341,7 @@ b --> c
             }
             if (roomId) {
                 setupWebsocket(roomId);
-                setupVideoAudio(roomId);
+                //setupVideoAudio(roomId);
             }
         }
 
