@@ -36,15 +36,6 @@
             font-weight: bold;
             text-shadow: 0px 0px 10px antiquewhite;
         }
-        
-        #canvas .ui-selecting {
-            box-shadow: 0px 0px 3px 3px #007bff;
-        }
-        
-        #canvas .ui-selected {
-            box-shadow: 0px 0px 3px 3px #007bff;
-        }
-        
         body {
             padding: 0;
             margin: 0;
@@ -102,13 +93,17 @@
         .canvas-item {
             cursor: grab;
         }
-
-        .canvas-item .ui-icon {
-            background-image: none;
+        
+        #canvas .canvas-item:hover {
+            box-shadow: 0px 0px 3px 3px #1ad2df;
         }
 
-        .canvas-item:hover {
-            box-shadow: 0px 0px 3px 3px #ff3c00 !important;
+        #canvas .canvas-item.ui-selecting {
+            box-shadow: 0px 0px 3px 3px #1ad2df;
+        }
+        
+        #canvas .canvas-item.ui-selected {
+            box-shadow: 0px 0px 3px 3px #007bff;
         }
         
         .card {
@@ -859,6 +854,7 @@ b --> c
             // resizable
             $(card).resizable({
                 aspectRatio: false,
+                autoHide: true,
                 resize: function (event, ui) {
                     let height = ui.originalSize.height + ((ui.size.height - ui.originalSize.height) /
                         currentScale);
@@ -902,6 +898,7 @@ b --> c
             let handles = isVertical ? "s" : "e";
             line.resizable({
                 handles: handles,
+                autoHide: true,
                 resize: function (event, ui) {
                     if (isVertical) {
                         let length = ui.originalSize.height + ((ui.size.height - ui.originalSize.height) /
@@ -951,6 +948,7 @@ b --> c
             });
             $(image).resizable({
                 aspectRatio: false,
+                autoHide: true,
                 resize: function (event, ui) {
                     let height = ui.originalSize.height + ((ui.size.height - ui.originalSize.height) /
                         currentScale);
@@ -969,10 +967,7 @@ b --> c
                 let added;
                 try {
                     added = addImage($(image).find("img").attr("src"));
-                    let sourceLeft = parseFloat($(image).css("left"));
-                    let sourceTop = parseFloat($(image).css("top"));
-                    added.css("left", sourceLeft + 3 + "px");
-                    added.css("top", sourceTop - 3 + "px");
+                    setPositionAsCopied(image, added);
                     added.width($(image).width());
                     added.height($(image).height());
                 } finally {
@@ -989,6 +984,13 @@ b --> c
         }
 
         function addImageFromClipboard(event) {
+            const active = document.activeElement;
+            if (active["type"]) {
+                const focusType = active.type.toLowerCase();
+                if (focusType == "text" || focusType == "textarea") {
+                    return;
+                }
+            }
             var items = event.originalEvent.clipboardData.items;
             for (var i = 0; i < items.length; i++) {
                 const item = items[i];
@@ -997,13 +999,14 @@ b --> c
                     readFileAsBase64Url(file, (dataUrl) => {
                         addImage(dataUrl);
                     });
+                    return;
                 } else if (item.type == "text/plain") {
                     item.getAsString(v => {
-                        console.log(v);
                         if (v.toLowerCase().startsWith("http")) {
                             addImage(v);
                         }
                     });
+                    return;
                 }
             }
         }
@@ -1065,6 +1068,7 @@ b --> c
             // resizable
             $(markdown).resizable({
                 aspectRatio: false,
+                autoHide: true,
                 resize: function (event, ui) {
                     let height = ui.originalSize.height + ((ui.size.height - ui.originalSize.height) /
                         currentScale);
@@ -1102,7 +1106,7 @@ b --> c
             };
             marked.setOptions({
                 renderer: renderer,
-                sanitize: true
+                //sanitize: true
             });
         }
 
@@ -1166,19 +1170,23 @@ b --> c
             $(target).css("z-index", maxIndex);
         }
 
+        function setPositionAsCopied(source, target) {
+            let sourceLeft = parseFloat($(source).css("left"));
+            let sourceTop = parseFloat($(source).css("top"));
+            target.css("left", sourceLeft + 5 + "px");
+            target.css("top", sourceTop + 5 + "px");
+        }
+
         function addStickyNoteFrom(from) {
             let added;
             isRecordEvents = false;
             try {
                 let target = $(from).attr("id") ? $(from) : $(from).parents(".sticky-note");
                 added = add();
-                let sourceLeft = parseFloat($(target).css("left"));
-                let sourceTop = parseFloat($(target).css("top"));
                 let colorClass = findFirstClass(target, (className) => className.startsWith("color-"));
                 isRecordEvents = false;
                 changeColor(added, colorClass ? colorClass.substring(6) : "color-yellow");
-                added.css("left", sourceLeft + 3 + "px");
-                added.css("top", sourceTop - 3 + "px");
+                setPositionAsCopied(target, added);
                 added.width($(from).width());
                 added.height($(from).height());
                 adjustFontSize(added.find("textarea"));
@@ -1195,10 +1203,7 @@ b --> c
                 let target = $(from).attr("id") ? $(from) : $(from).parents(".line");
                 let isVertical = $(target).hasClass("vertical-line");
                 added = addLine(isVertical);
-                let sourceLeft = parseFloat($(target).css("left"));
-                let sourceTop = parseFloat($(target).css("top"));
-                added.css("left", sourceLeft + 3 + "px");
-                added.css("top", sourceTop - 3 + "px");
+                setPositionAsCopied(target, added);
                 if (isVertical) {
                     added.height($(target).height());
                 } else {
@@ -1216,10 +1221,7 @@ b --> c
             try {
                 let target = $(from).attr("id") ? $(from) : $(from).parents(".markdown");
                 added = addMarkdown();
-                let sourceLeft = parseFloat($(target).css("left"));
-                let sourceTop = parseFloat($(target).css("top"));
-                added.css("left", sourceLeft + 3 + "px");
-                added.css("top", sourceTop - 3 + "px");
+                setPositionAsCopied(target, added);
                 added.width($(from).width());
                 added.height($(from).height());
             } finally {
