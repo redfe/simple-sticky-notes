@@ -1336,6 +1336,21 @@ b --> c
                     $(".sticky-note textarea").blur();
                 }
             });
+            $(canvas).on("mousedown", ".canvas-item", function (e) {
+                const target = $(e.target).parents(".canvas-item");
+                const withCtrl = navigator.platform.indexOf("Mac") >= 0 ?
+                    e.metaKey : e.ctrlKey;
+                if ($(target).hasClass("ui-selected")) {
+                    if (withCtrl) {
+                        $(target).removeClass("ui-selected");
+                    }
+                } else {
+                    if (!withCtrl) {
+                        $(".ui-selected").removeClass("ui-selected");
+                    }
+                    $(target).addClass("ui-selected");
+                }
+            });
             // for scaleable select.
             $.fn.outerWidth = function () {
                 var w = oldOuterWidth.apply($(this));
