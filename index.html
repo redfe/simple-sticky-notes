@@ -489,16 +489,13 @@
                     </div>
                 </div>
             </div>
-            <div class="col-sm-3">
+            <div class="col-sm-4">
                 <div class="">Groop Work</div>
-                <input class="user-name" type="text" placeholder="your name" />
+                <input id="user-name" class="user-name d-none" type="text" placeholder="your name" />
                 <button id="create-room-button" class="btn btn-secondary btn-sm">Create room</button>
-                <button id="push-button" class="btn btn-warning btn-sm">Push</button>
-                <button id="call-button" class="btn btn-secondary btn-sm">&#x270B Call</button>
-            </div>
-            <div class="col-sm-2">
-                <div>Pointer</div>
-                <button id="clear-pointers-button" class="btn btn-secondary btn-sm">Clear</button>
+                <button id="push-button" class="btn btn-warning btn-sm d-none">Push</button>
+                <button id="call-button" class="btn btn-secondary btn-sm d-none">&#x270B Call</button>
+                <button id="clear-pointers-button" class="btn btn-secondary btn-sm d-none">Clear Pointer</button>
             </div>
             <div class="col-sm-2">
                 <div class="">Zoom</div>
@@ -2369,7 +2366,12 @@ b --> c
             if (roomId) {
                 setupWebsocket(roomId);
                 //setupVideoAudio(roomId);
+                showGroupWorkMenu();
             }
+        }
+
+        function showGroupWorkMenu() {
+            $("#user-name,#push-button,#call-button,#clear-pointers-button").removeClass("d-none");
         }
 
         function createRoom() {
