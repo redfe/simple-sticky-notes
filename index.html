@@ -1456,10 +1456,12 @@ b --> c
             } else {
                 let selecteds = $(".canvas-item.ui-selected");
                 var mostLeft = Math.min.apply(null, $.map(selecteds, x => parseInt($(x).css("left"))));
+                var mostRight = Math.max.apply(null, $.map(selecteds, x => parseInt($(x).css("left")) + $(x).width()));
                 var mostTop = Math.min.apply(null, $.map(selecteds, x => parseInt($(x).css("top"))));
+                var mostBottom = Math.max.apply(null, $.map(selecteds, x => parseInt($(x).css("top")) + $(x).height()));
                 resize();
-                $(window).scrollLeft(mostLeft * currentScale - (30 * currentScale));
-                $(window).scrollTop(mostTop * currentScale - (30 * currentScale));
+                $(window).scrollLeft(mostLeft * currentScale - ($(window).width() / 2) + ((mostRight - mostLeft) * currentScale / 2));
+                $(window).scrollTop($("#menu").height() + mostTop * currentScale - ($(window).height() / 2) + ((mostBottom - mostTop) * currentScale / 2));
             }
         }
 

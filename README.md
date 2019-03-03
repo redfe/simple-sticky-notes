@@ -9,8 +9,7 @@ very simple stikcy notes.
 - support epic canvas.
   - fit width.
   - resizable canvas.
-  - zoom in/out with selected cards as starting point.
-  - tooltip.
+  - zoom in/out.
 - add line.
 - add image.
 - add markdown.
