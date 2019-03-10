@@ -388,54 +388,49 @@
             padding:0;
             margin: 0;
         }
+
         /* colors */
+        
+        .sticky-note {
+            border: 1px solid rgba(0, 0, 0, 0.2);
+        }
         
         .color-red,
         .color-red .sticky-note-body textarea {
             background-color: rgba(255, 200, 255, 1);
-            border-color: rgba(200, 150, 200, 1);
         }
         
         .color-blue,
         .color-blue .sticky-note-body textarea {
             background-color: rgba(150, 200, 255, 1);
-            border-color: rgba(100, 150, 200, 1);
         }
         
         .color-green,
         .color-green .sticky-note-body textarea {
             background-color: rgba(200, 255, 200, 1);
-            border-color: rgba(150, 200, 150, 1);
         }
         
         .color-yellow,
         .color-yellow .sticky-note-body textarea {
             background-color: rgba(255, 255, 200, 1);
-            border-color: rgba(200, 200, 150, 1);
         }
         
         .color-white,
         .color-white .sticky-note-body textarea {
             background-color: rgba(255, 255, 255, 1);
-            border-color: rgba(150, 150, 150, 1);
         }
         
         .color-transparent,
         .color-transparent .sticky-note-body textarea {
             background-color: unset;
-            border-color: rgba(0, 0, 0, 0.3);
+            border-color: rgba(0, 0, 0, 0);
         }
         
         .color-transparent.card:hover {
             box-shadow: unset;
-            border: 1px solid rgba(0,0,0,0.3);
+            border: 1px solid rgba(0,0,0,0.2);
         }
         
-        .color-transparent.card {
-            box-shadow: unset;
-            border: 1px solid rgba(0,0,0,0);
-        }
-
         /* colors end */
         
     </style>
@@ -1334,7 +1329,8 @@ b --> c
                 }
             });
             $(canvas).on("mousedown", ".canvas-item", function (e) {
-                const target = $(e.target).parents(".canvas-item");
+                const target = $(e.target).hasClass("canvas-item") ? $(e.target) : $(e.target).parents(
+                    ".canvas-item");
                 const withCtrl = navigator.platform.indexOf("Mac") >= 0 ?
                     e.metaKey : e.ctrlKey;
                 if ($(target).hasClass("ui-selected")) {
@@ -1460,8 +1456,10 @@ b --> c
                 var mostTop = Math.min.apply(null, $.map(selecteds, x => parseInt($(x).css("top"))));
                 var mostBottom = Math.max.apply(null, $.map(selecteds, x => parseInt($(x).css("top")) + $(x).height()));
                 resize();
-                $(window).scrollLeft(mostLeft * currentScale - ($(window).width() / 2) + ((mostRight - mostLeft) * currentScale / 2));
-                $(window).scrollTop($("#menu").height() + mostTop * currentScale - ($(window).height() / 2) + ((mostBottom - mostTop) * currentScale / 2));
+                $(window).scrollLeft(mostLeft * currentScale - ($(window).width() / 2) + ((mostRight - mostLeft) *
+                    currentScale / 2));
+                $(window).scrollTop($("#menu").height() + mostTop * currentScale - ($(window).height() / 2) + ((
+                    mostBottom - mostTop) * currentScale / 2));
             }
         }
 
