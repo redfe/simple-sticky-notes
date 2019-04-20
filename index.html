@@ -479,6 +479,8 @@
                         <div class="dropdown-menu">
                             <a id="undo-button" class="dropdown-item">Undo</a>
                             <a id="redo-button" class="dropdown-item">Redo</a>
+                            <a id="send-to-front-button" class="dropdown-item">Send To Front</a>
+                            <a id="send-to-back-button" class="dropdown-item">Send To Back</a>
                             <a id="delete-item-button" class="dropdown-item bg-danger text-white">Delete</a>
                         </div>
                     </div>
@@ -704,6 +706,8 @@ b --> c
             $("#add-button").on("click", add);
             $("#undo-button").on("click", undo);
             $("#redo-button").on("click", redo);
+            $("#send-to-front-button").on("click", sendToFront);
+            $("#send-to-back-button").on("click", sendToBack);
             $("#zoom-in-button").on("click", zoomIn);
             $("#zoom-out-button").on("click", zoomOut);
             $("#zoom-fit-button").on("click", zoomFitWidth);
@@ -833,11 +837,6 @@ b --> c
             card.addClass("color-" + color);
 
             initializePosition(card);
-            toFrontMostItem(card);
-
-            card.on("mousedown", (e) => {
-                toFrontMostItem($(card));
-            });
 
             // add from this card on double clik .
             $(card).on("dblclick", (e) => {
@@ -869,6 +868,7 @@ b --> c
             });
 
             $("#canvas").append(card);
+            toFrontMostItems(card);
 
             toDraggable(card);
 
@@ -892,7 +892,6 @@ b --> c
             line.addClass(isVertical ? "vertical-line" : "horizontal-line");
             line.attr("id", lineId);
             initializePosition(line);
-            toFrontMostItem(line);
             let handles = isVertical ? "s" : "e";
             line.resizable({
                 handles: handles,
@@ -914,16 +913,13 @@ b --> c
                 }
             });
 
-            line.on("mousedown", (e) => {
-                toFrontMostItem($(line));
-            });
-
             // add from this line on double clik .
             $(line).on("dblclick", (e) => {
                 addLineFrom(line);
             });
 
             $("#canvas").append(line);
+            toFrontMostItems(line);
             toDraggable(line);
 
             AppEvent.AddItem.publish(line);
@@ -940,10 +936,6 @@ b --> c
             initializePosition(image);
             $(image).find("img").attr("src", sourceUrl);
 
-            toFrontMostItem(image);
-            image.on("mousedown", (e) => {
-                toFrontMostItem($(image));
-            });
             $(image).resizable({
                 aspectRatio: false,
                 autoHide: true,
@@ -974,6 +966,7 @@ b --> c
                 AppEvent.AddItem.publish(added);
             });
             $("#canvas").append(image);
+            toFrontMostItems(image);
             toDraggable(image);
 
             AppEvent.AddItem.publish(image);
@@ -1052,11 +1045,6 @@ b --> c
             markdown.removeClass("d-none");
 
             initializePosition(markdown);
-            toFrontMostItem(markdown);
-
-            markdown.on("mousedown", (e) => {
-                toFrontMostItem($(markdown));
-            });
 
             // add from this markdown on double clik .
             $(markdown).find(".markdown-header,.spacer").on("dblclick", (e) => {
@@ -1082,7 +1070,7 @@ b --> c
             });
 
             $("#canvas").append(markdown);
-
+            toFrontMostItems(markdown);
             toDraggable(markdown);
 
             // view
@@ -1146,26 +1134,78 @@ b --> c
             item.css("left", scrollX + 30 + "px");
         }
 
-        function toFrontMostItem(target) {
-            let targetIndex = parseInt($(target).css("z-index"));
-            if (!targetIndex) {
-                targetIndex = 0;
+        function sendToFront() {
+            toFrontMostItems($("#canvas .ui-selected"));
+        }
+
+        function toFrontMostItems(targets) {
+            if (!targets || targets.length == 0) {
+                return;
             }
-            var maxIndex = 0;
-            $(".canvas-item").each((i, v) => {
-                if ($(v) == $(target)) {
-                    return;
+            targets.sort((a, b) => {
+                let ai = parseInt($(a).css("z-index"));
+                let bi = parseInt($(b).css("z-index"));
+                if (!ai) {
+                    ai = 0;
                 }
+                if (!bi) {
+                    bi = 0;
+                }
+                return bi - ai;
+            });
+            const canvasItems = $("#canvas .canvas-item");
+            let targetMaxIndex = parseInt($(targets[0]).css("z-index"));
+            if (isNaN(targetMaxIndex)) {
+                targetMaxIndex = canvasItems.length - 1;
+            }
+            canvasItems.each((i, v) => {
                 let myIndex = parseInt($(v).css("z-index"));
                 if (!myIndex) {
                     myIndex = 0;
                 }
-                maxIndex = Math.max(maxIndex, myIndex);
-                if (myIndex > targetIndex) {
-                    $(v).css("z-index", myIndex - 1);
+                if (targetMaxIndex < myIndex) {
+                    $(v).css("z-index", myIndex - targets.length);
                 }
             });
-            $(target).css("z-index", maxIndex);
+            let targetIndex = canvasItems.length - 1;
+            targets.each((i, v) => {
+                $(v).css("z-index", targetIndex--);
+            });
+        }
+
+        function sendToBack() {
+            toBackMostItems($("#canvas .ui-selected"));
+        }
+
+        function toBackMostItems(targets) {
+            if (!targets || targets.length == 0) {
+                return;
+            }
+            targets.sort((a, b) => {
+                let ai = parseInt($(a).css("z-index"));
+                let bi = parseInt($(b).css("z-index"));
+                if (!ai) {
+                    ai = 0;
+                }
+                if (!bi) {
+                    bi = 0;
+                }
+                return bi - ai;
+            });
+            let targetMinIndex = parseInt($(targets[targets.length - 1]).css("z-index"));
+            $("#canvas .canvas-item").each((i, v) => {
+                let myIndex = parseInt($(v).css("z-index"));
+                if (!myIndex) {
+                    myIndex = 0;
+                }
+                if (myIndex < targetMinIndex) {
+                    $(v).css("z-index", myIndex + targets.length);
+                }
+            });
+            let targetIndex = targets.length - 1;
+            targets.each((i, v) => {
+                $(v).css("z-index", targetIndex--);
+            });
         }
 
         function setPositionAsCopied(source, target) {
@@ -1263,7 +1303,7 @@ b --> c
             // In the case of zoom-in / zoom-out, since the position of the drag shifts, it is necessary to adjust it.
             // see https://stackoverflow.com/questions/13882070/jquery-draggable-and-webkit-transform-scale
             $(item).draggable({
-                stack: ".canvas-item",
+                stack: false,
                 start: function (event) {
                     click.x = event.clientX;
                     click.y = event.clientY;
@@ -1936,7 +1976,6 @@ b --> c
                     const targets = [];
                     event.eventBody.ids.forEach(function (id, i) {
                         const target = $("#" + id);
-                        toFrontMostItem(target);
                         targets.push(target);
                         const left = parseInt(target.css("left"));
                         const top = parseInt(target.css("top"));
@@ -1982,7 +2021,6 @@ b --> c
                     const target = $("#" + event.eventBody.id)
                         .width(event.eventBody.to.width)
                         .height(event.eventBody.to.height);
-                    toFrontMostItem(target);
                     if (event.eventBody.elementClass.indexOf("sticky-note") >= 0) {
                         adjustFontSize(target.find("textarea"));
                     }
@@ -2047,7 +2085,6 @@ b --> c
                 },
                 forward: function (event) {
                     const target = $("#" + event.eventBody.id);
-                    toFrontMostItem(target);
                     const textarea = target.find("textarea");
                     const text = event.eventBody.to;
                     textarea.val(text);
@@ -2087,7 +2124,6 @@ b --> c
                 forward: function (event) {
                     event.eventBody.ids.forEach(function (id, i) {
                         const target = $("#" + id);
-                        toFrontMostItem(target);
                         removeColorClass(target);
                         target.addClass(event.eventBody.to);
                     });
@@ -2121,7 +2157,6 @@ b --> c
                 },
                 forward: function (event) {
                     const target = $("#" + event.eventBody.id);
-                    toFrontMostItem(target);
                     const textarea = target.find("textarea");
                     const text = event.eventBody.to;
                     textarea.val(text);
