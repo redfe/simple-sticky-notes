@@ -1135,7 +1135,10 @@ b --> c
         }
 
         function sendToFront() {
-            const targets = $("#canvas .ui-selected");
+            const targets = $("#canvas .ui-selected").sort(compareByZIndex);
+            if (!targets || targets.length == 0) {
+                return;
+            }
             const targetIds = $.makeArray(targets.map((i, v) => $(v).attr("id")));
             const zIndexes = $.makeArray(targets.map((i, v) => parseInt($(v).css("z-index"))));
             toFrontMostItems(targets);
@@ -1143,57 +1146,35 @@ b --> c
         }
 
         function toFrontMostItems(targetItems) {
-            const targets = $(targetItems);
+            const targets = $(targetItems).sort(compareByZIndex);
             if (!targets || targets.length == 0) {
                 return;
             }
-            targets.sort((a, b) => {
-                return compareByZIndex(b, a);
-            });
-            const canvasItems = $("#canvas .canvas-item");
-            let targetMaxIndex = parseInt($(targets[0]).css("z-index"));
-            if (isNaN(targetMaxIndex)) {
-                targetMaxIndex = canvasItems.length - 1;
-            }
-            canvasItems.each((i, v) => {
-                let myIndex = parseInt($(v).css("z-index"));
-                if (!myIndex) {
-                    myIndex = 0;
-                }
-                if (targetMaxIndex < myIndex) {
-                    $(v).css("z-index", myIndex - targets.length);
-                }
-            });
-            let targetIndex = canvasItems.length - 1;
-            targets.each((i, v) => {
-                $(v).css("z-index", targetIndex--);
+            const canvasItems = $("#canvas .canvas-item").not(targets).sort(compareByZIndex);
+            const results = $.merge(canvasItems, targets);
+            results.each((i, v) => {
+                $(v).css("z-index", i);
             });
         }
 
         function sendToBack() {
-            toBackMostItems($("#canvas .ui-selected"));
-        }
-
-        function toBackMostItems(targets) {
+            const targets = $("#canvas .ui-selected").sort(compareByZIndex);
             if (!targets || targets.length == 0) {
                 return;
             }
-            targets.sort((a, b) => {
-                return compareByZIndex(b, a);
-            });
-            let targetMinIndex = parseInt($(targets[targets.length - 1]).css("z-index"));
-            $("#canvas .canvas-item").each((i, v) => {
-                let myIndex = parseInt($(v).css("z-index"));
-                if (!myIndex) {
-                    myIndex = 0;
-                }
-                if (myIndex < targetMinIndex) {
-                    $(v).css("z-index", myIndex + targets.length);
-                }
-            });
-            let targetIndex = targets.length - 1;
-            targets.each((i, v) => {
-                $(v).css("z-index", targetIndex--);
+            const targetIds = $.makeArray(targets.map((i, v) => $(v).attr("id")));
+            const zIndexes = $.makeArray(targets.map((i, v) => parseInt($(v).css("z-index"))));
+            toBackMostItems(targets);
+            AppEvent.SendToBack.publish(targetIds, zIndexes);
+
+        }
+
+        function toBackMostItems(targetItems) {
+            const targets = $(targetItems).sort(compareByZIndex);
+            const canvasItems = $("#canvas .canvas-item").not(targets).sort(compareByZIndex);
+            const results = $.merge(targets, canvasItems);
+            results.each((i, v) => {
+                $(v).css("z-index", i);
             });
         }
 
@@ -2249,11 +2230,10 @@ b --> c
                     return event.eventType == "sendToFront";
                 },
                 back: function (event) {
-                    const targets = $(event.eventBody.ids).map((i, id) => $("#" + id)).sort(compareByZIndex);
-                    toFrontMostItems(targets);
-                    const sortedItems = $("#canvas .canvas-item").sort(compareByZIndex);
+                    let targets = $(event.eventBody.ids).map((i, id) => $("#" + id)[0]);
+                    const sortedItems = $("#canvas .canvas-item").not(targets).sort(compareByZIndex);
                     targets.each((i, v) => {
-                        moveIndex(sortedItems, parseInt($(v).css("z-index")), event.eventBody.oldZIndexes[i])
+                        sortedItems.splice(event.eventBody.oldZIndexes[i], 0, v);
                     });
                     sortedItems.each((i, v) => {
                         $(v).css("z-index", i);
@@ -2263,8 +2243,32 @@ b --> c
                     const targets = $(event.eventBody.ids).map((i, id) => $("#" + id));
                     toFrontMostItems(targets);
                 }
+            },
+            SendToBack: {
+                publish: function (ids, oldZIndexes) {
+                    if (!isRecordEvents) {
+                        return;
+                    }
+                    eventStore.push({
+                        eventType: "sendToBack",
+                        eventBody: {
+                            ids: ids,
+                            oldZIndexes: oldZIndexes
+                        }
+                    });
+                    clearForwardStore();
+                },
+                isTargetType: function (event) {
+                    return event.eventType == "sendToBack";
+                },
+                back: function (event) {
+                    AppEvent.SendToFront.back(event);
+                },
+                forward: function (event) {
+                    const targets = $(event.eventBody.ids).map((i, id) => $("#" + id));
+                    toBackMostItems(targets);
+                }
             }
-            // TODO SendToBack
 
         };
 
