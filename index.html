@@ -1135,23 +1135,20 @@ b --> c
         }
 
         function sendToFront() {
-            toFrontMostItems($("#canvas .ui-selected"));
+            const targets = $("#canvas .ui-selected");
+            const targetIds = $.makeArray(targets.map((i, v) => $(v).attr("id")));
+            const zIndexes = $.makeArray(targets.map((i, v) => parseInt($(v).css("z-index"))));
+            toFrontMostItems(targets);
+            AppEvent.SendToFront.publish(targetIds, zIndexes);
         }
 
-        function toFrontMostItems(targets) {
+        function toFrontMostItems(targetItems) {
+            const targets = $(targetItems);
             if (!targets || targets.length == 0) {
                 return;
             }
             targets.sort((a, b) => {
-                let ai = parseInt($(a).css("z-index"));
-                let bi = parseInt($(b).css("z-index"));
-                if (!ai) {
-                    ai = 0;
-                }
-                if (!bi) {
-                    bi = 0;
-                }
-                return bi - ai;
+                return compareByZIndex(b, a);
             });
             const canvasItems = $("#canvas .canvas-item");
             let targetMaxIndex = parseInt($(targets[0]).css("z-index"));
@@ -1182,15 +1179,7 @@ b --> c
                 return;
             }
             targets.sort((a, b) => {
-                let ai = parseInt($(a).css("z-index"));
-                let bi = parseInt($(b).css("z-index"));
-                if (!ai) {
-                    ai = 0;
-                }
-                if (!bi) {
-                    bi = 0;
-                }
-                return bi - ai;
+                return compareByZIndex(b, a);
             });
             let targetMinIndex = parseInt($(targets[targets.length - 1]).css("z-index"));
             $("#canvas .canvas-item").each((i, v) => {
@@ -2241,7 +2230,42 @@ b --> c
                             currentScale)
                     });
                 }
+            },
+            SendToFront: {
+                publish: function (ids, oldZIndexes) {
+                    if (!isRecordEvents) {
+                        return;
+                    }
+                    eventStore.push({
+                        eventType: "sendToFront",
+                        eventBody: {
+                            ids: ids,
+                            oldZIndexes: oldZIndexes
+                        }
+                    });
+                    clearForwardStore();
+                },
+                isTargetType: function (event) {
+                    return event.eventType == "sendToFront";
+                },
+                back: function (event) {
+                    const targets = $(event.eventBody.ids).map((i, id) => $("#" + id)).sort(compareByZIndex);
+                    toFrontMostItems(targets);
+                    const sortedItems = $("#canvas .canvas-item").sort(compareByZIndex);
+                    targets.each((i, v) => {
+                        moveIndex(sortedItems, parseInt($(v).css("z-index")), event.eventBody.oldZIndexes[i])
+                    });
+                    sortedItems.each((i, v) => {
+                        $(v).css("z-index", i);
+                    });
+                },
+                forward: function (event) {
+                    const targets = $(event.eventBody.ids).map((i, id) => $("#" + id));
+                    toFrontMostItems(targets);
+                }
             }
+            // TODO SendToBack
+
         };
 
         function setupShortcutKeys() {
@@ -2654,6 +2678,28 @@ b --> c
             });
 
         }
+
+        function compareByZIndex(a, b) {
+            let ai = parseInt($(a).css("z-index"));
+            if (isNaN(ai)) {
+                ai = 0;
+            }
+            let bi = parseInt($(b).css("z-index"));
+            if (isNaN(bi)) {
+                bi = 0;
+            }
+            return ai - bi;
+        }
+
+        function moveIndex(sortedItems, targetIndex, toIndex) {
+            if (targetIndex == toIndex) {
+                return;
+            }
+            const target = sortedItems[targetIndex];
+            sortedItems.splice(targetIndex, 1);
+            sortedItems.splice(toIndex, 0, target);
+        }
+
     </script>
 </body>
 
