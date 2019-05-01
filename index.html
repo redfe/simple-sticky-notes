@@ -199,10 +199,6 @@
             width: 100%;
         }
 
-        #canvas {
-            transition: transform 500ms 0s ease;
-        }
-
         .canvas-item.image {
             width: 14em;
             padding: 0;
@@ -1436,7 +1432,7 @@ b --> c
                 let beforeDocumentHeight = $(document).height();
                 resize();
                 $(window).scrollLeft($(document).width() * (scrollLeft / beforeDocumentWidth));
-                $(window).scrollTop(($(document).height()) * (scrollTop / beforeDocumentHeight));
+                $(window).scrollTop($(document).height() * (scrollTop / beforeDocumentHeight));
             } else {
                 let selecteds = $(".canvas-item.ui-selected");
                 var mostLeft = Math.min.apply(null, $.map(selecteds, x => parseInt($(x).css("left"))));
