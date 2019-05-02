@@ -722,7 +722,7 @@ b --> c
             // initialize margin of main.
             adjustMainMarginTop();
             $(window).on("resize", adjustMainMarginTop);
-            $(window).on("resize", applyScale);
+            $(window).on("resize", function() {applyScale(currentScale);});
 
             // setup conrifm
             $(window).on('beforeunload', function (event) {
@@ -1393,46 +1393,42 @@ b --> c
         }
 
         function zoomIn() {
-            currentScale = currentScale + (currentScale * scaleStep);
-            applyScale();
+            applyScale(currentScale + (currentScale * scaleStep));
         }
 
         function zoomOut() {
-            currentScale = currentScale - (currentScale * scaleStep);
-            applyScale();
+            applyScale(currentScale - (currentScale * scaleStep));
         }
 
         function zoomFitWidth() {
-            currentScale = window.innerWidth / $("#canvas").width();
+            applyScale($(window).width() / $("#canvas").width(), true);
             scrollTo(0, 0);
-            applyScale(true);
         }
 
         function zoomReset() {
-            currentScale = 1;
-            applyScale();
+            applyScale(1);
         }
 
-        function applyScale(disableAnchor) {
+        function applyScale(newScale, disableAnchor) {
             // do nothing while resizing.
             if ($(".ui-resizable-resizing").length > 0) {
                 return;
             }
             const resize = () => {
                 $("#canvas")
-                    .css("transform", "scale(" + currentScale + ")")
+                    .css("transform", "scale(" + newScale + ")")
                     .css("transform-origin", "left top");
             };
-            if (disableAnchor) {
+            if (disableAnchor || $(".ui-selected").length == 0) {
+                var mostLeft = $(window).scrollLeft() / currentScale;
+                var mostRight = mostLeft + ($(window).width() / currentScale);
+                var mostTop = ($(window).scrollTop() / currentScale) - ($("#menu").height() / currentScale);
+                var mostBottom = mostTop + ($(window).height() / currentScale);
                 resize();
-            } else if ($(".ui-selected").length == 0) {
-                let scrollLeft = $(window).scrollLeft();
-                let scrollTop = $(window).scrollTop();
-                let beforeDocumentWidth = $(document).width();
-                let beforeDocumentHeight = $(document).height();
-                resize();
-                $(window).scrollLeft($(document).width() * (scrollLeft / beforeDocumentWidth));
-                $(window).scrollTop($(document).height() * (scrollTop / beforeDocumentHeight));
+                $(window).scrollLeft(mostLeft * newScale - ($(window).width() / 2) + ((mostRight - mostLeft) *
+                newScale / 2));
+                $(window).scrollTop($("#menu").height() + mostTop * newScale - ($(window).height() / 2) + ((
+                    mostBottom - mostTop) * newScale / 2));
             } else {
                 let selecteds = $(".canvas-item.ui-selected");
                 var mostLeft = Math.min.apply(null, $.map(selecteds, x => parseInt($(x).css("left"))));
@@ -1440,11 +1436,12 @@ b --> c
                 var mostTop = Math.min.apply(null, $.map(selecteds, x => parseInt($(x).css("top"))));
                 var mostBottom = Math.max.apply(null, $.map(selecteds, x => parseInt($(x).css("top")) + $(x).height()));
                 resize();
-                $(window).scrollLeft(mostLeft * currentScale - ($(window).width() / 2) + ((mostRight - mostLeft) *
-                    currentScale / 2));
-                $(window).scrollTop($("#menu").height() + mostTop * currentScale - ($(window).height() / 2) + ((
-                    mostBottom - mostTop) * currentScale / 2));
+                $(window).scrollLeft(mostLeft * newScale - ($(window).width() / 2) + ((mostRight - mostLeft) *
+                    newScale / 2));
+                $(window).scrollTop($("#menu").height() + mostTop * newScale - ($(window).height() / 2) + ((
+                    mostBottom - mostTop) * newScale / 2));
             }
+            currentScale = newScale;
         }
 
         function setCanvasSize() {
