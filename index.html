@@ -13,7 +13,6 @@
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css"
         integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
     <style>
-
         body {
             padding: 0;
             margin: 0;
@@ -722,7 +721,7 @@ b --> c
             // initialize margin of main.
             adjustMainMarginTop();
             $(window).on("resize", adjustMainMarginTop);
-            $(window).on("resize", function() {applyScale(currentScale);});
+            $(window).on("resize", function () { applyScale(currentScale); });
 
             // setup conrifm
             $(window).on('beforeunload', function (event) {
@@ -1358,7 +1357,7 @@ b --> c
                 if (fontSize <= minFontSize) {
                     return;
                 }
-                const minScrollHeight = $(textarea).height();
+                const minScrollHeight = Math.round($(textarea).height());
                 if (minScrollHeight >= $(textarea)[0].scrollHeight) {
                     return;
                 }
@@ -1383,7 +1382,7 @@ b --> c
                 adjustFontSize(textarea);
             };
 
-            const minScrollHeight = $(textarea).height();
+            const minScrollHeight = Math.round($(textarea).height());
             const currentScrollHeight = $(textarea)[0].scrollHeight;
             if (minScrollHeight < currentScrollHeight) {
                 toSmall();
@@ -1426,7 +1425,7 @@ b --> c
                 var mostBottom = mostTop + ($(window).height() / currentScale);
                 resize();
                 $(window).scrollLeft(mostLeft * newScale - ($(window).width() / 2) + ((mostRight - mostLeft) *
-                newScale / 2));
+                    newScale / 2));
                 $(window).scrollTop($("#menu").height() + mostTop * newScale - ($(window).height() / 2) + ((
                     mostBottom - mostTop) * newScale / 2));
             } else {
