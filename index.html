@@ -199,7 +199,6 @@
         }
 
         .canvas-item.image {
-            width: 14em;
             padding: 0;
             opacity: 1;
         }
@@ -437,6 +436,7 @@
                             Add
                         </button>
                         <div class="dropdown-menu">
+                            <a id="add-narrative-arc-button" class="dropdown-item">Narrative Arc</a>
                             <a id="add-button" class="dropdown-item">Card</a>
                             <a id="add-markdown-button" class="dropdown-item">Markdown</a>
                             <a id="add-image-button" class="dropdown-item">Image</a>
@@ -672,6 +672,7 @@ b --> c
         $(function () {
             setupShortcutKeys();
             $('[data-toggle="tooltip"]').tooltip();
+            $("#add-narrative-arc-button").on("click", addNarativeArc);
             $("#add-button").on("click", add);
             $("#undo-button").on("click", undo);
             $("#redo-button").on("click", redo);
@@ -734,6 +735,10 @@ b --> c
 
             initRoom();
         });
+
+        function addNarativeArc() {
+            addImage("https://redfe.github.io/simple-sticky-notes-assets/storymapping/narrative-arc.svg");
+        }
 
         function add() {
 
@@ -934,6 +939,8 @@ b --> c
                 }
                 AppEvent.AddItem.publish(added);
             });
+            $(image).width(200);
+            $(image).height(200);
             $("#canvas").append(image);
             toFrontMostItems(image);
             toDraggable(image);
