@@ -1060,7 +1060,7 @@ b --> c
         function setupMarkdownRenderWithMermaid() {
             var renderer = new marked.Renderer();
             renderer.code = function (code, language) {
-                if (code.match(/^sequenceDiagram/) || code.match(/^graph/) || code.match(/^gantt/) || code.match(/^classDiagram/) || code.match(/^gitGraph/) {
+                if (code.match(/^sequenceDiagram/) || code.match(/^graph/) || code.match(/^gantt/) || code.match(/^classDiagram/) || code.match(/^gitGraph/)) {
                     return '<div class="mermaid">' + code + '</div>';
                 } else {
                     return '<pre><code>' + sanitize(code) + '</code></pre>';
