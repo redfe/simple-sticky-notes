@@ -536,6 +536,24 @@
         </div>
     </div>
 
+    <div id="input-dialog" class="modal fade" tabindex="-1" role="dialog" data-backdrop="static">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"></h5>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <input type="text" class="form-control" id="input-box">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="yes btn btn-primary">Yes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id="videochat-setting-dialog" class="modal fade" tabindex="-1" role="dialog">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -2404,10 +2422,31 @@ b --> c
                 }
             }
             if (roomId) {
+                showUserNameInputDialog();
                 setupWebsocket(roomId);
                 //setupVideoAudio(roomId);
                 showGroupWorkMenu();
             }
+        }
+
+        function showUserNameInputDialog() {
+            inputWithDialog("Your name", function (userName) {
+                if (userName == null || userName == "") {
+                    return false;
+                }
+                $("#user-name").val(userName);
+                return true;
+            });
+        }
+
+        function inputWithDialog(title, callbackOfYes) {
+            $("#input-dialog .modal-title").text(title);
+            $("#input-dialog .yes").on("click", function () {
+                if (callbackOfYes($("#input-box").val())) {
+                    $("#input-dialog").modal("hide");
+                }
+            });
+            $("#input-dialog").modal();
         }
 
         function showGroupWorkMenu() {
