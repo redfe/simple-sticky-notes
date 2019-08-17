@@ -543,9 +543,11 @@
                     <h5 class="modal-title"></h5>
                 </div>
                 <div class="modal-body">
-                    <div class="form-group">
-                        <input type="text" class="form-control" id="input-box">
-                    </div>
+                    <form>
+                        <div >
+                            <input type="text" class="form-control" id="input-box" name="inputBox">
+                        </div>
+                    </form>
                 </div>
                 <div class="modal-footer">
                     <button class="yes btn btn-primary">Yes</button>
@@ -2446,7 +2448,14 @@ b --> c
                     $("#input-dialog").modal("hide");
                 }
             });
+            $("#input-dialog form").on("submit", function() {
+                $("#input-dialog .yes").click();
+                return false;
+            });
             $("#input-dialog").modal();
+            $("#input-dialog").on("shown.bs.modal", function (e) {
+                $("#input-box").focus();
+            });
         }
 
         function showGroupWorkMenu() {
