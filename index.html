@@ -2470,10 +2470,12 @@ b --> c
             });
         }
 
-        function initRoom() {
+        function initRoom(roomIdParam) {
             var query = location.search;
-            var roomId
-            if (query) {
+            var roomId;
+            if (roomIdParam) {
+                roomId = roomIdParam;
+            } else if (query) {
                 var preRoomIdWord = "roomId=";
                 var idx = query.indexOf(preRoomIdWord);
                 if (idx > 0) {
@@ -2526,7 +2528,9 @@ b --> c
         }
 
         function createRoom() {
-            location.search = "?roomId=" + cuid();
+            const roomId = cuid();
+            history.replaceState("", "", "?roomId=" + roomId);
+            initRoom(roomId);
         }
 
         function push() {
