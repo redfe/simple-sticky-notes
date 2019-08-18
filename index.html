@@ -54,6 +54,17 @@
             padding-bottom: 4px;
         }
 
+        #menu .fas {
+            margin-left: -19px;
+            margin-right: 5px;
+        }
+
+        #menu .fab {
+            margin-left: -19px;
+            margin-right: 5px;
+            font-size: 0.8rem;
+        }
+
         #zoom-in-button {
             font-weight: bold;
         }
@@ -446,8 +457,8 @@
                             File
                         </button>
                         <div class="dropdown-menu">
-                            <a id="export-button" class="dropdown-item">Export</a>
-                            <a id="import-button" class="dropdown-item">Import</a>
+                            <a id="export-button" class="dropdown-item"><span class="fas fa-file-export"></span>Export</a>
+                            <a id="import-button" class="dropdown-item"><span class="fas fa-file-import"></span>Import</a>
                         </div>
                     </div>
                     <div class="btn-group">
@@ -456,12 +467,12 @@
                             Add
                         </button>
                         <div class="dropdown-menu">
-                            <a id="add-narrative-arc-button" class="dropdown-item">Narrative Arc</a>
-                            <a id="add-button" class="dropdown-item">Card</a>
-                            <a id="add-markdown-button" class="dropdown-item">Markdown</a>
-                            <a id="add-image-button" class="dropdown-item">Image</a>
-                            <a id="add-horizontal-line-button" class="dropdown-item">Horizontal Line</a>
-                            <a id="add-vertical-line-button" class="dropdown-item">Vertical Line</a>
+                            <a id="add-narrative-arc-button" class="dropdown-item"><span class="fab fa-think-peaks"></span>Narrative Arc</a>
+                            <a id="add-button" class="dropdown-item"><span class="fas fa-sticky-note"></span>Sticky Note</a>
+                            <a id="add-markdown-button" class="dropdown-item"><span class="fab fa-markdown"></span>Markdown</a>
+                            <a id="add-image-button" class="dropdown-item"><span class="fas fa-image"></span>Image</a>
+                            <a id="add-horizontal-line-button" class="dropdown-item"><span class="fas fa-minus"></span>Horizontal Line</a>
+                            <a id="add-vertical-line-button" class="dropdown-item"><span class="fas fa-minus fa-rotate-90"></span>Vertical Line</a>
                             <input type="file" id="image-file-selection" hidden>
                         </div>
                     </div>
@@ -471,11 +482,11 @@
                             Edit
                         </button>
                         <div class="dropdown-menu">
-                            <a id="undo-button" class="dropdown-item">Undo</a>
-                            <a id="redo-button" class="dropdown-item">Redo</a>
-                            <a id="send-to-front-button" class="dropdown-item">Send To Front</a>
-                            <a id="send-to-back-button" class="dropdown-item">Send To Back</a>
-                            <a id="delete-item-button" class="dropdown-item bg-danger text-white">Delete</a>
+                            <a id="undo-button" class="dropdown-item"><span class="fas fa-undo"></span>Undo</a>
+                            <a id="redo-button" class="dropdown-item"><span class="fas fa-redo"></span>Redo</a>
+                            <a id="send-to-front-button" class="dropdown-item"><span class="fas fa-chevron-up"></span>Send To Front</a>
+                            <a id="send-to-back-button" class="dropdown-item"><span class="fas fa-chevron-down"></span>Send To Back</a>
+                            <a id="delete-item-button" class="dropdown-item bg-danger text-white"><span class="fas fa-trash-alt"></span>Delete</a>
                         </div>
                     </div>
                 </div>
