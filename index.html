@@ -18,6 +18,11 @@
             margin: 0;
         }
 
+        .ui-selectable-helper {
+            background-color: #aaaaaa;
+            opacity: 0.5;
+        }
+
         #menu {
             padding-left: -10px;
             padding-top: 10px;
@@ -47,6 +52,17 @@
             height: 31px;
             padding-top: 4px;
             padding-bottom: 4px;
+        }
+
+        #menu .fas {
+            margin-left: -19px;
+            margin-right: 5px;
+        }
+
+        #menu .fab {
+            margin-left: -19px;
+            margin-right: 5px;
+            font-size: 0.8rem;
         }
 
         #zoom-in-button {
@@ -84,7 +100,7 @@
         }
 
         .card {
-            padding: 0rem 1rem 0rem 1rem;
+            padding: 5px;
             height: 120px;
             width: 200px;
             border: solid 1px;
@@ -93,11 +109,12 @@
 
         .sticky-note-header {
             height: 1rem;
+            display: none;
         }
 
         .sticky-note-body {
             padding: 0;
-            height: calc(100% - 2rem);
+            height: 100%;
             position: relative;
         }
 
@@ -128,6 +145,7 @@
             overflow: hidden;
             height: 1rem;
             color: rgba(0, 0, 0, 0.3);
+            display: none;
         }
 
         .sticky-note-footer .row {
@@ -148,31 +166,44 @@
             z-index: 0;
         }
 
-        .sticky-note .menuset {
+        .canvas-item .menuset {
             display: none;
             position: absolute;
-            right: 1.5rem;
             top: 0.25rem;
-            margin: 0;
             top: 0px;
-            height: 1rem;
-            right: 0px;
+            right: -27px;
+            font-size: 0.5rem;
             margin: 0 0.5rem 0 auto;
+            background-color: #007bff;
+            border-radius: 0px 5px 5px 5px;
+            color: #ffffff;
         }
 
-        .sticky-note:hover .menuset {
-            display: inline;
+        .canvas-item.sticky-note .menuset {
+            right: -30px;
         }
 
-        .sticky-note .menuset * {
-            opacity: 0.3;
+        .canvas-item.horizontal-line .menuset {
+            top: 1rem;
+            right: -8px;
+            border-radius: 0px 0px 5px 5px;
         }
 
-        .sticky-note .menuset *:hover {
-            opacity: 0.7;
+        .canvas-item:hover .menuset {
+            display: block;
         }
 
-        .sticky-note:hover .menuset * {
+        .canvas-item .menuset * {
+            display: block;
+            padding: 7px 5px 7px 5px;
+        }
+
+        .canvas-item .menuset *:hover {
+            background-color: #0062cc;
+            border-radius: inherit;
+        }
+
+        .canvas-item:hover .menuset * {
             cursor: pointer;
         }
 
@@ -426,8 +457,8 @@
                             File
                         </button>
                         <div class="dropdown-menu">
-                            <a id="export-button" class="dropdown-item">Export</a>
-                            <a id="import-button" class="dropdown-item">Import</a>
+                            <a id="export-button" class="dropdown-item"><span class="fas fa-file-export"></span>Export</a>
+                            <a id="import-button" class="dropdown-item"><span class="fas fa-file-import"></span>Import</a>
                         </div>
                     </div>
                     <div class="btn-group">
@@ -436,12 +467,12 @@
                             Add
                         </button>
                         <div class="dropdown-menu">
-                            <a id="add-narrative-arc-button" class="dropdown-item">Narrative Arc</a>
-                            <a id="add-button" class="dropdown-item">Card</a>
-                            <a id="add-markdown-button" class="dropdown-item">Markdown</a>
-                            <a id="add-image-button" class="dropdown-item">Image</a>
-                            <a id="add-horizontal-line-button" class="dropdown-item">Horizontal Line</a>
-                            <a id="add-vertical-line-button" class="dropdown-item">Vertical Line</a>
+                            <a id="add-narrative-arc-button" class="dropdown-item"><span class="fab fa-think-peaks"></span>Narrative Arc</a>
+                            <a id="add-button" class="dropdown-item"><span class="fas fa-sticky-note"></span>Sticky Note</a>
+                            <a id="add-markdown-button" class="dropdown-item"><span class="fab fa-markdown"></span>Markdown</a>
+                            <a id="add-image-button" class="dropdown-item"><span class="fas fa-image"></span>Image</a>
+                            <a id="add-horizontal-line-button" class="dropdown-item"><span class="fas fa-minus"></span>Horizontal Line</a>
+                            <a id="add-vertical-line-button" class="dropdown-item"><span class="fas fa-minus fa-rotate-90"></span>Vertical Line</a>
                             <input type="file" id="image-file-selection" hidden>
                         </div>
                     </div>
@@ -451,11 +482,11 @@
                             Edit
                         </button>
                         <div class="dropdown-menu">
-                            <a id="undo-button" class="dropdown-item">Undo</a>
-                            <a id="redo-button" class="dropdown-item">Redo</a>
-                            <a id="send-to-front-button" class="dropdown-item">Send To Front</a>
-                            <a id="send-to-back-button" class="dropdown-item">Send To Back</a>
-                            <a id="delete-item-button" class="dropdown-item bg-danger text-white">Delete</a>
+                            <a id="undo-button" class="dropdown-item"><span class="fas fa-undo"></span>Undo</a>
+                            <a id="redo-button" class="dropdown-item"><span class="fas fa-redo"></span>Redo</a>
+                            <a id="send-to-front-button" class="dropdown-item"><span class="fas fa-chevron-up"></span>Send To Front</a>
+                            <a id="send-to-back-button" class="dropdown-item"><span class="fas fa-chevron-down"></span>Send To Back</a>
+                            <a id="delete-item-button" class="dropdown-item bg-danger text-white"><span class="fas fa-trash-alt"></span>Delete</a>
                         </div>
                     </div>
                 </div>
@@ -544,7 +575,7 @@
                 </div>
                 <div class="modal-body">
                     <form>
-                        <div >
+                        <div>
                             <input type="text" class="form-control" id="input-box" name="inputBox">
                         </div>
                     </form>
@@ -600,8 +631,11 @@
             </div>
         </div>
         <div class="menuset">
-            <div class="edit icon fas fa-edit"></div>
-            <div class="menu icon fas fa-bars"></div>
+            <div class="edit icon fas fa-edit" title="Edit mode."></div>
+            <div class="menu icon fas fa-bars" title="Open submenu."></div>
+            <div class="tofront icon fas fa-chevron-up" title="Send to front."></div>
+            <div class="toback icon fas fa-chevron-down" title="Send to back."></div>
+            <div class="delete icon fas fa-trash-alt" title="Delete."></div>
         </div>
     </div>
 
@@ -637,6 +671,19 @@ b --> c
 ```
 </textarea>
             </div>
+        </div>
+        <div class="menuset">
+            <div class="tofront icon fas fa-chevron-up" title="Send to front."></div>
+            <div class="toback icon fas fa-chevron-down" title="Send to back."></div>
+            <div class="delete icon fas fa-trash-alt" title="Delete."></div>
+        </div>
+    </div>
+
+    <div id="common-item-template" class="d-none">
+        <div class="menuset">
+            <div class="tofront icon fas fa-chevron-up" title="Send to front."></div>
+            <div class="toback icon fas fa-chevron-down" title="Send to back."></div>
+            <div class="delete icon fas fa-trash-alt" title="Delete."></div>
         </div>
     </div>
 
@@ -718,6 +765,18 @@ b --> c
             $("#call-button").on("click", call);
             $("#canvas").on("mousemove", syncMousePosition)
             $("#clear-pointers-button").on("click", clearPointers);
+            $(document).on("click", ".menuset .tofront", function (e) {
+                $(e.target).parent(".canvas-item").addClass("ui-select");
+                sendToFront();
+            });
+            $(document).on("click", ".menuset .toback", function (e) {
+                $(e.target).parent(".canvas-item").addClass("ui-select");
+                sendToBack();
+            });
+            $(document).on("click", ".menuset .delete", function (e) {
+                $(e.target).parent(".canvas-item").addClass("ui-select");
+                deleteItem();
+            });
             toSelectable($("#canvas"));
 
             // card menu dialog.
@@ -881,7 +940,8 @@ b --> c
 
         function addLine(isVertical) {
             let lineId = cuid();
-            var line = $("<div></div>");
+            var line = $("#common-item-template").clone();
+            line.removeClass("d-none");
             line.addClass("line canvas-item");
             line.addClass(isVertical ? "vertical-line" : "horizontal-line");
             line.attr("id", lineId);
@@ -923,10 +983,11 @@ b --> c
 
         function addImage(sourceUrl) {
             const imageId = cuid();
-            const image = $("<div></div>");
+            const image = $("#common-item-template").clone();
+            $(image).removeClass("d-none");
             $(image).attr("id", imageId);
             $(image).addClass("image canvas-item")
-            $(image).html("<img>");
+            $(image).append($("<img>"));
             initializePosition(image);
             $(image).find("img").attr("src", sourceUrl);
 
@@ -2448,7 +2509,7 @@ b --> c
                     $("#input-dialog").modal("hide");
                 }
             });
-            $("#input-dialog form").on("submit", function() {
+            $("#input-dialog form").on("submit", function () {
                 $("#input-dialog .yes").click();
                 return false;
             });
