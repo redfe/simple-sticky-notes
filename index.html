@@ -101,8 +101,8 @@
 
         .card {
             padding: 5px;
-            height: 120px;
-            width: 200px;
+            height: 60px;
+            width: 120px;
             border: solid 1px;
             transition: transform 500ms 0s ease;
         }
@@ -119,7 +119,7 @@
         }
 
         .sticky-note-body textarea {
-            font-size: 48px;
+            font-size: 24px;
             width: 100%;
             height: 100%;
             margin: 0;
@@ -816,7 +816,9 @@ b --> c
         });
 
         function addNarativeArc() {
-            addImage("https://redfe.github.io/simple-sticky-notes-assets/storymapping/narrative-arc.svg");
+            const added = addImage("https://redfe.github.io/simple-sticky-notes-assets/storymapping/narrative-arc.svg");
+            $(added).width(1000);
+            $(added).height(300);
         }
 
         function add() {
