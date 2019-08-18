@@ -816,7 +816,9 @@ b --> c
         });
 
         function addNarativeArc() {
-            addImage("https://redfe.github.io/simple-sticky-notes-assets/storymapping/narrative-arc.svg");
+            const added = addImage("https://redfe.github.io/simple-sticky-notes-assets/storymapping/narrative-arc.svg");
+            $(added).width(1000);
+            $(added).height(300);
         }
 
         function add() {
