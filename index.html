@@ -394,6 +394,11 @@
             margin: 0;
         }
 
+        #create-url-dialog .modal-body textarea {
+            height: 10rem;
+            max-height: 10rem;
+        }
+
         /* colors */
 
         .sticky-note {
@@ -457,8 +462,12 @@
                             File
                         </button>
                         <div class="dropdown-menu">
-                            <a id="export-button" class="dropdown-item"><span class="fas fa-file-export"></span>Export</a>
-                            <a id="import-button" class="dropdown-item"><span class="fas fa-file-import"></span>Import</a>
+                            <a id="export-button" class="dropdown-item"><span
+                                    class="fas fa-file-export"></span>Export</a>
+                            <a id="import-button" class="dropdown-item"><span
+                                    class="fas fa-file-import"></span>Import</a>
+                            <a id="create-url-button" class="dropdown-item"><span class="fas fa-link"></span>Create
+                                URL</a>
                         </div>
                     </div>
                     <div class="btn-group">
@@ -467,12 +476,17 @@
                             Add
                         </button>
                         <div class="dropdown-menu">
-                            <a id="add-narrative-arc-button" class="dropdown-item"><span class="fab fa-think-peaks"></span>Narrative Arc</a>
-                            <a id="add-button" class="dropdown-item"><span class="fas fa-sticky-note"></span>Sticky Note</a>
-                            <a id="add-markdown-button" class="dropdown-item"><span class="fab fa-markdown"></span>Markdown</a>
+                            <a id="add-narrative-arc-button" class="dropdown-item"><span
+                                    class="fab fa-think-peaks"></span>Narrative Arc</a>
+                            <a id="add-button" class="dropdown-item"><span class="fas fa-sticky-note"></span>Sticky
+                                Note</a>
+                            <a id="add-markdown-button" class="dropdown-item"><span
+                                    class="fab fa-markdown"></span>Markdown</a>
                             <a id="add-image-button" class="dropdown-item"><span class="fas fa-image"></span>Image</a>
-                            <a id="add-horizontal-line-button" class="dropdown-item"><span class="fas fa-minus"></span>Horizontal Line</a>
-                            <a id="add-vertical-line-button" class="dropdown-item"><span class="fas fa-minus fa-rotate-90"></span>Vertical Line</a>
+                            <a id="add-horizontal-line-button" class="dropdown-item"><span
+                                    class="fas fa-minus"></span>Horizontal Line</a>
+                            <a id="add-vertical-line-button" class="dropdown-item"><span
+                                    class="fas fa-minus fa-rotate-90"></span>Vertical Line</a>
                             <input type="file" id="image-file-selection" hidden>
                         </div>
                     </div>
@@ -484,9 +498,12 @@
                         <div class="dropdown-menu">
                             <a id="undo-button" class="dropdown-item"><span class="fas fa-undo"></span>Undo</a>
                             <a id="redo-button" class="dropdown-item"><span class="fas fa-redo"></span>Redo</a>
-                            <a id="send-to-front-button" class="dropdown-item"><span class="fas fa-chevron-up"></span>Send To Front</a>
-                            <a id="send-to-back-button" class="dropdown-item"><span class="fas fa-chevron-down"></span>Send To Back</a>
-                            <a id="delete-item-button" class="dropdown-item bg-danger text-white"><span class="fas fa-trash-alt"></span>Delete</a>
+                            <a id="send-to-front-button" class="dropdown-item"><span
+                                    class="fas fa-chevron-up"></span>Send To Front</a>
+                            <a id="send-to-back-button" class="dropdown-item"><span
+                                    class="fas fa-chevron-down"></span>Send To Back</a>
+                            <a id="delete-item-button" class="dropdown-item bg-danger text-white"><span
+                                    class="fas fa-trash-alt"></span>Delete</a>
                         </div>
                     </div>
                 </div>
@@ -582,6 +599,22 @@
                 </div>
                 <div class="modal-footer">
                     <button class="yes btn btn-primary">Yes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="create-url-dialog" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Created URL</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <textarea class="form-control"></textarea>
                 </div>
             </div>
         </div>
@@ -759,6 +792,7 @@ b --> c
             $("#add-markdown-button").on("click", addMarkdown);
             $("#export-button").on("click", exportData);
             $("#import-button").on("click", importData);
+            $("#create-url-button").on("click", createUrl);
             $(document).on("paste", addImageFromClipboard);
             $("#create-room-button").on("click", createRoom);
             $("#push-button").on("click", push);
@@ -813,6 +847,7 @@ b --> c
             setupMarkdownRenderWithMermaid();
 
             initRoom();
+            loadDataFromParameter();
         });
 
         function addNarativeArc() {
@@ -1645,6 +1680,47 @@ b --> c
             document.body.appendChild(input);
             input.click();
             document.body.removeChild(input);
+        }
+
+        function createUrl() {
+            const json = JSON.stringify(createExportData());
+            const url = location.protocol + "//"
+                + location.hostname
+                + (location.port == 80 ? "" : ":" + location.port)
+                + location.pathname
+                + "?data=" + enc64(json);
+            $("#create-url-dialog .modal-body textarea").val(url);
+            $("#create-url-dialog").modal();
+        }
+
+        function loadDataFromParameter() {
+            if (!location.search) {
+                return;
+            }
+            const index = location.search.indexOf("?data=");
+            if (index < 0) {
+                return;
+            }
+            const param = location.search.substring(index + "?data=".length);
+            importDataFromJson(dec64(param));
+            history.replaceState("", "", "index.html");
+        }
+
+        function enc64(str) {
+            return Base64.encode(str);
+        }
+
+        function dec64(str) {
+            return Base64.decode(str);
+        }
+
+        var Base64 = {
+            encode: function (str) {
+                return btoa(unescape(encodeURIComponent(str)));
+            },
+            decode: function (str) {
+                return decodeURIComponent(escape(atob(str)));
+            }
         }
 
         function getCurrentDatetimeString() {
