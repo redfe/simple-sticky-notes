@@ -326,9 +326,17 @@
         }
 
         [data-notify="container"][class*="alert"] {
-            width: 200px;
+            width: 150px;
             overflow: hidden;
-            background-color: rgba(209, 236, 241, 0.8);
+            font-size: 0.5rem;
+        }
+
+        [data-notify="icon"] {
+            font-size: 1rem;
+        }
+
+        .close {
+            font-size: 0.7rem;
         }
 
         textarea.editing {
@@ -399,6 +407,18 @@
         #create-url-dialog .modal-body textarea {
             height: 10rem;
             max-height: 10rem;
+        }
+
+
+        #reaction-buttons {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            opacity: 0.3;
+        }
+
+        #reaction-buttons:hover {
+            opacity: 1;
         }
 
         /* colors */
@@ -515,7 +535,6 @@
                 <input id="user-name" class="user-name d-none" type="text" placeholder="your name" />
                 <button id="create-room-button" class="btn btn-secondary btn-sm">Create room</button>
                 <button id="push-button" class="btn btn-warning btn-sm d-none">Push</button>
-                <button id="call-button" class="btn btn-secondary btn-sm d-none">&#x270B Call</button>
                 <button id="clear-pointers-button" class="btn btn-secondary btn-sm d-none">Clear Pointer</button>
             </div>
             <div class="col-sm-2">
@@ -534,6 +553,13 @@
                 <button id="set-canvas-size-button" class="btn btn-secondary btn-sm">Set</button>
             </div>
         </div>
+    </div>
+
+    <div id="reaction-buttons" class="btn-group d-none">
+        <button id="call-button" class="btn btn-light fas fa-hand-paper text-warning" data-notify-class="fas fa-hand-paper text-warning"></button>
+        <button id="good-button" class="btn btn-light fas fa-thumbs-up text-success" data-notify-class="fas fa-thumbs-up text-success"></button>
+        <button id="nogood-button" class="btn btn-light fas fa-thumbs-down text-danger" data-notify-class="fas fa-thumbs-down text-danger"></button>
+        <button id="applause-button" class="btn btn-light fas fa-sign-language text-info" data-notify-class="fas fa-sign-language text-info"></button>
     </div>
 
     <div id="card-menu-dialog" class="modal fade" tabindex="-1" role="dialog">
@@ -798,7 +824,7 @@ b --> c
             $(document).on("paste", addImageFromClipboard);
             $("#create-room-button").on("click", createRoom);
             $("#push-button").on("click", push);
-            $("#call-button").on("click", call);
+            $("#reaction-buttons button").on("click", e => notify($(e.target).data("notify-class")));
             $("#canvas").on("mousemove", syncMousePosition)
             $("#clear-pointers-button").on("click", clearPointers);
             $(document).on("click", ".menuset .tofront", function (e) {
@@ -1612,6 +1638,7 @@ b --> c
 
         function adjustMainMarginTop() {
             $("#canvas").css("margin-top", $("#menu").innerHeight());
+            $("#reaction-buttons").css("margin-top", $("#menu").innerHeight());
         }
 
         function loadImageFromLocal(event) {
@@ -2289,27 +2316,30 @@ b --> c
                     });
                 }
             },
-            Call: {
-                publish: function () {
+            Notify: {
+                publish: function (msg) {
                     eventStore.push({
-                        eventType: "call",
-                        eventBody: {},
+                        eventType: "notify",
+                        eventBody: {msg: msg},
                         forwardOnly: true
                     });
                 },
                 isTargetType: function (event) {
-                    return event.eventType == "call";
+                    return event.eventType == "notify";
                 },
                 back: function () { },
                 forward: function (event) {
                     $.notify({
-                        message: '\u270B ' + event.userName
+                        message:  ": " + event.userName,
+                        icon: event.eventBody.msg
                     }, {
                             allow_dismiss: true,
+                            type: "info",
                             offset: {
-                                x: 20,
-                                y: 100
-                            }
+                                x: 10,
+                                y: $("#menu").innerHeight() + 70
+                            },
+                            spacing: 5
                         });
                 }
             },
@@ -2602,7 +2632,8 @@ b --> c
         }
 
         function showGroupWorkMenu() {
-            $("#user-name,#push-button,#call-button,#clear-pointers-button").removeClass("d-none");
+            $("#user-name,#push-button,#clear-pointers-button").removeClass("d-none");
+            $("#reaction-buttons").removeClass("d-none");
         }
 
         function createRoom() {
@@ -2638,8 +2669,8 @@ b --> c
             return $("input.user-name").val();
         }
 
-        function call() {
-            AppEvent.Call.publish()
+        function notify(msg) {
+            AppEvent.Notify.publish(msg)
         }
 
         function setupVideoAudio(roomId) {
