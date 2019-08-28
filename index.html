@@ -15,7 +15,7 @@
         integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
     <style>
         html {
-            font-size: 17px;
+            font-size: 14px;
         }
         body {
             font-family: 'Noto Sans JP', sans-serif;
@@ -174,18 +174,14 @@
         .canvas-item .menuset {
             display: none;
             position: absolute;
-            top: 0.25rem;
             top: 0px;
-            right: -27px;
-            font-size: 0.5rem;
+            right: -28px;
+            width: 20px;
+            font-size: 10px;
             margin: 0 0.5rem 0 auto;
             background-color: #007bff;
             border-radius: 0px 5px 5px 5px;
             color: #ffffff;
-        }
-
-        .canvas-item.sticky-note .menuset {
-            right: -30px;
         }
 
         .canvas-item.horizontal-line .menuset {
@@ -331,15 +327,15 @@
         [data-notify="container"][class*="alert"] {
             width: 150px;
             overflow: hidden;
-            font-size: 0.5rem;
+            font-size: 12px;
         }
 
         [data-notify="icon"] {
-            font-size: 1rem;
+            font-size: 14px;
         }
 
         .close {
-            font-size: 0.7rem;
+            font-size: 12px;
         }
 
         textarea.editing {
@@ -478,7 +474,7 @@
 
     <div id="menu" class="container-fluid">
         <div class="row">
-            <div class="col-sm-3 container-fluid">
+            <div class="col-sm-2 container-fluid">
                 <div>Main Menu</div>
                 <div class="btn-group" role="group">
                     <div class="btn-group">
@@ -549,7 +545,7 @@
                     <button id="zoom-reset-button" class="btn btn-secondary btn-sm">Reset</button>
                 </div>
             </div>
-            <div class="col-sm-2">
+            <div class="col-sm-3">
                 <div>Canvas Size</div>
                 <input type="number" id="canvas-width" />
                 <input type="number" id="canvas-height" />
@@ -1505,7 +1501,7 @@ b --> c
         }
 
         function adjustFontSize(textarea) {
-            const minFontSize = 8;
+            const minFontSize = 10;
             const maxFontSize = 150;
 
             const toSmall = function () {
