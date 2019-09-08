@@ -17,6 +17,7 @@
         html {
             font-size: 14px;
         }
+
         body {
             font-family: 'Noto Sans JP', sans-serif;
             padding: 0;
@@ -498,7 +499,7 @@
                         </button>
                         <div class="dropdown-menu">
                             <a id="add-narrative-arc-button" class="dropdown-item"><span
-                                    class="fab fa-think-peaks"></span>Narrative Arc</a>
+                                    class="fab fa-think-peaks"></span>Story Template</a>
                             <a id="add-button" class="dropdown-item"><span class="fas fa-sticky-note"></span>Sticky
                                 Note</a>
                             <a id="add-markdown-button" class="dropdown-item"><span
@@ -555,10 +556,14 @@
     </div>
 
     <div id="reaction-buttons" class="btn-group d-none">
-        <button id="call-button" class="btn btn-light fas fa-hand-paper text-warning" data-notify-class="fas fa-hand-paper text-warning"></button>
-        <button id="good-button" class="btn btn-light fas fa-thumbs-up text-success" data-notify-class="fas fa-thumbs-up text-success"></button>
-        <button id="nogood-button" class="btn btn-light fas fa-thumbs-down text-danger" data-notify-class="fas fa-thumbs-down text-danger"></button>
-        <button id="applause-button" class="btn btn-light fas fa-sign-language text-info" data-notify-class="fas fa-sign-language text-info"></button>
+        <button id="call-button" class="btn btn-light fas fa-hand-paper text-warning"
+            data-notify-class="fas fa-hand-paper text-warning"></button>
+        <button id="good-button" class="btn btn-light fas fa-thumbs-up text-success"
+            data-notify-class="fas fa-thumbs-up text-success"></button>
+        <button id="nogood-button" class="btn btn-light fas fa-thumbs-down text-danger"
+            data-notify-class="fas fa-thumbs-down text-danger"></button>
+        <button id="applause-button" class="btn btn-light fas fa-sign-language text-info"
+            data-notify-class="fas fa-sign-language text-info"></button>
     </div>
 
     <div id="card-menu-dialog" class="modal fade" tabindex="-1" role="dialog">
@@ -878,9 +883,88 @@ b --> c
         });
 
         function addNarativeArc() {
-            const added = addImage("https://redfe.github.io/simple-sticky-notes-assets/storymapping/narrative-arc.svg");
-            $(added).width(1000);
-            $(added).height(300);
+            const resize = (elm, width, height) => {
+                const oldWidth = $(elm).width();
+                const oldHeight = $(elm).height();
+                $(elm).width(width);
+                $(elm).height(height);
+                AppEvent.ResizeItem.publish($(elm), oldWidth, oldHeight);
+            };
+            const move = (elm, moveLeft, moveTop) => {
+                const ids = [$(elm).attr("id")];
+                const oldLeft = $(elm).offset().left;
+                const oldTop = $(elm).offset().top;
+                const oldPositions = [{ left: oldLeft, top: oldTop }];
+                $(elm).offset({ left: oldLeft + moveLeft, top: oldTop + moveTop });
+                AppEvent.MoveItems.publish(ids, oldPositions, moveLeft, moveTop);
+            };
+            const addCard = (text) => {
+                const card = add();
+                changeColor(card, "transparent");
+                $(card).find("textarea").text(text).change();
+                adjustFontSize($(card).find("textarea"));
+                return card;
+            };
+            const arc = addImage("https://redfe.github.io/simple-sticky-notes-assets/storymapping/narrative-arc.svg");
+            resize(arc, 1000, 300);
+            move(arc, 0, 70);
+
+            const situationExplanation = addImage("https://redfe.github.io/simple-sticky-notes-assets/storymapping/RosenfeldMedia/situation_explanation.png");
+            resize(situationExplanation, 70, 70);
+            move(situationExplanation, 0, 280);
+            move(addCard("situation explanation ..."), 0, 200);
+            move(add(), 0, 400);
+            move(add(), 0, 470);
+            move(add(), 0, 540);
+
+            const trigger = addImage("https://redfe.github.io/simple-sticky-notes-assets/storymapping/RosenfeldMedia/trigger.png");
+            resize(trigger, 80, 60);
+            move(trigger, 150, 250);
+            move(addCard("trigger ..."), 150, 170);
+            move(add(), 150, 400);
+            move(add(), 150, 470);
+            move(add(), 150, 540);
+
+            const step = addImage("https://redfe.github.io/simple-sticky-notes-assets/storymapping/RosenfeldMedia/step.png");
+            resize(step, 50, 50);
+            move(step, 320, 200);
+            move(addCard("some steps ..."), 320, 120);
+            move(add(), 320, 400);
+            move(add(), 320, 470);
+            move(add(), 320, 540);
+
+            const crisis = addImage("https://redfe.github.io/simple-sticky-notes-assets/storymapping/RosenfeldMedia/crisis.png");
+            resize(crisis, 50, 50);
+            move(crisis, 470, 100);
+            move(addCard("crisis ..."), 470, 30);
+            move(add(), 470, 400);
+            move(add(), 470, 470);
+            move(add(), 470, 540);
+
+            const climax = addImage("https://redfe.github.io/simple-sticky-notes-assets/storymapping/RosenfeldMedia/climax.png");
+            resize(climax, 80, 80);
+            move(climax, 620, -10);
+            move(addCard("climax ..."), 710, -10);
+            move(add(), 650, 400);
+            move(add(), 650, 470);
+            move(add(), 650, 540);
+
+            const andThen = addImage("https://redfe.github.io/simple-sticky-notes-assets/storymapping/RosenfeldMedia/and_then.png");
+            resize(andThen, 50, 50);
+            move(andThen, 820, 170);
+            move(addCard("and then ..."), 820, 100);
+            move(add(), 820, 400);
+            move(add(), 820, 470);
+            move(add(), 820, 540);
+
+            const ending = addImage("https://redfe.github.io/simple-sticky-notes-assets/storymapping/RosenfeldMedia/ending.png");
+            resize(ending, 55, 50);
+            move(ending, 950, 300);
+            move(addCard("ending ..."), 950, 230);
+            move(add(), 950, 400);
+            move(add(), 950, 470);
+            move(add(), 950, 540);
+
         }
 
         function add() {
@@ -2319,7 +2403,7 @@ b --> c
                 publish: function (msg) {
                     eventStore.push({
                         eventType: "notify",
-                        eventBody: {msg: msg},
+                        eventBody: { msg: msg },
                         forwardOnly: true
                     });
                 },
@@ -2329,7 +2413,7 @@ b --> c
                 back: function () { },
                 forward: function (event) {
                     $.notify({
-                        message:  ": " + event.userName,
+                        message: ": " + event.userName,
                         icon: event.eventBody.msg
                     }, {
                             allow_dismiss: true,
