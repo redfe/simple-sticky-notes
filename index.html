@@ -17,6 +17,7 @@
         html {
             font-size: 14px;
         }
+
         body {
             font-family: 'Noto Sans JP', sans-serif;
             padding: 0;
@@ -555,10 +556,14 @@
     </div>
 
     <div id="reaction-buttons" class="btn-group d-none">
-        <button id="call-button" class="btn btn-light fas fa-hand-paper text-warning" data-notify-class="fas fa-hand-paper text-warning"></button>
-        <button id="good-button" class="btn btn-light fas fa-thumbs-up text-success" data-notify-class="fas fa-thumbs-up text-success"></button>
-        <button id="nogood-button" class="btn btn-light fas fa-thumbs-down text-danger" data-notify-class="fas fa-thumbs-down text-danger"></button>
-        <button id="applause-button" class="btn btn-light fas fa-sign-language text-info" data-notify-class="fas fa-sign-language text-info"></button>
+        <button id="call-button" class="btn btn-light fas fa-hand-paper text-warning"
+            data-notify-class="fas fa-hand-paper text-warning"></button>
+        <button id="good-button" class="btn btn-light fas fa-thumbs-up text-success"
+            data-notify-class="fas fa-thumbs-up text-success"></button>
+        <button id="nogood-button" class="btn btn-light fas fa-thumbs-down text-danger"
+            data-notify-class="fas fa-thumbs-down text-danger"></button>
+        <button id="applause-button" class="btn btn-light fas fa-sign-language text-info"
+            data-notify-class="fas fa-sign-language text-info"></button>
     </div>
 
     <div id="card-menu-dialog" class="modal fade" tabindex="-1" role="dialog">
@@ -2319,7 +2324,7 @@ b --> c
                 publish: function (msg) {
                     eventStore.push({
                         eventType: "notify",
-                        eventBody: {msg: msg},
+                        eventBody: { msg: msg },
                         forwardOnly: true
                     });
                 },
@@ -2329,7 +2334,7 @@ b --> c
                 back: function () { },
                 forward: function (event) {
                     $.notify({
-                        message:  ": " + event.userName,
+                        message: ": " + event.userName,
                         icon: event.eventBody.msg
                     }, {
                             allow_dismiss: true,
