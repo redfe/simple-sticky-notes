@@ -326,13 +326,13 @@
         }
 
         [data-notify="container"][class*="alert"] {
-            width: 150px;
+            width: 250px;
             overflow: hidden;
-            font-size: 12px;
+            font-size: 30px;
         }
 
         [data-notify="icon"] {
-            font-size: 14px;
+            font-size: 30px;
         }
 
         .close {
@@ -419,6 +419,10 @@
 
         #reaction-buttons:hover {
             opacity: 1;
+        }
+
+        #reaction-buttons button {
+            font-size: 30px;
         }
 
         /* colors */
@@ -556,7 +560,7 @@
     </div>
 
     <div id="reaction-buttons" class="btn-group d-none">
-        <button id="call-button" class="btn btn-light fas fa-hand-paper text-warning"
+        <button id="call-button" class="btn btn-lg btn-light fas fa-hand-paper text-warning"
             data-notify-class="fas fa-hand-paper text-warning"></button>
         <button id="good-button" class="btn btn-light fas fa-thumbs-up text-success"
             data-notify-class="fas fa-thumbs-up text-success"></button>
@@ -2422,7 +2426,8 @@ b --> c
                                 x: 10,
                                 y: $("#menu").innerHeight() + 70
                             },
-                            spacing: 5
+                            spacing: 5,
+                            delay: 10000
                         });
                 }
             },
