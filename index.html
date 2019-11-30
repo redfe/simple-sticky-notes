@@ -326,9 +326,10 @@
         }
 
         [data-notify="container"][class*="alert"] {
-            width: 250px;
+            width: 210px;
             overflow: hidden;
             font-size: 30px;
+            padding: 3px 14px;
         }
 
         [data-notify="icon"] {
@@ -2195,8 +2196,8 @@ b --> c
                     event.eventBody.ids.forEach(function (id, i) {
                         const target = $("#" + id);
                         targets.push(target);
-                        const left = parseInt(target.css("left"));
-                        const top = parseInt(target.css("top"));
+                        const left = parseInt(event.eventBody.oldPositions[i].left);
+                        const top = parseInt(event.eventBody.oldPositions[i].top);
                         target.css("left", left + event.eventBody.moveLeft);
                         target.css("top", top + event.eventBody.moveTop);
                     });
@@ -2414,10 +2415,13 @@ b --> c
                 isTargetType: function (event) {
                     return event.eventType == "notify";
                 },
+                permitMyself: function() {
+                    return true;
+                },
                 back: function () { },
                 forward: function (event) {
                     $.notify({
-                        message: ": " + event.userName,
+                        message: " " + event.userName,
                         icon: event.eventBody.msg
                     }, {
                             allow_dismiss: true,
@@ -2426,7 +2430,7 @@ b --> c
                                 x: 10,
                                 y: $("#menu").innerHeight() + 70
                             },
-                            spacing: 5,
+                            spacing: 3,
                             delay: 10000
                         });
                 }
@@ -2638,26 +2642,33 @@ b --> c
             $.getScript(config.socketioServer + config.socketioScript, () => {
                 socket = io(config.socketioServer + '/?roomId=' + roomId);
                 socket.on('do event', function (event) {
-                    if (event.publisherId == publisherId) {
-                        return;
-                    }
                     //console.log(event);
                     for (var key in AppEvent) {
                         const e = AppEvent[key];
                         if (e.isTargetType && e.isTargetType(event)) {
+                            if (event.publisherId == publisherId) {
+                                if (!e.permitMyself) {
+                                    continue;
+                                }
+                            }
                             e.forward(event);
                             return;
                         }
                     }
                 });
                 socket.on('undo event', function (event) {
-                    if (!event || event.publisherId == publisherId) {
+                    if (!event) {
                         return;
                     }
                     //console.log(event);
                     for (var key in AppEvent) {
                         const e = AppEvent[key];
                         if (e.isTargetType && e.isTargetType(event)) {
+                            if (event.publisherId == publisherId) {
+                                if (!e.permitMyself) {
+                                    continue;
+                                }
+                            }
                             e.back(event);
                             return;
                         }
@@ -2666,28 +2677,46 @@ b --> c
             });
         }
 
-        function initRoom(roomIdParam) {
+        function getCurrentRoomId() {
+            var roomId = null;
             var query = location.search;
+            var preRoomIdWord = "roomId=";
+            var idx = query.indexOf(preRoomIdWord);
+            if (idx > 0) {
+                var temp = query.substring(idx + preRoomIdWord.length);
+                var ampIdx = temp.indexOf("&");
+                if (ampIdx > 0) {
+                    roomId = temp.substring(0, ampIdx);
+                } else {
+                    roomId = temp;
+                }
+            }
+            return roomId;
+        }
+
+        function initRoom(roomIdParam) {
+            const currentRoomId = getCurrentRoomId();
             var roomId;
-            if (roomIdParam) {
-                roomId = roomIdParam;
-            } else if (query) {
-                var preRoomIdWord = "roomId=";
-                var idx = query.indexOf(preRoomIdWord);
-                if (idx > 0) {
-                    var temp = query.substring(idx + preRoomIdWord.length);
-                    var ampIdx = temp.indexOf("&");
-                    if (ampIdx > 0) {
-                        roomId = temp.substring(0, ampIdx);
-                    } else {
-                        roomId = temp;
+            if (currentRoomId) {
+                if (roomIdParam) {
+                    if (currentRoomId != roomIdParam) {
+                        // should be reload
+                        history.replaceState("", "", "?roomId=" + roomIdParam);
+                        location.href = location.href;
+                        return;
                     }
+                } else {
+                    roomId = currentRoomId;
+                }
+            } else {
+                if (roomIdParam) {
+                    roomId = roomIdParam;
                 }
             }
             if (roomId) {
+                history.replaceState("", "", "?roomId=" + roomId);
                 showUserNameInputDialog();
                 setupWebsocket(roomId);
-                //setupVideoAudio(roomId);
                 showGroupWorkMenu();
             }
         }
@@ -2726,7 +2755,6 @@ b --> c
 
         function createRoom() {
             const roomId = cuid();
-            history.replaceState("", "", "?roomId=" + roomId);
             initRoom(roomId);
         }
 
@@ -2761,212 +2789,6 @@ b --> c
             AppEvent.Notify.publish(msg)
         }
 
-        function setupVideoAudio(roomId) {
-            $.getScript(config.skyWayScript, () => {
-                $("#video-view-menu-button").on("click", () => {
-                    $("#videochat-setting-dialog").modal();
-                });
-                $("#video-container").show();
-                $("#video-view-controller").show();
-                $("#videochat-setting-dialog .ok").on("click", () => {
-                    initializeMyVideo();
-                    $("#videochat-setting-dialog").modal("hide");
-                });
-                const videoHeight = 100;
-                $("#video-view-expand-button").on('click', () => {
-                    if ($("#video-container").height() === videoHeight) {
-                        $("#video-container").height("auto");
-                        if ($("#video-container").height() < (videoHeight * 2)) {
-                            $("#video-container").height(videoHeight);
-                        }
-                    } else {
-                        $("#video-container").height(videoHeight);
-                    }
-                    if ($("#video-container").height() === videoHeight) {
-                        $("#video-view-expand-button").text("all");
-                    } else {
-                        $("#video-view-expand-button").text("close");
-                    }
-                });
-                $("#video-view-up-button").on('click', () => {
-                    const current = $("#video-container").scrollTop();
-                    $("#video-container").scrollTop(current - (videoHeight + 6));
-                });
-                $("#video-view-down-button").on('click', () => {
-                    const current = $("#video-container").scrollTop();
-                    $("#video-container").scrollTop(current + (videoHeight + 6));
-                    if ($("#video-container").scrollTop() % (videoHeight + 6) !== 0) {
-                        $("#video-container").scrollTop(current);
-                    }
-                });
-
-                initializeVideoAudioSelection();
-                initializeMyVideo();
-                initializePeer();
-                setTimeout(connectTheirVideos, 3000);
-            });
-        }
-
-        let localStream;
-        let room;
-        let peer;
-
-        function initializeVideoAudioSelection() {
-            // set up audio and video input selectors
-            const audioSelect = $('#audio-source');
-            const videoSelect = $('#video-source');
-            const selectors = [audioSelect, videoSelect];
-
-            navigator.mediaDevices.enumerateDevices()
-                .then(deviceInfos => {
-                    const values = selectors.map(select => select.val() || '');
-                    selectors.forEach(select => {
-                        const children = select.children(':first');
-                        while (children.length) {
-                            select.remove(children);
-                        }
-                    });
-
-                    for (let i = 0; i !== deviceInfos.length; ++i) {
-                        const deviceInfo = deviceInfos[i];
-                        const option = $('<option>').val(deviceInfo.deviceId);
-
-                        if (deviceInfo.kind === 'audioinput') {
-                            option.text(deviceInfo.label || 'Microphone ' + (audioSelect.children().length + 1));
-                            audioSelect.append(option);
-                        } else if (deviceInfo.kind === 'videoinput') {
-                            option.text(deviceInfo.label || 'Camera ' + (videoSelect.children().length + 1));
-                            videoSelect.append(option);
-                        }
-                    }
-
-                    selectors.forEach((select, selectorIndex) => {
-                        if (Array.prototype.slice.call(select.children()).some(n => {
-                            return n.value === values[selectorIndex];
-                        })) {
-                            select.val(values[selectorIndex]);
-                        }
-                    });
-
-                    audioSelect.append($('<option>').val("unuse").text("--- unuse ---"));
-                    videoSelect.append($('<option>').val("unuse").text("--- unuse ---"));
-                });
-        }
-
-        function initializeMyVideo() {
-            // Get audio/video stream
-            const audioSource = $('#audio-source').val();
-            const videoSource = $('#video-source').val();
-            const constrains = {
-                audio: {
-                    deviceId: (audioSource && audioSource != "unuse") ? {
-                        exact: audioSource
-                    } : undefined
-                },
-                video: {
-                    deviceId: (videoSource && videoSource != "unuse") ? {
-                        exact: videoSource
-                    } : undefined
-                },
-            };
-
-            if (audioSource == "unuse") {
-                stopAudio();
-                constrains.audio = false;
-            }
-            if (videoSource == "unuse") {
-                stopVideo();
-                constrains.video = false;
-            }
-
-            if (constrains.audio === false && constrains.video === false) {
-                return;
-            }
-
-            navigator.mediaDevices.getUserMedia(constrains).then(stream => {
-                $('#my-video video').each((i, e) => {
-                    e.srcObject = stream;
-                });
-                localStream = stream;
-
-                if (room) {
-                    room.replaceStream(stream);
-                    return;
-                }
-            }).catch(err => {
-                console.error(err);
-            });
-        }
-
-        function stopVideo() {
-            const myVideo = $("#my-video video").get(0).srcObject;
-            myVideo.getVideoTracks().forEach((track) => {
-                track.stop();
-            });
-        }
-
-        function stopAudio() {
-            const myVideo = $("#my-video video").get(0).srcObject;
-            myVideo.getAudioTracks().forEach((track) => {
-                track.stop();
-            });
-        }
-
-        function initializePeer() {
-            if (peer) {
-                return;
-            }
-            peer = new Peer({
-                key: config.skyWayApiKey,
-                debug: 3,
-            });
-            peer.on('open', () => {
-                //$('#my-id').text(peer.id);
-                // Get things startd
-                initializeMyVideo();
-            });
-
-            peer.on('error', err => {
-                alert(err.message);
-                // Return to step 2 if error occurs
-                disconnectTheirVideos();
-            });
-
-        }
-
-        function disconnectTheirVideos() {
-            $('.their-video').remove();
-        }
-
-        function connectTheirVideos(roomId) {
-            const roomName = roomId;
-            room = peer.joinRoom('sfu_video_' + roomName, {
-                mode: 'sfu',
-                stream: localStream
-            });
-            room.on('stream', stream => {
-                const peerId = stream.peerId;
-                const id = 'video_' + peerId + '_' + stream.id.replace('{', '').replace('}', '');
-                $('#video-container').append($(
-                    '<div class="video their-video video_' + peerId + '" id="' + id + '">' +
-                    '<video class="" autoplay playsinline>' +
-                    '</div>'));
-                const el = $('#' + id).find('video').get(0);
-                el.srcObject = stream;
-                el.play();
-            });
-
-            room.on('removeStream', stream => {
-                const peerId = stream.peerId;
-                $('#video_' + peerId + '_' + stream.id.replace('{', '').replace('}', '')).remove();
-            });
-
-            room.on('close', initializePeer);
-            room.on('peerLeave', peerId => {
-                $('.video_' + peerId).remove();
-            });
-
-        }
 
         function compareByZIndex(a, b) {
             let ai = parseInt($(a).css("z-index"));
