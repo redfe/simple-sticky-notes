@@ -2195,8 +2195,8 @@ b --> c
                     event.eventBody.ids.forEach(function (id, i) {
                         const target = $("#" + id);
                         targets.push(target);
-                        const left = parseInt(target.css("left"));
-                        const top = parseInt(target.css("top"));
+                        const left = parseInt(event.eventBody.oldPositions[i].left);
+                        const top = parseInt(event.eventBody.oldPositions[i].top);
                         target.css("left", left + event.eventBody.moveLeft);
                         target.css("top", top + event.eventBody.moveTop);
                     });
