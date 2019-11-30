@@ -326,9 +326,10 @@
         }
 
         [data-notify="container"][class*="alert"] {
-            width: 250px;
+            width: 210px;
             overflow: hidden;
             font-size: 30px;
+            padding: 3px 14px;
         }
 
         [data-notify="icon"] {
@@ -2420,7 +2421,7 @@ b --> c
                 back: function () { },
                 forward: function (event) {
                     $.notify({
-                        message: ": " + event.userName,
+                        message: " " + event.userName,
                         icon: event.eventBody.msg
                     }, {
                             allow_dismiss: true,
@@ -2429,7 +2430,7 @@ b --> c
                                 x: 10,
                                 y: $("#menu").innerHeight() + 70
                             },
-                            spacing: 5,
+                            spacing: 3,
                             delay: 10000
                         });
                 }
