@@ -2677,25 +2677,45 @@ b --> c
             });
         }
 
-        function initRoom(roomIdParam) {
+        function getCurrentRoomId() {
+            var roomId = null;
             var query = location.search;
-            var roomId;
-            if (roomIdParam) {
-                roomId = roomIdParam;
-            } else if (query) {
-                var preRoomIdWord = "roomId=";
-                var idx = query.indexOf(preRoomIdWord);
-                if (idx > 0) {
-                    var temp = query.substring(idx + preRoomIdWord.length);
-                    var ampIdx = temp.indexOf("&");
-                    if (ampIdx > 0) {
-                        roomId = temp.substring(0, ampIdx);
-                    } else {
-                        roomId = temp;
-                    }
+            var preRoomIdWord = "roomId=";
+            var idx = query.indexOf(preRoomIdWord);
+            if (idx > 0) {
+                var temp = query.substring(idx + preRoomIdWord.length);
+                var ampIdx = temp.indexOf("&");
+                if (ampIdx > 0) {
+                    roomId = temp.substring(0, ampIdx);
+                } else {
+                    roomId = temp;
                 }
             }
+            return roomId;
+        }
+
+        function initRoom(roomIdParam) {
+            const currentRoomId = getCurrentRoomId();
+            var roomId;
+            if (currentRoomId) {
+                if (roomIdParam) {
+                    if (currentRoomId != roomIdParam) {
+                        // should be reload
+                        history.replaceState("", "", "?roomId=" + roomIdParam);
+                        location.href = location.href;
+                        return;
+                    }
+                } else {
+                    roomId = currentRoomId;
+                }
+            } else {
+                if (roomIdParam) {
+                    roomId = roomIdParam;
+                }
+            }
+            console.log("roomId:" + roomId);
             if (roomId) {
+                history.replaceState("", "", "?roomId=" + roomId);
                 showUserNameInputDialog();
                 setupWebsocket(roomId);
                 showGroupWorkMenu();
@@ -2736,7 +2756,6 @@ b --> c
 
         function createRoom() {
             const roomId = cuid();
-            history.replaceState("", "", "?roomId=" + roomId);
             initRoom(roomId);
         }
 
