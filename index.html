@@ -125,6 +125,7 @@
         }
 
         .sticky-note-body textarea {
+            position: absolute; /* Edge 対応 */
             font-size: 24px;
             width: 100%;
             height: 100%;
@@ -132,6 +133,12 @@
             padding: 0;
             border: none;
             resize: none;
+            overflow-y: none;
+            -ms-overflow-style: none;    /* IE, Edge 対応 */
+            scrollbar-width: none;       /* Firefox 対応 */
+        }
+        .sticky-note-body textarea::-webkit-scrollbar {
+            width: 0;
         }
 
         .sticky-note-body .textarea-cover {
