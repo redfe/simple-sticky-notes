@@ -1298,10 +1298,20 @@ b --> c
             return markdown;
         }
 
+        const mermaidKeyKeywords = [
+            "sequenceDiagram",
+            "graph",
+            "gantt",
+            "classDiagram",
+            "gitGraph",
+            "stateDiagram",
+            "pie"
+        ];
+        
         function setupMarkdownRenderWithMermaid() {
             var renderer = new marked.Renderer();
             renderer.code = function (code, language) {
-                if (code.match(/^sequenceDiagram/) || code.match(/^graph/) || code.match(/^gantt/) || code.match(/^classDiagram/) || code.match(/^gitGraph/)) {
+                if (matchMermaid(code)) {
                     return '<div class="mermaid">' + code + '</div>';
                 } else {
                     return '<pre><code>' + sanitize(code) + '</code></pre>';
@@ -1309,8 +1319,18 @@ b --> c
             };
             marked.setOptions({
                 renderer: renderer,
-                //sanitize: true
+                sanitize: true
             });
+        }
+
+        function matchMermaid(code) {
+            for (let i = 0; i < mermaidKeyKeywords.length; i++) {
+                const regexp = new RegExp('^' + mermaidKeyKeywords[i], 'g')
+                if (code.match(regexp)) {
+                    return true;
+                }
+            }
+            return false;
         }
 
         function sanitize(s) {
@@ -2036,6 +2056,13 @@ b --> c
                 for (var i = 0; i < data.items.length; i++) {
                     importItem(data.items[i]);
                 }
+
+                // adjust z-index
+                for (var i = 0; i < data.items.length; i++) {
+                    const item = data.items[i];
+                    $("#" + item.id).css("z-index", item.zIndex);
+                }
+
             } finally {
                 isRecordEvents = true;
             }
