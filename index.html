@@ -125,7 +125,8 @@
         }
 
         .sticky-note-body textarea {
-            position: absolute; /* Edge 対応 */
+            position: absolute;
+            /* Edge 対応 */
             font-size: 24px;
             width: 100%;
             height: 100%;
@@ -134,9 +135,12 @@
             border: none;
             resize: none;
             overflow-y: none;
-            -ms-overflow-style: none;    /* IE, Edge 対応 */
-            scrollbar-width: none;       /* Firefox 対応 */
+            -ms-overflow-style: none;
+            /* IE, Edge 対応 */
+            scrollbar-width: none;
+            /* Firefox 対応 */
         }
+
         .sticky-note-body textarea::-webkit-scrollbar {
             width: 0;
         }
@@ -369,56 +373,10 @@
             font-size: 0.7rem;
         }
 
-        #video-container {
-            display: none;
-            padding: 0;
-            margin: 0;
-            position: fixed;
-            bottom: 0;
-            overflow-y: hidden;
-            height: 100px;
-            padding-left: 55px;
-            width: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-        }
-
-        #video-view-controller {
-            display: none;
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 50px;
-            height: 100px;
-        }
-
-        #video-view-controller>div {
-            width: 50px;
-            height: 25px;
-            border: none;
-            font-size: 0.8rem;
-            font-weight: unset;
-            cursor: pointer;
-            border-radius: unset;
-            padding: 5px 0 0 0;
-            margin-top: -3px;
-        }
-
-        #video-container .video {
-            margin-left: -5px;
-            display: inline-block;
-        }
-
-        #video-container .video video {
-            height: 100px;
-            padding: 0;
-            margin: 0;
-        }
-
         #create-url-dialog .modal-body textarea {
             height: 10rem;
             max-height: 10rem;
         }
-
 
         #reaction-buttons {
             position: fixed;
@@ -490,81 +448,80 @@
     <div id="menu" class="container-fluid">
         <div class="row">
             <div class="col-sm-2 container-fluid">
-                <div>Main Menu</div>
+                <div>メニュー</div>
                 <div class="btn-group" role="group">
                     <div class="btn-group">
                         <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"
                             aria-haspopup="true" aria-expanded="false">
-                            File
+                            ファイル
                         </button>
                         <div class="dropdown-menu">
                             <a id="export-button" class="dropdown-item"><span
-                                    class="fas fa-file-export"></span>Export</a>
+                                    class="fas fa-file-export"></span>エクスポート</a>
                             <a id="import-button" class="dropdown-item"><span
-                                    class="fas fa-file-import"></span>Import</a>
-                            <a id="create-url-button" class="dropdown-item"><span class="fas fa-link"></span>Create
-                                URL</a>
+                                    class="fas fa-file-import"></span>インポート</a>
+                            <a id="create-url-button" class="dropdown-item"><span class="fas fa-link"></span>URLを生成</a>
                         </div>
                     </div>
                     <div class="btn-group">
                         <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"
                             aria-haspopup="true" aria-expanded="false">
-                            Add
+                            追加
                         </button>
                         <div class="dropdown-menu">
                             <a id="add-narrative-arc-button" class="dropdown-item"><span
-                                    class="fab fa-think-peaks"></span>Story Template</a>
-                            <a id="add-button" class="dropdown-item"><span class="fas fa-sticky-note"></span>Sticky
-                                Note</a>
+                                    class="fab fa-think-peaks"></span>ストーリー</a>
+                            <a id="add-button" class="dropdown-item"><span class="fas fa-sticky-note"></span>付箋</a>
                             <a id="add-markdown-button" class="dropdown-item"><span
-                                    class="fab fa-markdown"></span>Markdown</a>
-                            <a id="add-image-button" class="dropdown-item"><span class="fas fa-image"></span>Image</a>
+                                    class="fab fa-markdown"></span>マークダウン</a>
+                            <a id="add-image-button" class="dropdown-item"><span class="fas fa-image"></span>画像</a>
                             <a id="add-horizontal-line-button" class="dropdown-item"><span
-                                    class="fas fa-minus"></span>Horizontal Line</a>
+                                    class="fas fa-minus"></span>横線</a>
                             <a id="add-vertical-line-button" class="dropdown-item"><span
-                                    class="fas fa-minus fa-rotate-90"></span>Vertical Line</a>
+                                    class="fas fa-minus fa-rotate-90"></span>縦線</a>
                             <input type="file" id="image-file-selection" hidden>
                         </div>
                     </div>
                     <div class="btn-group">
                         <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"
                             aria-haspopup="true" aria-expanded="false">
-                            Edit
+                            編集
                         </button>
                         <div class="dropdown-menu">
-                            <a id="undo-button" class="dropdown-item"><span class="fas fa-undo"></span>Undo</a>
-                            <a id="redo-button" class="dropdown-item"><span class="fas fa-redo"></span>Redo</a>
+                            <a id="undo-button" class="dropdown-item"><span class="fas fa-undo"></span>元に戻す</a>
+                            <a id="redo-button" class="dropdown-item"><span class="fas fa-redo"></span>やり直し</a>
                             <a id="send-to-front-button" class="dropdown-item"><span
-                                    class="fas fa-chevron-up"></span>Send To Front</a>
+                                    class="fas fa-chevron-up"></span>最前面に移動</a>
                             <a id="send-to-back-button" class="dropdown-item"><span
-                                    class="fas fa-chevron-down"></span>Send To Back</a>
+                                    class="fas fa-chevron-down"></span>最背面に移動</a>
                             <a id="delete-item-button" class="dropdown-item bg-danger text-white"><span
-                                    class="fas fa-trash-alt"></span>Delete</a>
+                                    class="fas fa-trash-alt"></span>削除</a>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="col-sm-4">
-                <div class="">Groop Work</div>
-                <input id="user-name" class="user-name d-none" type="text" placeholder="your name" />
-                <button id="create-room-button" class="btn btn-secondary btn-sm">Create room</button>
-                <button id="push-button" class="btn btn-warning btn-sm d-none">Push</button>
-                <button id="clear-pointers-button" class="btn btn-secondary btn-sm d-none">Clear Pointer</button>
+                <div class="">共同作業
+                </div>
+                <input id="user-name" class="user-name d-none" type="text" placeholder="名前"" />
+                <button id="create-room-button" class="btn btn-secondary btn-sm">部屋を作成</button>
+                <button id="push-button" class="btn btn-warning btn-sm d-none">表示内容をプッシュ</button>
+                <button id="clear-pointers-button" class="btn btn-secondary btn-sm d-none">ポインタを削除</button>
             </div>
-            <div class="col-sm-2">
-                <div class="">Zoom</div>
+            <div class="col-sm-3">
+                <div class="">ズーム</div>
                 <div class="">
                     <button id="zoom-in-button" class="btn btn-secondary btn-sm">＋</button>
                     <button id="zoom-out-button" class="btn btn-secondary btn-sm">ー</button>
-                    <button id="zoom-fit-button" class="btn btn-secondary btn-sm">Fit</button>
-                    <button id="zoom-reset-button" class="btn btn-secondary btn-sm">Reset</button>
+                    <button id="zoom-fit-button" class="btn btn-secondary btn-sm">横幅に合わせる</button>
+                    <button id="zoom-reset-button" class="btn btn-secondary btn-sm">リセット</button>
                 </div>
             </div>
-            <div class="col-sm-3">
-                <div>Canvas Size</div>
-                <input type="number" id="canvas-width" />
-                <input type="number" id="canvas-height" />
-                <button id="set-canvas-size-button" class="btn btn-secondary btn-sm">Set</button>
+            <div class="col-sm-2">
+                <div>キャンバスサイズ</div>
+                <input type="number" id="canvas-width" placeholder="横幅" />
+                <input type="number" id="canvas-height" placeholder="高さ" />
+                <button id="set-canvas-size-button" class="btn btn-secondary btn-sm">設定</button>
             </div>
         </div>
     </div>
@@ -584,7 +541,7 @@
         <div class="modal-dialog modal-sm">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Card action</h5>
+                    <h5 class="modal-title">付箋の操作</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -592,15 +549,15 @@
                 <div class="modal-body">
                     <div class="list-group list-group-flush">
                         <div class="list-group-item">
-                            <label for="card-menu-color-selection">Color</label>
+                            <label for="card-menu-color-selection">色</label>
                             <select id="card-menu-color-selection">
-                                <option value="" selected>Choose...</option>
-                                <option value="red" class="color-red">Red</option>
-                                <option value="blue" class="color-blue">Blue</option>
-                                <option value="green" class="color-green">Green</option>
-                                <option value="yellow" class="color-yellow">Yellow</option>
-                                <option value="white" class="color-white">White</option>
-                                <option value="transparent">Transparent</option>
+                                <option value="" selected>選択...</option>
+                                <option value="red" class="color-red">赤</option>
+                                <option value="blue" class="color-blue">青</option>
+                                <option value="green" class="color-green">緑</option>
+                                <option value="yellow" class="color-yellow">黄色</option>
+                                <option value="white" class="color-white">白</option>
+                                <option value="transparent">透明</option>
                             </select>
                         </div>
                     </div>
@@ -615,7 +572,7 @@
         <div class="modal-dialog modal-sm">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Confrim</h5>
+                    <h5 class="modal-title">確認</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -623,8 +580,8 @@
                 <div class="modal-body">
                 </div>
                 <div class="modal-footer">
-                    <button class="no btn btn-secondary" data-dismiss="modal">No</button>
-                    <button class="yes btn btn-primary">Yes</button>
+                    <button class="no btn btn-secondary" data-dismiss="modal">いいえ</button>
+                    <button class="yes btn btn-primary">はい</button>
                 </div>
             </div>
         </div>
@@ -644,7 +601,7 @@
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button class="yes btn btn-primary">Yes</button>
+                    <button class="yes btn btn-primary">はい</button>
                 </div>
             </div>
         </div>
@@ -654,42 +611,13 @@
         <div class="modal-dialog modal-sm">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Created URL</h5>
+                    <h5 class="modal-title">URLを生成</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
                     <textarea class="form-control"></textarea>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="videochat-setting-dialog" class="modal fade" tabindex="-1" role="dialog">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Videochat Setting</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="form-group row">
-                        <label for="audioSource" class="col-sm-2 col-form-label">Audio</label>
-                        <div class="col-sm-10">
-                            <select id="audio-source" class="form-control"></select>
-                        </div>
-                        <label for="videoSource" class="col-sm-2 col-form-label">Video</label>
-                        <div class="col-sm-10">
-                            <select id="video-source" class="form-control"></select>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button class="cancel btn btn-secondary" data-dismiss="modal">Cancel</button>
-                    <button class="ok btn btn-primary">OK</button>
                 </div>
             </div>
         </div>
@@ -710,11 +638,11 @@
             </div>
         </div>
         <div class="menuset">
-            <div class="edit icon fas fa-edit" title="Edit mode."></div>
-            <div class="menu icon fas fa-bars" title="Open submenu."></div>
-            <div class="tofront icon fas fa-chevron-up" title="Send to front."></div>
-            <div class="toback icon fas fa-chevron-down" title="Send to back."></div>
-            <div class="delete icon fas fa-trash-alt" title="Delete."></div>
+            <div class="edit icon fas fa-edit" title="編集"></div>
+            <div class="menu icon fas fa-bars" title="設定"></div>
+            <div class="tofront icon fas fa-chevron-up" title="最前面に移動"></div>
+            <div class="toback icon fas fa-chevron-down" title="最背面に移動"></div>
+            <div class="delete icon fas fa-trash-alt" title="削除"></div>
         </div>
     </div>
 
@@ -723,62 +651,50 @@
         <ul class="nav nav-tabs" role="tablist">
             <li class="nav-item">
                 <a class="nav-link active md-view" data-toggle="tab" href="" role="tab" aria-controls=""
-                    aria-selected="true">View</a>
+                    aria-selected="true">表示</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link md-editor" data-toggle="tab" href="" role="tab" aria-controls=""
-                    aria-selected="false">Edit</a>
+                    aria-selected="false">編集</a>
             </li>
             <li class="nav-item spacer"></li>
         </ul>
         <div class="tab-content">
             <div class="md-view tab-pane show active"></div>
             <div class="md-editor tab-pane">
-                <textarea class="editing">### Default Sample
+                <textarea class="editing">## デフォルトサンプル
 
-see [Marked](https://marked.js.org/) and [Mermaidjs](https://mermaidjs.github.io/)
+参考: [Marked](https://marked.js.org/), [Mermaidjs](https://mermaidjs.github.io/)。
 
-### Architecture
+### アーキテクチャ
 
-|service|scope of use|
+|サービス|用途|
 |-|-|
-|GitHub Pages|Web server|
-|Heroku|WebSocket server|
+|GitHub Pages|Web サーバ|
+|Heroku|WebSocket サーバ|
 
 ```
 graph TB
-Client --> Heroku
-Heroku --> Client
-Client --> GitHub_Pages
+ブラウザ --> Heroku
+Heroku --> ブラウザ
+ブラウザ --> GitHub_Pages
 ```
 </textarea>
             </div>
         </div>
         <div class="menuset">
-            <div class="tofront icon fas fa-chevron-up" title="Send to front."></div>
-            <div class="toback icon fas fa-chevron-down" title="Send to back."></div>
-            <div class="delete icon fas fa-trash-alt" title="Delete."></div>
+            <div class="tofront icon fas fa-chevron-up" title="最前面に移動"></div>
+            <div class="toback icon fas fa-chevron-down" title="最背面に移動"></div>
+            <div class="delete icon fas fa-trash-alt" title="削除"></div>
         </div>
     </div>
 
     <div id="common-item-template" class="d-none">
         <div class="menuset">
-            <div class="tofront icon fas fa-chevron-up" title="Send to front."></div>
-            <div class="toback icon fas fa-chevron-down" title="Send to back."></div>
-            <div class="delete icon fas fa-trash-alt" title="Delete."></div>
+            <div class="tofront icon fas fa-chevron-up" title="最前面に移動"></div>
+            <div class="toback icon fas fa-chevron-down" title="最背面に移動"></div>
+            <div class="delete icon fas fa-trash-alt" title="削除"></div>
         </div>
-    </div>
-
-    <div id="video-container">
-        <div id="my-video" class="video">
-            <video muted="true" autoplay playsinline></video>
-        </div>
-    </div>
-    <div id="video-view-controller">
-        <div id="video-view-menu-button" class="btn btn-secondary">setting</div>
-        <div id="video-view-expand-button" class="btn btn-secondary">all</div>
-        <div id="video-view-up-button" class="btn btn-secondary">up</div>
-        <div id="video-view-down-button" class="btn btn-secondary">down</div>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"
@@ -888,7 +804,7 @@ Client --> GitHub_Pages
 
             // setup conrifm
             $(window).on('beforeunload', function (event) {
-                const message = `Are you sure you want to leave?`;
+                const message = `この画面から離れても良いですか?`;
                 event.returnValue = message;
                 return message;
             });
@@ -1312,7 +1228,7 @@ Client --> GitHub_Pages
             "stateDiagram",
             "pie"
         ];
-        
+
         function setupMarkdownRenderWithMermaid() {
             var renderer = new marked.Renderer();
             renderer.code = function (code, language) {
@@ -2424,7 +2340,7 @@ Client --> GitHub_Pages
             },
             Push: {
                 publish: function () {
-                    confirmYesNo("Do you want to push this content?", function () {
+                    confirmYesNo("あなたの表示内容で他のメンバーに上書きさせますか?", function () {
                         const data = createExportData();
                         eventStore.push({
                             eventType: "push",
@@ -2438,7 +2354,7 @@ Client --> GitHub_Pages
                 },
                 back: function () { },
                 forward: function (event) {
-                    confirmYesNo("Overwrite with pushed content from " + event.userName + "?", function () {
+                    confirmYesNo(event.userName + "から送らられてきた内容で上書きしますか?", function () {
                         importDataFromData(event.eventBody);
                     });
                 }
@@ -2454,7 +2370,7 @@ Client --> GitHub_Pages
                 isTargetType: function (event) {
                     return event.eventType == "notify";
                 },
-                permitMyself: function() {
+                permitMyself: function () {
                     return true;
                 },
                 back: function () { },
@@ -2463,15 +2379,15 @@ Client --> GitHub_Pages
                         message: " " + event.userName,
                         icon: event.eventBody.msg
                     }, {
-                            allow_dismiss: true,
-                            type: "info",
-                            offset: {
-                                x: 10,
-                                y: $("#menu").innerHeight() + 70
-                            },
-                            spacing: 3,
-                            delay: 10000
-                        });
+                        allow_dismiss: true,
+                        type: "info",
+                        offset: {
+                            x: 10,
+                            y: $("#menu").innerHeight() + 70
+                        },
+                        spacing: 3,
+                        delay: 10000
+                    });
                 }
             },
             MoveMouse: {
@@ -2761,7 +2677,7 @@ Client --> GitHub_Pages
         }
 
         function showUserNameInputDialog() {
-            inputWithDialog("Your name", function (userName) {
+            inputWithDialog("あなたの名前", function (userName) {
                 if (userName == null || userName == "") {
                     return false;
                 }
