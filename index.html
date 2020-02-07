@@ -326,10 +326,12 @@
             background-color: silver;
             color: white;
             font-weight: normal;
+            padding: 5px;
         }
 
         .markdown .md-view table td {
             border: solid 1px;
+            padding: 5px;
         }
 
         [data-notify="container"][class*="alert"] {
@@ -736,15 +738,18 @@
 
 see [Marked](https://marked.js.org/) and [Mermaidjs](https://mermaidjs.github.io/)
 
-|xxx|yyy|zzz|
-|-|-|-|
-|xxxxx|yyyyy|zzzzz|
-|xxxxx|yyyyy|zzzzz|
+### Architecture
+
+|service|scope of use|
+|-|-|
+|GitHub Pages|Web server|
+|Heroku|WebSocket server|
 
 ```
-graph LR
-a --> b
-b --> c
+graph TB
+Client --> Heroku
+Heroku --> Client
+Client --> GitHub_Pages
 ```
 </textarea>
             </div>
