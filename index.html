@@ -802,7 +802,7 @@ Heroku --> ブラウザ
             $(window).on("resize", adjustMainMarginTop);
             $(window).on("resize", function () { applyScale(currentScale); });
 
-            // setup conrifm
+            // setup confrim
             $(window).on('beforeunload', function (event) {
                 const message = `この画面から離れても良いですか?`;
                 event.returnValue = message;
@@ -813,6 +813,11 @@ Heroku --> ブラウザ
 
             initRoom();
             loadDataFromParameter();
+
+            // accessible to item menu
+            $("#canvas").on("click", ".canvas-item", function() {
+                toFrontMostItems($(this));
+            });
         });
 
         function addNarativeArc() {
