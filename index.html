@@ -494,7 +494,7 @@
                 <div class="">共同作業
                 </div>
                 <input id="user-name" class="user-name d-none" type="text" placeholder="名前"" />
-                <button id="create-room-button" class="btn btn-secondary btn-sm">部屋を作成</button>
+                <button id=" create-room-button" class="btn btn-secondary btn-sm">部屋を作成</button>
                 <button id="push-button" class="btn btn-warning btn-sm d-none">表示内容をプッシュ</button>
                 <button id="clear-pointers-button" class="btn btn-secondary btn-sm d-none">ポインタを削除</button>
             </div>
@@ -826,16 +826,16 @@ Heroku --> ブラウザ
             };
             const move = (elm, moveLeft, moveTop) => {
                 const ids = [$(elm).attr("id")];
-                const oldLeft = $(elm).offset().left;
-                const oldTop = $(elm).offset().top;
+                const oldLeft = parseInt($(elm).css("left"));
+                const oldTop = parseInt($(elm).css("top"));
                 const oldPositions = [{ left: oldLeft, top: oldTop }];
-                $(elm).offset({ left: oldLeft + moveLeft, top: oldTop + moveTop });
+                $(elm).css("left", oldLeft + moveLeft + "px");
+                $(elm).css("top", oldTop + moveTop + "px");
                 AppEvent.MoveItems.publish(ids, oldPositions, moveLeft, moveTop);
             };
             const addCard = (text) => {
                 const card = add();
-                card.width(150);
-                card.height(25);
+                resize(card, 150, 25);
                 changeColor(card, "transparent");
                 $(card).find("textarea").text(text + " ...").change();
                 adjustFontSize($(card).find("textarea"));
@@ -847,7 +847,7 @@ Heroku --> ブラウザ
 
             const offsetY1 = 400;
             const offsetY2 = 465;
-            const offsetY3 = 530;            
+            const offsetY3 = 530;
             const incrementalX = 125;
             let offsetX = 0;
             const situationExplanation = addImage("https://redfe.github.io/simple-sticky-notes-assets/storymapping/RosenfeldMedia/situation_explanation.png");
@@ -2501,6 +2501,23 @@ Heroku --> ブラウザ
 
         };
 
+        function moveByArrowKey(event, moveLeft, moveTop) {
+            const selecteds = $("#canvas .ui-selected");
+            if (selecteds.length == 0) {
+                return;
+            }
+            event.preventDefault();
+            const ids = selecteds.map(function (i, a) { return $(a).attr("id"); }).get();
+            const oldPositions = selecteds.map(function (i, a) {
+                return { "left": parseInt($(a).css("left")), "top": parseInt($(a).css("top")) };
+            }).get();
+            selecteds.each(function (i, a) {
+                $(a).css("left", oldPositions[i].left + moveLeft + "px");
+                $(a).css("top", oldPositions[i].top + moveTop + "px");
+            });
+            AppEvent.MoveItems.publish(ids, oldPositions, moveLeft, moveTop);
+        }
+
         function setupShortcutKeys() {
             $(window).on("keydown", function (e) {
                 const _isFocusOnBody = isFocusOnBody();
@@ -2546,6 +2563,22 @@ Heroku --> ブラウザ
                         $(document.body).focus();
                         importData();
                     }
+                    // arrow left (37)
+                    else if (isTargetKeyEvent(e, false, false, false, false, 37)) {
+                        moveByArrowKey(e, -1, 0);
+                    }
+                    // arrow up (38)
+                    else if (isTargetKeyEvent(e, false, false, false, false, 38)) {
+                        moveByArrowKey(e, 0, -1);
+                    }
+                    // arrow right (39)
+                    else if (isTargetKeyEvent(e, false, false, false, false, 39)) {
+                        moveByArrowKey(e, 1, 0);
+                    }
+                    // arrow down (40)
+                    else if (isTargetKeyEvent(e, false, false, false, false, 40)) {
+                        moveByArrowKey(e, 0, 1);
+                    }
                 } else {
                     // delete (deleteItem)
                     if (_isFocusOnBody && isTargetKeyEvent(e, false, false, false, false, 46)) {
@@ -2588,6 +2621,22 @@ Heroku --> ブラウザ
                         e.preventDefault();
                         $(document.body).focus();
                         importData();
+                    }
+                    // arrow left (37)
+                    else if (isTargetKeyEvent(e, false, false, false, false, 37)) {
+                        moveByArrowKey(e, -1, 0);
+                    }
+                    // arrow up (38)
+                    else if (isTargetKeyEvent(e, false, false, false, false, 38)) {
+                        moveByArrowKey(e, 0, -1);
+                    }
+                    // arrow right (39)
+                    else if (isTargetKeyEvent(e, false, false, false, false, 39)) {
+                        moveByArrowKey(e, 1, 0);
+                    }
+                    // arrow down (40)
+                    else if (isTargetKeyEvent(e, false, false, false, false, 40)) {
+                        moveByArrowKey(e, 0, 1);
                     }
                 }
             });
