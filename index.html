@@ -2502,6 +2502,9 @@ Heroku --> ブラウザ
         };
 
         function moveByArrowKey(event, moveLeft, moveTop) {
+            if (isOnInput(event)) {
+                return;
+            }
             const selecteds = $("#canvas .ui-selected");
             if (selecteds.length == 0) {
                 return;
@@ -2516,6 +2519,10 @@ Heroku --> ブラウザ
                 $(a).css("top", oldPositions[i].top + moveTop + "px");
             });
             AppEvent.MoveItems.publish(ids, oldPositions, moveLeft, moveTop);
+        }
+
+        function isOnInput(event) {
+            return $(event.target).closest(".canvas-item").find("textarea").is(":focus");
         }
 
         function setupShortcutKeys() {
