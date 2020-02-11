@@ -262,8 +262,8 @@
         }
 
         .markdown {
-            width: 400px;
-            height: 300px;
+            width: auto;
+            height: auto;
             padding: 0px 10px 10px 10px;
             border: solid 1px black;
             overflow: none;
@@ -287,7 +287,6 @@
         }
 
         .markdown .md-editor textarea {
-            margin-top: 5px;
             resize: none;
             width: 100%;
             height: calc(100% - 5px);
@@ -305,6 +304,10 @@
         .markdown .nav-tabs a {
             font-size: 0.8em;
             padding: .3rem .3rem;
+        }
+
+        .markdown .md-view {
+            padding: 10px;
         }
 
         .markdown .md-view table {
@@ -652,7 +655,7 @@
         <div class="tab-content">
             <div class="md-view tab-pane show active"></div>
             <div class="md-editor tab-pane">
-                <textarea class="editing">## デフォルトサンプル
+                <textarea class="editing">## 記載例
 
 参考: [Marked](https://marked.js.org/), [Mermaidjs](https://mermaidjs.github.io/)。
 
@@ -665,8 +668,8 @@
 
 ```
 graph TB
-ブラウザ --> Heroku
-Heroku --> ブラウザ
+ブラウザ -- event --> Heroku
+Heroku -- event --> ブラウザ
 ブラウザ --> GitHub_Pages
 ```
 </textarea>
