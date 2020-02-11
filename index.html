@@ -30,19 +30,24 @@
         }
 
         #menu {
-            padding-left: -10px;
-            padding-top: 10px;
+            min-width: 1400px;
+            padding: .7rem 1rem;
             position: fixed;
             top: 0;
             left: 0;
-            min-height: 50px;
-            padding-bottom: 10px;
-            background-color: white;
-            border-bottom: solid 1px rgb(200, 200, 200);
+            background-color: #3c2d0d;
+            box-shadow: 0 5px 5px rgba(0, 0, 0, 0.3);
         }
 
         #menu a {
             cursor: pointer;
+        }
+
+        #menu input {
+            border-radius: .2rem;
+            font-size: .875rem;
+            border-style: none;
+            padding: .25rem .5rem .4rem .5rem;
         }
 
         #menu>.row {
@@ -54,10 +59,9 @@
         }
 
         #menu .btn-group>button {
-            font-size: 14px;
-            height: 31px;
-            padding-top: 4px;
-            padding-bottom: 4px;
+            font-size: .875rem;
+            padding-top: .25rem;
+            padding-bottom: .25rem;
         }
 
         #menu .fas {
@@ -441,7 +445,6 @@
     <div id="menu" class="container-fluid">
         <div class="row">
             <div class="col-sm-2 container-fluid">
-                <div>メニュー</div>
                 <div class="btn-group" role="group">
                     <div class="btn-group">
                         <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"
@@ -493,25 +496,17 @@
                     </div>
                 </div>
             </div>
-            <div class="col-sm-4">
-                <div class="">共同作業
-                </div>
+            <div class="col-sm-5">
                 <input id="user-name" class="user-name d-none" type="text" placeholder="名前"" />
                 <button id="create-room-button" class="btn btn-secondary btn-sm">部屋を作成</button>
                 <button id="push-button" class="btn btn-warning btn-sm d-none">表示内容をプッシュ</button>
                 <button id="clear-pointers-button" class="btn btn-secondary btn-sm d-none">ポインタを削除</button>
             </div>
-            <div class="col-sm-3">
-                <div class="">ズーム</div>
-                <div class="">
-                    <button id="zoom-in-button" class="btn btn-secondary btn-sm">＋</button>
-                    <button id="zoom-out-button" class="btn btn-secondary btn-sm">ー</button>
-                    <button id="zoom-fit-button" class="btn btn-secondary btn-sm">横幅に合わせる</button>
-                    <button id="zoom-reset-button" class="btn btn-secondary btn-sm">リセット</button>
-                </div>
-            </div>
-            <div class="col-sm-2">
-                <div>キャンバスサイズ</div>
+            <div class="col-sm-5">
+                <button id="zoom-in-button" class="btn btn-secondary btn-sm">＋</button>
+                <button id="zoom-out-button" class="btn btn-secondary btn-sm">ー</button>
+                <button id="zoom-fit-button" class="btn btn-secondary btn-sm">横幅に合わせる</button>
+                <button id="zoom-reset-button" class="btn btn-secondary btn-sm">リセット</button>
                 <input type="number" id="canvas-width" placeholder="横幅" />
                 <input type="number" id="canvas-height" placeholder="高さ" />
                 <button id="set-canvas-size-button" class="btn btn-secondary btn-sm">設定</button>
