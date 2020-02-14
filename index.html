@@ -321,19 +321,20 @@
             padding: .3rem .3rem;
         }
 
-        .markdown .md-view {
+        .markdown .tab-content .md-view {
             padding: 10px;
+            cursor: auto;
         }
 
-        .markdown .md-view table {
+        .markdown .tab-content .md-view table {
             border: solid 1px;
         }
 
-        .markdown .md-view table {
+        .markdown .tab-content .md-view table {
             border-collapse: collapse;
         }
 
-        .markdown .md-view table th {
+        .markdown .tab-content .md-view table th {
             border: solid 1px black;
             background-color: silver;
             color: white;
@@ -341,7 +342,7 @@
             padding: 5px;
         }
 
-        .markdown .md-view table td {
+        .markdown .tab-content .md-view table td {
             border: solid 1px;
             padding: 5px;
         }
@@ -1351,6 +1352,7 @@ Heroku -- event --> ブラウザ
             $("#canvas").append(markdown);
             toFrontMostItems(markdown);
             toDraggable(markdown);
+            markdown.draggable("option", "cancel", ".tab-content .md-view, textarea");
 
             // view
             viewButton.trigger("click");
@@ -1573,6 +1575,7 @@ Heroku -- event --> ブラウザ
             // see https://stackoverflow.com/questions/13882070/jquery-draggable-and-webkit-transform-scale
             $(item).draggable({
                 stack: false,
+                cancel: "textarea",
                 start: function (event) {
                     click.x = event.clientX;
                     click.y = event.clientY;
@@ -1639,7 +1642,8 @@ Heroku -- event --> ブラウザ
                 filter: ".canvas-item",
                 start: (e, ui) => {
                     $(".sticky-note textarea").blur();
-                }
+                },
+                cancel: "textarea, .md-view"
             });
             $(canvas).on("mousedown", ".canvas-item", function (e) {
                 const target = $(e.target).hasClass("canvas-item") ? $(e.target) : $(e.target).parents(
