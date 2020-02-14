@@ -560,7 +560,7 @@
                 </div>
             </div>
             <div class="col-sm-5">
-                <input id="user-name" class="user-name d-none" type="text" placeholder="名前"" />
+                <input id="user-name" class="user-name d-none" type="text" placeholder="名前" />
                 <button id="create-room-button" class="btn btn-secondary btn-sm">部屋を作成</button>
                 <button id="push-button" class="btn btn-warning btn-sm d-none">表示内容をプッシュ</button>
                 <button id="clear-pointers-button" class="btn btn-secondary btn-sm d-none">ポインタを削除</button>
@@ -747,7 +747,51 @@ Heroku -- event --> ブラウザ
             <div class="delete icon fas fa-trash-alt" title="削除"></div>
         </div>
     </div>
+    <textarea id="help-text" class="d-none">
+## このツールは?
 
+付箋を使った思考整理用ツールです。
+
+認証は必要ありません。アクセスしたらすぐに使えます。
+
+## 背景
+
+ユーザーストーリーマップを素早く共同作業で作成できるツールが欲しかったので作成しました。
+
+## 使い方
+
+### アイテムの操作
+
+メニューの `追加` からアイテムを追加できます。
+アイテムはマウスで移動・リサイズが可能です。
+
+アイテムはダブルクリックすることでコピーされます。ただし、入力内容はコピーされません。
+
+メニューの `編集` から編集操作が可能です。また、アイテムを選択する事でアイテム毎の編集メニューが表示されるので、そこから編集することも可能です。
+
+### 共同作業
+
+メニューの `部屋を作成` をクリックすると他のユーザと共同作業できます。共同作業したい人にブラウザの URL にアクセスしてもらってください。
+
+共同作業者のマウス位置は赤色のポインタで表示されます。ポインタが残ってしまって邪魔な場合は `ポインターを削除` をクリックすれば削除できます。
+
+`表示内容をプッシュ` をクリックするとあなたのブラウザに表示されている内容を共同作業者に上書きしてもらうように依頼します。依頼を受け取った共同作業者は上書きするかどうか自分で決める事ができます。
+
+共同作業中はキャンバスの右上にリアクションボタンが表示されます。右から `手を上げる`・`良い`・`悪い`・`拍手`
+を意味します。リアクションボタンの下にアイコンと名前が全員に追加表示されます。この表示は10秒で削除されます。
+
+### キャンバスの表示
+
+メニューの右側はキャンバスの表示方法を設定する項目です。`+` は拡大、`-` は縮小、`リセット` で元に戻します。`設定` をクリックすると入力された横幅・縦幅がキャンバスに設定されます。
+
+### 保存・読込
+
+メニューの `ファイル` から保存と読込ができます。
+
+`エクスポート` は現在の内容を JSON 形式でダウンロードできます。`インポート` はエクスポートしたファイルを読み込んでキャンバスを上書きします。
+
+`URLを生成` は表示内容をBase64形式にしたものをパラメータに追加したURLを生成します。ただし、長すぎるURLはブラウザが対応していない場合があるのでご注意ください。
+    </textarea>
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"
         integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"
@@ -876,8 +920,25 @@ Heroku -- event --> ブラウザ
                 $(".canvas-item").filter((i, a) => !$(a).hasClass("ui-selected")).find(".menuset").hide();
             }
             $("#canvas").on("mousedown", unselectedMenuset);
+            showHelp();
         });
 
+        function showHelp() {
+            const markDown = addMarkdown();
+            markDown.find("textarea").text($("#help-text").text());
+            const minWidth = 500;
+            const windowWidth = $(window).width();
+            if (minWidth <= windowWidth) {
+                markDown.width(windowWidth * 0.5);
+            } else {
+                markDown.width(minWidth);
+            }
+            markDown.height(800);
+            const left = (windowWidth - markDown.width()) / 2;
+            if (left > 0) {
+                markDown.css("left", left + "px");
+            }
+        }
         function addNarativeArc() {
             const resize = (elm, width, height) => {
                 const oldWidth = $(elm).width();
@@ -2596,10 +2657,10 @@ Heroku -- event --> ブラウザ
         }
 
         function setupShortcutKeys() {
-            const isMac = function() {
+            const isMac = function () {
                 return navigator.platform.indexOf("Mac");
             }
-            const replaceShortcutKeyName = function(menuId, name) {
+            const replaceShortcutKeyName = function (menuId, name) {
                 $("#" + menuId).find(".short-cut-key").text(name);
             };
             if (isMac) {
