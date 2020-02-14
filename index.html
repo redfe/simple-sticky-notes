@@ -41,6 +41,7 @@
 
         #menu a {
             cursor: pointer;
+            padding-right: .5rem;
         }
 
         #menu input {
@@ -64,15 +65,25 @@
             padding-bottom: .25rem;
         }
 
-        #menu .fas {
-            margin-left: -19px;
+        #menu a>span {
+            display: inline-block;
+        }
+
+        #menu a .icon {
+            width: 16px;
+            margin-left: -15px;
             margin-right: 5px;
         }
 
-        #menu .fab {
-            margin-left: -19px;
-            margin-right: 5px;
-            font-size: 0.8rem;
+        #menu a span.name {
+            width: 150px;
+        }
+
+        #menu a .short-cut-key {
+            width: 150px;
+            text-align: right;
+            font-size: .8rem;
+            color: gray;
         }
 
         #zoom-in-button {
@@ -266,8 +277,8 @@
         }
 
         .markdown {
-            width: auto;
-            height: auto;
+            width: 350px;
+            height: 450px;
             padding: 0px 10px 10px 10px;
             border: solid 1px black;
             overflow: none;
@@ -452,53 +463,105 @@
                             ファイル
                         </button>
                         <div class="dropdown-menu">
-                            <a id="export-button" class="dropdown-item"><span
-                                    class="fas fa-file-export"></span>エクスポート</a>
-                            <a id="import-button" class="dropdown-item"><span
-                                    class="fas fa-file-import"></span>インポート</a>
-                            <a id="create-url-button" class="dropdown-item"><span class="fas fa-link"></span>URLを生成</a>
+                            <a id="export-button" class="dropdown-item">
+                                <span class="icon fas fa-file-export"></span>
+                                <span class="name">エクスポート</span>
+                                <span class="short-cut-key"></span>
+                            </a>
+                            <a id="import-button" class="dropdown-item">
+                                <span class="icon fas fa-file-import"></span>
+                                <span class="name">インポート</span>
+                                <span class="short-cut-key"></span>
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a id="create-url-button" class="dropdown-item">
+                                <span class="icon fas fa-link"></span>
+                                <span class="name">URLを生成</span>
+                                <span class="short-cut-key"></span>
+                            </a>
                         </div>
                     </div>
                     <div class="btn-group">
                         <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"
-                            aria-haspopup="true" aria-expanded="false">
-                            追加
-                        </button>
+                            aria-haspopup="true" aria-expanded="false">追加</button>
                         <div class="dropdown-menu">
-                            <a id="add-narrative-arc-button" class="dropdown-item"><span
-                                    class="fab fa-think-peaks"></span>ストーリー</a>
-                            <a id="add-button" class="dropdown-item"><span class="fas fa-sticky-note"></span>付箋</a>
-                            <a id="add-markdown-button" class="dropdown-item"><span
-                                    class="fab fa-markdown"></span>マークダウン</a>
-                            <a id="add-image-button" class="dropdown-item"><span class="fas fa-image"></span>画像</a>
-                            <a id="add-horizontal-line-button" class="dropdown-item"><span
-                                    class="fas fa-minus"></span>横線</a>
-                            <a id="add-vertical-line-button" class="dropdown-item"><span
-                                    class="fas fa-minus fa-rotate-90"></span>縦線</a>
+                            <a id="add-narrative-arc-button" class="dropdown-item">
+                                <span class="icon fab fa-think-peaks"></span>
+                                <span class="name">ストーリー</span>
+                                <span class="short-cut-key"></span>
+                            </a>
+                            <a id="add-button" class="dropdown-item">
+                                <span class="icon fas fa-sticky-note"></span>
+                                <span class="name">付箋</span>
+                                <span class="short-cut-key"></span>
+                            </a>
+                            <a id="add-markdown-button" class="dropdown-item">
+                                <span class="icon fab fa-markdown"></span>
+                                <span class="name">マークダウン</span>
+                                <span class="short-cut-key"></span>
+                            </a>
+                            <a id="add-image-button" class="dropdown-item">
+                                <span class="icon fas fa-image"></span>
+                                <span class="name">画像</span>
+                                <span class="short-cut-key"></span>
+                            </a>
+                            <a id="add-horizontal-line-button" class="dropdown-item">
+                                <span class="icon fas fa-minus"></span>
+                                <span class="name">横線</span>
+                                <span class="short-cut-key"></span>
+                            </a>
+                            <a id="add-vertical-line-button" class="dropdown-item">
+                                <span class="icon fas fa-minus fa-rotate-90"></span>
+                                <span class="name">縦線</span>
+                                <span class="short-cut-key"></span>
+                            </a>
                             <input type="file" id="image-file-selection" hidden>
                         </div>
                     </div>
                     <div class="btn-group">
                         <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"
-                            aria-haspopup="true" aria-expanded="false">
-                            編集
-                        </button>
+                            aria-haspopup="true" aria-expanded="false">編集</button>
                         <div class="dropdown-menu">
-                            <a id="undo-button" class="dropdown-item"><span class="fas fa-undo"></span>元に戻す</a>
-                            <a id="redo-button" class="dropdown-item"><span class="fas fa-redo"></span>やり直し</a>
-                            <a id="send-to-front-button" class="dropdown-item"><span
-                                    class="fas fa-chevron-up"></span>最前面に移動</a>
-                            <a id="send-to-back-button" class="dropdown-item"><span
-                                    class="fas fa-chevron-down"></span>最背面に移動</a>
-                            <a id="delete-item-button" class="dropdown-item bg-danger text-white"><span
-                                    class="fas fa-trash-alt"></span>削除</a>
+                            <a id="undo-button" class="dropdown-item">
+                                <span class="icon fas fa-undo"></span>
+                                <span class="name">元に戻す</span>
+                                <span class="short-cut-key"></span>
+                            </a>
+                            <a id="redo-button" class="dropdown-item">
+                                <span class="icon fas fa-redo"></span>
+                                <span class="name">やり直し</span>
+                                <span class="short-cut-key"></span>
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a id="select-all-button" class="dropdown-item">
+                                <span class="icon"></span>
+                                <span class="name">全て選択</span>
+                                <span class="short-cut-key"></span>
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a id="send-to-front-button" class="dropdown-item">
+                                <span class="icon fas fa-chevron-up"></span>
+                                <span class="name">最前面に移動</span>
+                                <span class="short-cut-key"></span>
+                            </a>
+                            <a id="send-to-back-button" class="dropdown-item">
+                                <span class="icon fas fa-chevron-down"></span>
+                                <span class="name">最背面に移動</span>
+                                <span class="short-cut-key"></span>
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a id="delete-item-button" class="dropdown-item">
+                                <span class="icon fas fa-trash-alt"></span>
+                                <span class="name">削除</span>
+                                <span class="short-cut-key"></span>
+                            </a>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="col-sm-5">
                 <input id="user-name" class="user-name d-none" type="text" placeholder="名前"" />
-                <button id="create-room-button" class="btn btn-secondary btn-sm">部屋を作成</button>
+                <button id=" create-room-button" class="btn btn-secondary btn-sm">部屋を作成</button>
                 <button id="push-button" class="btn btn-warning btn-sm d-none">表示内容をプッシュ</button>
                 <button id="clear-pointers-button" class="btn btn-secondary btn-sm d-none">ポインタを削除</button>
             </div>
@@ -729,6 +792,7 @@ Heroku -- event --> ブラウザ
             $("#add-button").on("click", add);
             $("#undo-button").on("click", undo);
             $("#redo-button").on("click", redo);
+            $("#select-all-button").on("click", selectAll);
             $("#send-to-front-button").on("click", sendToFront);
             $("#send-to-back-button").on("click", sendToBack);
             $("#zoom-in-button").on("click", zoomIn);
@@ -2523,10 +2587,41 @@ Heroku -- event --> ブラウザ
             return $(event.target).closest(".canvas-item").find("textarea").is(":focus");
         }
 
+        function selectAll() {
+            $(".canvas-item:visible").addClass("ui-selected");
+        }
+
+        function deselectAll() {
+            $(".canvas-item:visible").removeClass("ui-selected");
+        }
+
         function setupShortcutKeys() {
+            const isMac = function() {
+                return navigator.platform.indexOf("Mac");
+            }
+            const replaceShortcutKeyName = function(menuId, name) {
+                $("#" + menuId).find(".short-cut-key").text(name);
+            };
+            if (isMac) {
+                replaceShortcutKeyName("export-button", "Cmd+S");
+                replaceShortcutKeyName("import-button", "Cmd+O");
+                replaceShortcutKeyName("add-image-button", "or URLをペースト");
+                replaceShortcutKeyName("undo-button", "Cmd+Z");
+                replaceShortcutKeyName("redo-button", "Cmd+Shift+Z");
+                replaceShortcutKeyName("select-all-button", "Cmd+A");
+                replaceShortcutKeyName("delete-item-button", "Delete");
+            } else {
+                replaceShortcutKeyName("export-button", "Ctrl+S");
+                replaceShortcutKeyName("import-button", "Ctrl+O");
+                replaceShortcutKeyName("add-image-button", "or URLをペースト");
+                replaceShortcutKeyName("undo-button", "Ctrl+Z");
+                replaceShortcutKeyName("redo-button", "Ctrl+Y");
+                replaceShortcutKeyName("select-all-button", "Ctrl+A");
+                replaceShortcutKeyName("delete-item-button", "Delete");
+            }
             $(window).on("keydown", function (e) {
                 const _isFocusOnBody = isFocusOnBody();
-                if (navigator.platform.indexOf("Mac") >= 0) {
+                if (isMac) {
                     // delete (deleteItem)
                     if (_isFocusOnBody && isTargetKeyEvent(e, false, false, false, false, 8)) {
                         e.preventDefault();
@@ -2547,7 +2642,7 @@ Heroku -- event --> ブラウザ
                     else if (_isFocusOnBody && isTargetKeyEvent(e, false, false, false, true,
                         65)) {
                         e.preventDefault();
-                        $(".canvas-item:visible").addClass("ui-selected");
+                        selectAll();
                     }
                     // escape (deselect all)
                     else if (_isFocusOnBody && isTargetKeyEvent(e, false, false, false, false,
@@ -2606,7 +2701,7 @@ Heroku -- event --> ブラウザ
                     else if (_isFocusOnBody && isTargetKeyEvent(e, true, false, false, false,
                         65)) {
                         e.preventDefault();
-                        $(".canvas-item:visible").addClass("ui-selected");
+                        selectAll();
                     }
                     // escape (deselect all)
                     else if (_isFocusOnBody && isTargetKeyEvent(e, false, false, false, false,
