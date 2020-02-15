@@ -94,6 +94,14 @@
             font-weight: bold;
         }
 
+        #help-button {
+            width: 2rem;
+            height: 2rem;
+            border-radius: 1rem;
+            padding-top: .375rem;
+            margin-left: 2rem;
+        }
+
         #main {
             padding: 0;
             margin: 0 auto;
@@ -278,7 +286,7 @@
 
         .markdown {
             width: 350px;
-            height: 450px;
+            height: 600px;
             padding: 0px 10px 10px 10px;
             border: solid 1px black;
             overflow: none;
@@ -325,13 +333,12 @@
             padding: 10px;
             cursor: auto;
         }
-        
+
         .markdown .tab-content .md-view h1,
         .markdown .tab-content .md-view h2,
         .markdown .tab-content .md-view h3,
         .markdown .tab-content .md-view h4,
-        .markdown .tab-content .md-view h5
-        {
+        .markdown .tab-content .md-view h5 {
             margin-bottom: 1.75rem;
             padding: .875rem 0;
         }
@@ -339,8 +346,7 @@
         .markdown .tab-content .md-view h2,
         .markdown .tab-content .md-view h3,
         .markdown .tab-content .md-view h4,
-        .markdown .tab-content .md-view h5
-        {
+        .markdown .tab-content .md-view h5 {
             margin-top: 1.75rem;
         }
 
@@ -603,6 +609,7 @@
                 <input type="number" id="canvas-width" placeholder="横幅" />
                 <input type="number" id="canvas-height" placeholder="高さ" />
                 <button id="set-canvas-size-button" class="btn btn-secondary btn-sm">設定</button>
+                <button id="help-button" class="btn btn-primary btn-sm fas fa-question"></button>
             </div>
         </div>
     </div>
@@ -743,11 +750,11 @@
         <div class="tab-content">
             <div class="md-view tab-pane show active"></div>
             <div class="md-editor tab-pane">
-                <textarea class="editing">## 記載例
+                <textarea class="editing"># 記載例
 
 参考: [Marked](https://marked.js.org/), [Mermaidjs](https://mermaidjs.github.io/)。
 
-### アーキテクチャ
+## アーキテクチャ
 
 |サービス|用途|
 |-|-|
@@ -890,6 +897,7 @@ Heroku -- event --> ブラウザ
             $("#reaction-buttons button").on("click", e => notify($(e.target).data("notify-class")));
             $("#canvas").on("mousemove", syncMousePosition)
             $("#clear-pointers-button").on("click", clearPointers);
+            $("#help-button").on("click", showHelp);
             $(document).on("click", ".menuset .tofront", function (e) {
                 $(e.target).parent(".canvas-item").addClass("ui-select");
                 sendToFront();
