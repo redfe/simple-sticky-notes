@@ -778,15 +778,15 @@ Heroku -- event --> ブラウザ
         </div>
     </div>
     <textarea id="help-text" class="d-none">
-## このツールは?
+# このツールは?
 
 付箋を使った思考整理用ツールです。
 
-認証は必要ありません。アクセスしたらすぐに使えます。
+認証は必要ありません。アクセスしたらすぐに使うことができます。
 
 ## 背景
 
-ユーザーストーリーマップを素早く共同作業で作成できるツールが欲しかったので作成しました。
+共同作業で素早くユーザーストーリーマップを作成できるツールが欲しかったので作成しました。
 
 ## 使い方
 
@@ -956,15 +956,9 @@ Heroku -- event --> ブラウザ
         function showHelp() {
             const markDown = addMarkdown();
             markDown.find("textarea").text($("#help-text").text());
-            const minWidth = 500;
-            const windowWidth = $(window).width();
-            if (minWidth <= windowWidth) {
-                markDown.width(windowWidth * 0.5);
-            } else {
-                markDown.width(minWidth);
-            }
+            markDown.width(500);
             markDown.height(800);
-            const left = window.scrollX + (windowWidth - markDown.width()) / 2;
+            const left = window.scrollX + ($(window).width() - markDown.width()) / 2;
             if (left > 0) {
                 markDown.css("left", left + "px");
             }
