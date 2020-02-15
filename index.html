@@ -325,6 +325,30 @@
             padding: 10px;
             cursor: auto;
         }
+        
+        .markdown .tab-content .md-view h1,
+        .markdown .tab-content .md-view h2,
+        .markdown .tab-content .md-view h3,
+        .markdown .tab-content .md-view h4,
+        .markdown .tab-content .md-view h5
+        {
+            margin-bottom: 1.75rem;
+            padding: .875rem 0;
+        }
+
+        .markdown .tab-content .md-view h2,
+        .markdown .tab-content .md-view h3,
+        .markdown .tab-content .md-view h4,
+        .markdown .tab-content .md-view h5
+        {
+            margin-top: 1.75rem;
+        }
+
+
+        .markdown .tab-content .md-view h2 {
+            border-bottom: 1px solid silver;
+
+        }
 
         .markdown .tab-content .md-view table {
             border: solid 1px;
@@ -345,6 +369,11 @@
         .markdown .tab-content .md-view table td {
             border: solid 1px;
             padding: 5px;
+        }
+
+        .markdown .tab-content .md-view code {
+            background-color: #eee;
+            padding: .25rem;
         }
 
         [data-notify="container"][class*="alert"] {
@@ -749,15 +778,15 @@ Heroku -- event --> ブラウザ
         </div>
     </div>
     <textarea id="help-text" class="d-none">
-## このツールは?
+# このツールは?
 
 付箋を使った思考整理用ツールです。
 
-認証は必要ありません。アクセスしたらすぐに使えます。
+認証は必要ありません。アクセスしたらすぐに使うことができます。
 
 ## 背景
 
-ユーザーストーリーマップを素早く共同作業で作成できるツールが欲しかったので作成しました。
+共同作業で素早くユーザーストーリーマップを作成できるツールが欲しかったので作成しました。
 
 ## 使い方
 
@@ -927,15 +956,9 @@ Heroku -- event --> ブラウザ
         function showHelp() {
             const markDown = addMarkdown();
             markDown.find("textarea").text($("#help-text").text());
-            const minWidth = 500;
-            const windowWidth = $(window).width();
-            if (minWidth <= windowWidth) {
-                markDown.width(windowWidth * 0.5);
-            } else {
-                markDown.width(minWidth);
-            }
+            markDown.width(500);
             markDown.height(800);
-            const left = window.scrollX + (windowWidth - markDown.width()) / 2;
+            const left = window.scrollX + ($(window).width() - markDown.width()) / 2;
             if (left > 0) {
                 markDown.css("left", left + "px");
             }
