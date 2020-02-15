@@ -76,7 +76,7 @@
         }
 
         #menu a span.name {
-            width: 150px;
+            width: 100px;
         }
 
         #menu a .short-cut-key {
@@ -935,11 +935,12 @@ Heroku -- event --> ブラウザ
                 markDown.width(minWidth);
             }
             markDown.height(800);
-            const left = (windowWidth - markDown.width()) / 2;
+            const left = window.scrollX + (windowWidth - markDown.width()) / 2;
             if (left > 0) {
                 markDown.css("left", left + "px");
             }
         }
+
         function addNarativeArc() {
             const resize = (elm, width, height) => {
                 const oldWidth = $(elm).width();
