@@ -2599,6 +2599,9 @@ Heroku -- event --> ブラウザ
                         spacing: 3,
                         delay: 10000
                     });
+                    if (event.publisherId == publisherId) {
+                        return;
+                    }
                     let icon = "✋";
                     if (event.eventBody.msg.indexOf("thumbs-up") >= 0) {
                         icon = "👍";
