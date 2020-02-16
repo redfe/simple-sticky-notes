@@ -2599,6 +2599,15 @@ Heroku -- event --> ブラウザ
                         spacing: 3,
                         delay: 10000
                     });
+                    let icon = "✋";
+                    if (event.eventBody.msg.indexOf("thumbs-up") >= 0) {
+                        icon = "👍";
+                    } else if (event.eventBody.msg.indexOf("thumbs-down") >= 0) {
+                        icon = "👎";
+                    } else if (event.eventBody.msg.indexOf("sign-language") >= 0) {
+                        icon = "👏";
+                    }
+                    new Notification(icon + " " + event.userName);
                 }
             },
             MoveMouse: {
