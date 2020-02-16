@@ -2587,7 +2587,8 @@ Heroku -- event --> ブラウザ
                 forward: function (event) {
                     $.notify({
                         message: " " + event.userName,
-                        icon: event.eventBody.msg
+                        icon: event.eventBody.msg,
+                        target: "_self"
                     }, {
                         allow_dismiss: true,
                         type: "info",
