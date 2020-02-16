@@ -963,7 +963,9 @@ Heroku -- event --> ブラウザ
                 $(".canvas-item").filter((i, a) => !$(a).hasClass("ui-selected")).find(".menuset").hide();
             }
             $("#canvas").on("mousedown", unselectedMenuset);
-            showHelp();
+            if (location.search.indexOf("roomId=") < 0) {
+                showHelp();
+            }
         });
 
         function showHelp() {
