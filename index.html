@@ -414,7 +414,7 @@
             outline: none;
         }
 
-        .markdown a[target="_blank"]:after {
+        a[target="_blank"]:after {
             content: "\f35d";
             margin: 0 3px 0 2px;
             font-family: "Font Awesome 5 Free";
@@ -680,6 +680,32 @@
         </div>
     </div>
 
+    <div id="websocket-server-dialog" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">WebSocket サーバのURLを入力してください。</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>未入力の場合はデフォルト値が使用されます。</p>
+                    <input id="web-socket-server-url" class="form-control" type="text" name="url" value="" />
+                    <p class="mt-4">
+                        セキュリティやパフォーマンスが気になる場合は <a href="https://github.com/redfe/simple-websocket-server"
+                            target="_blank">こちら</a> を参考にして独自に WebSocket サーバを構築してください。
+                    </p>
+
+                </div>
+                <div class="modal-footer">
+                    <button class="no btn btn-secondary" data-dismiss="modal">キャンセル</button>
+                    <button class="yes btn btn-primary">部屋を作成</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id="input-dialog" class="modal fade" tabindex="-1" role="dialog" data-backdrop="static">
         <div class="modal-dialog modal-sm">
             <div class="modal-content">
@@ -813,7 +839,7 @@ Heroku -- event --> ブラウザ
 
 ### 共同作業
 
-メニューの `部屋を作成` をクリックすると他のユーザと共同作業できます。共同作業したい人にブラウザの URL にアクセスしてもらってください。
+メニューの `部屋を作成` をクリックすると他のユーザと共同作業できます。作成後、ブラウザの URL をコピーして共同作業者に配布してください。
 
 共同作業者のマウス位置は赤色のポインタで表示されます。ポインタが残ってしまって邪魔な場合は `ポインターを削除` をクリックすれば削除できます。
 
@@ -839,11 +865,11 @@ Heroku -- event --> ブラウザ
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"
         integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
-        integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous">
-        </script>
+        integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+        crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"
-        integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous">
-        </script>
+        integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+        crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cuid/1.3.8/browser-cuid.min.js"></script>
     <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -854,9 +880,11 @@ Heroku -- event --> ブラウザ
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/2.0.8/purify.min.js"
         integrity="sha256-XN23us8AUgOfh7IEF7k6wOzJj5Aacbymf1ImHJaTK94=" crossorigin="anonymous"></script>
     <script>
+        const defaultWebSocketServer = "https://simple-websocket-server.herokuapp.com";
+        const defaultWebSocketScriptPath = "/socket.io/socket.io.js";
         const config = {
-            socketioServer: "https://simple-websocket-server.herokuapp.com",
-            socketioScript: "/socket.io/socket.io.js"
+            socketioServer: defaultWebSocketServer,
+            socketioScript: defaultWebSocketScriptPath
         };
         let scaleStep = 0.1;
         var currentScale = 1.0;
@@ -2902,43 +2930,60 @@ Heroku -- event --> ブラウザ
         }
 
         function getCurrentRoomId() {
-            var roomId = null;
-            var query = location.search;
-            var preRoomIdWord = "roomId=";
-            var idx = query.indexOf(preRoomIdWord);
-            if (idx > 0) {
-                var temp = query.substring(idx + preRoomIdWord.length);
-                var ampIdx = temp.indexOf("&");
-                if (ampIdx > 0) {
-                    roomId = temp.substring(0, ampIdx);
-                } else {
-                    roomId = temp;
-                }
-            }
-            return roomId;
+            return getUrlParameter("roomId");
         }
 
-        function initRoom(roomIdParam) {
-            const currentRoomId = getCurrentRoomId();
-            var roomId;
-            if (currentRoomId) {
-                if (roomIdParam) {
-                    if (currentRoomId != roomIdParam) {
-                        // should be reload
-                        history.replaceState("", "", "?roomId=" + roomIdParam);
-                        location.href = location.href;
-                        return;
-                    }
+        function getUrlParameter(name) {
+            var result = null;
+            var query = location.search;
+            var preWord = name + "=";
+            var idx = query.indexOf(preWord);
+            if (idx > 0) {
+                var temp = query.substring(idx + preWord.length);
+                var ampIdx = temp.indexOf("&");
+                if (ampIdx > 0) {
+                    result = temp.substring(0, ampIdx);
                 } else {
-                    roomId = currentRoomId;
-                }
-            } else {
-                if (roomIdParam) {
-                    roomId = roomIdParam;
+                    result = temp;
                 }
             }
+            if (result) {
+                return decodeURIComponent(result);
+            }
+            return null;
+        }
+
+        function initRoomByDialog(serverUrl) {
+            const roomId = cuid();
+            const currentServer = config.socketioServer;
+            activateRoom(roomId, serverUrl);
+        }
+
+        function initRoom() {
+            const roomId = getUrlParameter("roomId");
+            const serverUrl = getUrlParameter("sv");
+            activateRoom(roomId, serverUrl);
+        }
+
+        function activateRoom(roomId, serverUrl) {
+            if (!roomId) {
+                return;
+            }
+            const roomIdParam = getUrlParameter("roomId");
+            let serverUrlParam = "";
+            if (serverUrl && serverUrl != config.socketioServer && serverUrl != defaultWebSocketServer) {
+                config.socketioServer = serverUrl;
+                serverUrlParam = "&sv=" + encodeURIComponent(serverUrl);
+            }
+            const query = "?roomId=" + roomId + serverUrlParam;
+            // IDが違う場合は接続をリセットするため再描画させる。
+            if (roomIdParam && roomIdParam != roomId) {
+                history.replaceState("", "", query);
+                location.href = location.href;
+                return;
+            }
             if (roomId) {
-                history.replaceState("", "", "?roomId=" + roomId);
+                history.replaceState("", "", query);
                 showUserNameInputDialog();
                 setupWebsocket(roomId);
                 showGroupWorkMenu();
@@ -2978,8 +3023,14 @@ Heroku -- event --> ブラウザ
         }
 
         function createRoom() {
-            const roomId = cuid();
-            initRoom(roomId);
+            const dialog = $("#websocket-server-dialog ");
+            const url = dialog.find("input[name='url']");
+            url.attr("placeholder", config.socketioServer);
+            dialog.find(".yes").one("click", function () {
+                initRoomByDialog(url.val());
+                dialog.modal("hide");
+            });
+            dialog.modal();
         }
 
         function push() {
