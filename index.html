@@ -1190,7 +1190,6 @@ Heroku -- event --> ブラウザ
                 return false;
             });
 
-
             // resizable
             $(card).resizable({
                 aspectRatio: false,
@@ -2610,7 +2609,7 @@ Heroku -- event --> ブラウザ
                     } else if (event.eventBody.msg.indexOf("sign-language") >= 0) {
                         icon = "👏";
                     }
-                    new Notification(icon + " " + event.userName);
+                    notifyToDesktop(icon + " " + event.userName);
                 }
             },
             MoveMouse: {
@@ -3099,6 +3098,21 @@ Heroku -- event --> ブラウザ
             sortedItems.splice(toIndex, 0, target);
         }
 
+        function notifyToDesktop(msg) {
+            if (!("Notification" in window)) {
+                return;
+            }
+            if (Notification.permission === "granted") {
+                new Notification(msg);
+            } else if (Notification.permission !== 'denied') {
+                Notification.requestPermission(function (permission) {
+                    if (permission === "granted") {
+                        new Notification(msg);
+                    }
+                });
+            }
+
+        }
     </script>
 </body>
 
