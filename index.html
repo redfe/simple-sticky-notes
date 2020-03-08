@@ -2738,9 +2738,7 @@ Heroku -- event --> ブラウザ
         }
 
         function setupShortcutKeys() {
-            const isMac = function () {
-                return navigator.platform.indexOf("Mac");
-            }
+            const isMac = navigator.platform.indexOf("Mac") >= 0;
             const replaceShortcutKeyName = function (menuId, name) {
                 $("#" + menuId).find(".short-cut-key").text(name);
             };
