@@ -526,11 +526,13 @@
                         <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"
                             aria-haspopup="true" aria-expanded="false">追加</button>
                         <div class="dropdown-menu">
+                            <!--
                             <a id="add-narrative-arc-button" class="dropdown-item">
                                 <span class="icon fab fa-think-peaks"></span>
                                 <span class="name">ストーリー</span>
                                 <span class="short-cut-key"></span>
                             </a>
+                            -->
                             <a id="add-button" class="dropdown-item">
                                 <span class="icon fas fa-sticky-note"></span>
                                 <span class="name">付箋</span>
@@ -888,6 +890,7 @@ Heroku -- event --> ブラウザ
         };
         let scaleStep = 0.1;
         var currentScale = 1.0;
+        const grid = 10;
         var selectedCardId = null;
 
         var click = {
@@ -902,7 +905,7 @@ Heroku -- event --> ブラウザ
         $(function () {
             setupShortcutKeys();
             $('[data-toggle="tooltip"]').tooltip();
-            $("#add-narrative-arc-button").on("click", addNarativeArc);
+            //$("#add-narrative-arc-button").on("click", addNarativeArc);
             $("#add-button").on("click", add);
             $("#undo-button").on("click", undo);
             $("#redo-button").on("click", redo);
@@ -1003,7 +1006,7 @@ Heroku -- event --> ブラウザ
             markDown.height(800);
             const left = window.scrollX + ($(window).width() - markDown.width()) / 2;
             if (left > 0) {
-                markDown.css("left", left + "px");
+                markDown.css("left", fitToGrid(left) + "px");
             }
         }
 
@@ -1108,7 +1111,31 @@ Heroku -- event --> ブラウザ
             move(add(), offsetX, offsetY3);
 
         }
+        
+        function fitToGrid(num) {
+            const remain = num % grid;
+            const isShort = remain < (grid/2);
+            return num - (isShort ? remain : remain - grid);
+        }
 
+        function resizeWithGridAndScale(event, ui, target) {
+            resizeHeightWithGridAndScale(event, ui, target);
+            resizeWidthWithGridAndScale(event, ui, target);
+        }
+
+        function resizeHeightWithGridAndScale(event, ui, target) {
+            let height = ui.originalSize.height + ((ui.size.height - ui.originalSize.height)) / currentScale;
+            $(target).height(height);
+            height = parseInt($(target).css("height"));
+            $(target).css("height", fitToGrid(height));
+        }
+
+        function resizeWidthWithGridAndScale(event, ui, target) {
+            let width = ui.originalSize.width + ((ui.size.width - ui.originalSize.width) / currentScale);
+            $(target).width(width);
+            width = parseInt($(target).css("width"));
+            $(target).css("width", fitToGrid(width));
+        }
         function add() {
 
             let color = "yellow";
@@ -1195,12 +1222,7 @@ Heroku -- event --> ブラウザ
                 aspectRatio: false,
                 autoHide: true,
                 resize: function (event, ui) {
-                    let height = ui.originalSize.height + ((ui.size.height - ui.originalSize.height) /
-                        currentScale);
-                    $(card).height(height);
-                    let width = ui.originalSize.width + ((ui.size.width - ui.originalSize.width) /
-                        currentScale);
-                    $(card).width(width);
+                    resizeWithGridAndScale(event, ui, card);
                 },
                 stop: function (event, ui) {
                     AppEvent.ResizeItem.publish($(event.target), ui.originalSize.width, ui.originalSize
@@ -1208,6 +1230,9 @@ Heroku -- event --> ブラウザ
                     adjustFontSize(cardTextarea);
                 }
             });
+
+            $(card).width(140 - (140 % grid));
+            $(card).height(60 - (60 % grid));
 
             $("#canvas").append(card);
             toFrontMostItems(card);
@@ -1234,6 +1259,8 @@ Heroku -- event --> ブラウザ
             line.addClass("line canvas-item");
             line.addClass(isVertical ? "vertical-line" : "horizontal-line");
             line.attr("id", lineId);
+            line.width(isVertical ? fitToGrid(10) : fitToGrid(1000));
+            line.height(isVertical ? fitToGrid(1000): fitToGrid(10));
             initializePosition(line);
             let handles = isVertical ? "s" : "e";
             line.resizable({
@@ -1241,13 +1268,9 @@ Heroku -- event --> ブラウザ
                 autoHide: true,
                 resize: function (event, ui) {
                     if (isVertical) {
-                        let length = ui.originalSize.height + ((ui.size.height - ui.originalSize.height) /
-                            currentScale);
-                        $(line).height(length);
+                        resizeHeightWithGridAndScale(event, ui, line);
                     } else {
-                        let length = ui.originalSize.width + ((ui.size.width - ui.originalSize.width) /
-                            currentScale);
-                        $(line).width(length);
+                        resizeWidthWithGridAndScale(event, ui, line);
                     }
                 },
                 stop: function (event, ui) {
@@ -1284,12 +1307,7 @@ Heroku -- event --> ブラウザ
                 aspectRatio: false,
                 autoHide: true,
                 resize: function (event, ui) {
-                    let height = ui.originalSize.height + ((ui.size.height - ui.originalSize.height) /
-                        currentScale);
-                    $(image).height(height);
-                    let width = ui.originalSize.width + ((ui.size.width - ui.originalSize.width) /
-                        currentScale);
-                    $(image).width(width);
+                    resizeWithGridAndScale(event, ui, image);
                 },
                 stop: function (event, ui) {
                     AppEvent.ResizeItem.publish($(event.target), ui.originalSize.width, ui.originalSize
@@ -1309,8 +1327,8 @@ Heroku -- event --> ブラウザ
                 }
                 AppEvent.AddItem.publish(added);
             });
-            $(image).width(200);
-            $(image).height(200);
+            $(image).width(fitToGrid(200));
+            $(image).height(fitToGrid(200));
             $("#canvas").append(image);
             toFrontMostItems(image);
             toDraggable(image);
@@ -1402,12 +1420,7 @@ Heroku -- event --> ブラウザ
                 aspectRatio: false,
                 autoHide: true,
                 resize: function (event, ui) {
-                    let height = ui.originalSize.height + ((ui.size.height - ui.originalSize.height) /
-                        currentScale);
-                    $(markdown).height(height);
-                    let width = ui.originalSize.width + ((ui.size.width - ui.originalSize.width) /
-                        currentScale);
-                    $(markdown).width(width);
+                    resizeWithGridAndScale(event, ui, markdown);
                 },
                 stop: function (event, ui) {
                     AppEvent.ResizeItem.publish($(markdown), ui.originalSize.width, ui.originalSize
@@ -1416,6 +1429,8 @@ Heroku -- event --> ブラウザ
             });
 
             $("#canvas").append(markdown);
+            $(markdown).width(fitToGrid($(markdown).width()));
+            $(markdown).height(fitToGrid($(markdown).height()));
             toFrontMostItems(markdown);
             toDraggable(markdown);
             markdown.draggable("option", "cancel", ".tab-content .md-view, textarea");
@@ -1493,10 +1508,13 @@ Heroku -- event --> ブラウザ
         }
 
         function initializePosition(item) {
-            let scrollX = window.scrollX / currentScale;
-            let scrollY = window.scrollY / currentScale;
-            item.css("top", scrollY + 30 + "px");
-            item.css("left", scrollX + 30 + "px");
+            const scrollX = window.scrollX / currentScale;
+            const scrollY = window.scrollY / currentScale;
+            const initPosition = 50;
+            let top = (scrollY + initPosition);
+            let left = (scrollX + initPosition);
+            item.css("top", fitToGrid(top) + "px");
+            item.css("left", fitToGrid(left) + "px");
         }
 
         function sendToFront() {
@@ -1546,8 +1564,8 @@ Heroku -- event --> ブラウザ
         function setPositionAsCopied(source, target) {
             let sourceLeft = parseFloat($(source).css("left"));
             let sourceTop = parseFloat($(source).css("top"));
-            target.css("left", sourceLeft + 5 + "px");
-            target.css("top", sourceTop + 5 + "px");
+            target.css("left", fitToGrid(sourceLeft + grid) + "px");
+            target.css("top", fitToGrid(sourceTop + grid) + "px");
         }
 
         function addStickyNoteFrom(from) {
@@ -1659,9 +1677,11 @@ Heroku -- event --> ブラウザ
                     var original = ui.originalPosition;
 
                     // jQuery will simply use the same object we alter here
+                    let left = event.clientX - click.x + original.left;
+                    let top = event.clientY - click.y + original.top;
                     ui.position = {
-                        left: (event.clientX - click.x + original.left) / zoom,
-                        top: (event.clientY - click.y + original.top) / zoom
+                        left: fitToGrid(left / zoom),
+                        top: fitToGrid(top / zoom)
                     };
 
                     let moveX = original.left / zoom - ui.position.left;
@@ -2719,8 +2739,8 @@ Heroku -- event --> ブラウザ
                 return { "left": parseInt($(a).css("left")), "top": parseInt($(a).css("top")) };
             }).get();
             selecteds.each(function (i, a) {
-                $(a).css("left", oldPositions[i].left + moveLeft + "px");
-                $(a).css("top", oldPositions[i].top + moveTop + "px");
+                $(a).css("left", fitToGrid(oldPositions[i].left + moveLeft) + "px");
+                $(a).css("top", fitToGrid(oldPositions[i].top + moveTop) + "px");
             });
             AppEvent.MoveItems.publish(ids, oldPositions, moveLeft, moveTop);
         }
@@ -2805,19 +2825,19 @@ Heroku -- event --> ブラウザ
                     }
                     // arrow left (37)
                     else if (isTargetKeyEvent(e, false, false, false, false, 37)) {
-                        moveByArrowKey(e, -1, 0);
+                        moveByArrowKey(e, -grid, 0);
                     }
                     // arrow up (38)
                     else if (isTargetKeyEvent(e, false, false, false, false, 38)) {
-                        moveByArrowKey(e, 0, -1);
+                        moveByArrowKey(e, 0, -grid);
                     }
                     // arrow right (39)
                     else if (isTargetKeyEvent(e, false, false, false, false, 39)) {
-                        moveByArrowKey(e, 1, 0);
+                        moveByArrowKey(e, grid, 0);
                     }
                     // arrow down (40)
                     else if (isTargetKeyEvent(e, false, false, false, false, 40)) {
-                        moveByArrowKey(e, 0, 1);
+                        moveByArrowKey(e, 0, grid);
                     }
                 } else {
                     // delete (deleteItem)
@@ -2864,19 +2884,19 @@ Heroku -- event --> ブラウザ
                     }
                     // arrow left (37)
                     else if (isTargetKeyEvent(e, false, false, false, false, 37)) {
-                        moveByArrowKey(e, -1, 0);
+                        moveByArrowKey(e, -grid, 0);
                     }
                     // arrow up (38)
                     else if (isTargetKeyEvent(e, false, false, false, false, 38)) {
-                        moveByArrowKey(e, 0, -1);
+                        moveByArrowKey(e, 0, -grid);
                     }
                     // arrow right (39)
                     else if (isTargetKeyEvent(e, false, false, false, false, 39)) {
-                        moveByArrowKey(e, 1, 0);
+                        moveByArrowKey(e, grid, 0);
                     }
                     // arrow down (40)
                     else if (isTargetKeyEvent(e, false, false, false, false, 40)) {
-                        moveByArrowKey(e, 0, 1);
+                        moveByArrowKey(e, 0, grid);
                     }
                 }
             });
