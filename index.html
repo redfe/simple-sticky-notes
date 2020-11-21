@@ -847,7 +847,7 @@ Heroku -- event --> ブラウザ
 
 `表示内容をプッシュ` をクリックするとあなたのブラウザに表示されている内容を共同作業者に上書きしてもらうように依頼します。依頼を受け取った共同作業者は上書きするかどうか自分で決める事ができます。
 
-共同作業中はキャンバスの右上にリアクションボタンが表示されます。右から `手を上げる`・`良い`・`悪い`・`拍手`
+共同作業中はキャンバスの右上にリアクションボタンが表示されます。左から `手を上げる`・`良い`・`悪い`・`拍手`
 を意味します。リアクションボタンの下にアイコンと名前が全員に追加表示されます。この表示は10秒で削除されます。
 
 ### キャンバスの表示
@@ -987,7 +987,7 @@ Heroku -- event --> ブラウザ
             // accessible to item menu
             $("#canvas").on("mousedown", ".canvas-item", function () {
                 $(".menuset").hide();
-                toFrontMostItems($(this));
+                //toFrontMostItems($(this));
                 $(this).find(".menuset").show();
             });
             const unselectedMenuset = function () {
@@ -1450,7 +1450,10 @@ Heroku -- event --> ブラウザ
             "classDiagram",
             "gitGraph",
             "stateDiagram",
-            "pie"
+            "pie",
+            "journey",
+            "flowchart",
+            "erDiagram"
         ];
 
         function setupMarkdownRenderWithMermaid() {
