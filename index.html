@@ -874,7 +874,7 @@ Heroku -- event --> ブラウザ
         crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cuid/1.3.8/browser-cuid.min.js"></script>
     <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/3.0.8/marked.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mouse0270-bootstrap-notify/3.1.7/bootstrap-notify.min.js"
         integrity="sha256-LlN0a0J3hMkDLO1mhcMwy+GIMbIRV7kvKHx4oCxNoxI=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js"
@@ -1111,10 +1111,10 @@ Heroku -- event --> ブラウザ
             move(add(), offsetX, offsetY3);
 
         }
-        
+
         function fitToGrid(num) {
             const remain = num % grid;
-            const isShort = remain < (grid/2);
+            const isShort = remain < (grid / 2);
             return num - (isShort ? remain : remain - grid);
         }
 
@@ -1260,7 +1260,7 @@ Heroku -- event --> ブラウザ
             line.addClass(isVertical ? "vertical-line" : "horizontal-line");
             line.attr("id", lineId);
             line.width(isVertical ? fitToGrid(10) : fitToGrid(1000));
-            line.height(isVertical ? fitToGrid(1000): fitToGrid(10));
+            line.height(isVertical ? fitToGrid(1000) : fitToGrid(10));
             initializePosition(line);
             let handles = isVertical ? "s" : "e";
             line.resizable({
