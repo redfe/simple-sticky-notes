@@ -526,13 +526,11 @@
                         <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"
                             aria-haspopup="true" aria-expanded="false">追加</button>
                         <div class="dropdown-menu">
-                            <!--
                             <a id="add-narrative-arc-button" class="dropdown-item">
                                 <span class="icon fab fa-think-peaks"></span>
                                 <span class="name">ストーリー</span>
                                 <span class="short-cut-key"></span>
                             </a>
-                            -->
                             <a id="add-button" class="dropdown-item">
                                 <span class="icon fas fa-sticky-note"></span>
                                 <span class="name">付箋</span>
@@ -905,7 +903,7 @@ Heroku -- event --> ブラウザ
         $(function () {
             setupShortcutKeys();
             $('[data-toggle="tooltip"]').tooltip();
-            //$("#add-narrative-arc-button").on("click", addNarativeArc);
+            $("#add-narrative-arc-button").on("click", addNarativeArc);
             $("#add-button").on("click", add);
             $("#undo-button").on("click", undo);
             $("#redo-button").on("click", redo);
@@ -1036,13 +1034,13 @@ Heroku -- event --> ブラウザ
                 return card;
             };
             const arc = addImage("https://redfe.github.io/simple-sticky-notes-assets/storymapping/narrative-arc.svg");
-            resize(arc, 1000, 300);
+            resize(arc, 1200, 300);
             move(arc, 0, 70);
 
             const offsetY1 = 400;
-            const offsetY2 = 465;
-            const offsetY3 = 530;
-            const incrementalX = 125;
+            const offsetY2 = 470;
+            const offsetY3 = 540;
+            const incrementalX = 150;
             let offsetX = 0;
             const situationExplanation = addImage("https://redfe.github.io/simple-sticky-notes-assets/storymapping/RosenfeldMedia/situation_explanation.png");
             resize(situationExplanation, 70, 70);
