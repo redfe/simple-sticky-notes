@@ -496,7 +496,7 @@
 
     <div id="menu" class="container-fluid">
         <div class="row">
-            <div class="col-sm-2 container-fluid">
+            <div class="col-sm-7 container-fluid">
                 <div class="btn-group" role="group">
                     <div class="btn-group">
                         <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"
@@ -600,12 +600,12 @@
                     </div>
                 </div>
             </div>
-            <div class="col-sm-5">
+            <!-- <div class="col-sm-5">
                 <input id="user-name" class="user-name d-none" type="text" placeholder="名前" />
                 <button id="create-room-button" class="btn btn-secondary btn-sm">部屋を作成</button>
                 <button id="push-button" class="btn btn-warning btn-sm d-none">表示内容をプッシュ</button>
                 <button id="clear-pointers-button" class="btn btn-secondary btn-sm d-none">ポインタを削除</button>
-            </div>
+            </div> -->
             <div class="col-sm-5">
                 <button id="zoom-in-button" class="btn btn-secondary btn-sm">＋</button>
                 <button id="zoom-out-button" class="btn btn-secondary btn-sm">ー</button>
@@ -790,12 +790,9 @@
 |サービス|用途|
 |-|-|
 |GitHub Pages|Web サーバ|
-|Heroku|WebSocket サーバ|
 
 ```
 graph TB
-ブラウザ -- event --> Heroku
-Heroku -- event --> ブラウザ
 ブラウザ --> GitHub_Pages
 ```
 </textarea>
@@ -824,7 +821,7 @@ Heroku -- event --> ブラウザ
 
 ## 背景
 
-共同作業で素早くユーザーストーリーマップを作成できるツールが欲しかったので作成しました。
+素早くユーザーストーリーマップを作成できるツールが欲しかったので作成しました。
 
 ## 使い方
 
@@ -836,17 +833,6 @@ Heroku -- event --> ブラウザ
 アイテムはダブルクリックすることでコピーされます。ただし、入力内容はコピーされません。
 
 メニューの `編集` から編集操作が可能です。また、アイテムを選択する事でアイテム毎の編集メニューが表示されるので、そこから編集することも可能です。
-
-### 共同作業
-
-メニューの `部屋を作成` をクリックすると他のユーザと共同作業できます。作成後、ブラウザの URL をコピーして共同作業者に配布してください。
-
-共同作業者のマウス位置は赤色のポインタで表示されます。ポインタが残ってしまって邪魔な場合は `ポインターを削除` をクリックすれば削除できます。
-
-`表示内容をプッシュ` をクリックするとあなたのブラウザに表示されている内容を共同作業者に上書きしてもらうように依頼します。依頼を受け取った共同作業者は上書きするかどうか自分で決める事ができます。
-
-共同作業中はキャンバスの右上にリアクションボタンが表示されます。左から `手を上げる`・`良い`・`悪い`・`拍手`
-を意味します。リアクションボタンの下にアイコンと名前が全員に追加表示されます。この表示は10秒で削除されます。
 
 ### キャンバスの表示
 
